@@ -4,9 +4,7 @@ const saltRounds = 10;
 // hashPassword function : function untuk melakukan hashing pada password yang diterima
 const hashPassword = async (password) => {
   try {
-    let hashed = await bcrypt.hash(password, saltRounds);
-    console.log(hashed);
-    return hashed;
+    return (hashed = await bcrypt.hash(password, saltRounds));
   } catch (error) {
     return null;
   }

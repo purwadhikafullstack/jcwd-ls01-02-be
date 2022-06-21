@@ -1,5 +1,10 @@
-const { registerService } = require("./authServices");
-
+const {
+  registerService,
+  keepLoginService,
+  verificationService,
+} = require("./authServices");
 module.exports = {
   registerService,
+  keepLoginService,
+  verificationService,
 };

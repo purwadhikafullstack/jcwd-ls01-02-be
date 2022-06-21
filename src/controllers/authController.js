@@ -6,12 +6,16 @@ const {
   emailGenerator,
   createJWTAccess,
 } = require("../lib");
-const { registerService } = require("../services");
+const {
+  registerService,
+  keepLoginService,
+  verificationService,
+} = require("../services");
 
 const registerController = async (req, res) => {
   try {
     // calling register service for  data validation and data insertion to database
-    const data = await registerService(req.body);
+    const data = await registerService(req);
 
     // creating dataToken for token encryption
     const dataToken = newDataToken(data);
@@ -30,7 +34,7 @@ const registerController = async (req, res) => {
 
     const tokenAccess = createJWTAccess(dataToken);
     res.set("x-token-access", tokenAccess);
-    return res.status(200).send({ message: "success" });
+    return res.status(200).send(data);
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error.message });
@@ -39,6 +43,47 @@ const registerController = async (req, res) => {
 
 const keepLoginController = async (req, res) => {
   try {
-  } catch (error) {}
+    let data = await keepLoginService(req);
+    return res.status(200).send(data);
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
 };
-module.exports = { registerController };
+
+const emailVerificationController = async (req, res) => {
+  try {
+    const data = req.body;
+    const dataToken = newDataToken(data);
+
+    newCache(dataToken);
+
+    const tokenEmail = createJWTEmail(dataToken);
+
+    const link = linkGenerator(tokenEmail);
+
+    await emailGenerator(data, link, true);
+
+    return res
+      .status(200)
+      .send({ message: "e-mail verification has been sent" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: error.message || error });
+  }
+};
+
+const verificationController = async (req, res) => {
+  try {
+    const data = await verificationService(req);
+    return res.status(200).send(data);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: error.message || error });
+  }
+};
+module.exports = {
+  registerController,
+  keepLoginController,
+  emailVerificationController,
+  verificationController,
+};

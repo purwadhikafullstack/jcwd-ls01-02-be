@@ -1,5 +1,6 @@
 const NodeCache = require("node-cache");
 const jwt = require("jsonwebtoken");
+const myCache = new NodeCache();
 
 // newDataToken function : function yang digunakan untuk membuat data token yang baru, yang akan digunakan untuk membuat token
 const newDataToken = (data) => {
@@ -17,10 +18,9 @@ const newDataToken = (data) => {
   digunakan pada saat memverifikasi apabila token yang digunakan adalah token yang paling akhir di-request
 */
 const newCache = (data) => {
-  const myCache = new NodeCache();
   const { id } = data;
   const expirationTime = 300;
-  return myCache.set(id, data, expirationTime);
+  myCache.set(id, data, expirationTime);
 };
 
 // createJWTEmail function : function yang digunakan untuk membuat jwt token verifikasi akun
@@ -40,18 +40,22 @@ const createJWTAccess = (data) =>
   keeplogin, verification user, changepassword, membuat order, dsb.
 */
 const verifyToken = async (req, res, next) => {
-  const authHeader = req.header.authorization.split("_");
+  const authHeader = req.headers.authorization.split("?");
+
   const token = authHeader[0];
-  const verification = authHeader[1];
-  const key = verification
+  const verif = authHeader[1];
+
+  const key = verif
     ? process.env.JWT_SECRET_EMAIL
     : process.env.JWT_SECRET_ACCESS;
 
   try {
     let decode = jwt.verify(token, key);
     req.user = decode;
+
     next();
   } catch (error) {
+    console.log(error);
     return res.status(401).send({ message: "Unauthorized user detected!" });
   }
 };
@@ -59,11 +63,12 @@ const verifyToken = async (req, res, next) => {
 // verifyLastToken function : function yang digunakan untuk memverifikasi apakah token yang digunakan merupakan token yang paling terakhir di-request oleh user
 const verifyLastToken = async (req, res, next) => {
   const { createdAt, id } = req.user;
-  const myCache = new NodeCache();
   let cache = myCache.get(id);
   if (createdAt === cache?.createdAt) {
     next();
   } else {
+    console.log(`gagal lewat verify last token`);
+
     return res.status(401).send({ message: "Token expired" });
   }
 };
