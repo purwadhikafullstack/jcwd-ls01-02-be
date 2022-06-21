@@ -54,7 +54,7 @@ const emailVerificationController = async (req, res) => {
   try {
     const data = req.body;
     const dataToken = newDataToken(data);
-
+    //
     newCache(dataToken);
 
     const tokenEmail = createJWTEmail(dataToken);

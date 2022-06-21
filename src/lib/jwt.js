@@ -40,7 +40,7 @@ const createJWTAccess = (data) =>
   keeplogin, verification user, changepassword, membuat order, dsb.
 */
 const verifyToken = async (req, res, next) => {
-  const authHeader = req.headers.authorization.split("?");
+  const authHeader = req.headers.authorization.split(" ");
 
   const token = authHeader[0];
   const verif = authHeader[1];
