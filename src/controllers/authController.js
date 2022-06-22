@@ -10,6 +10,7 @@ const {
   registerService,
   keepLoginService,
   verificationService,
+  loginService,
 } = require("../services");
 
 const registerController = async (req, res) => {
@@ -81,9 +82,30 @@ const verificationController = async (req, res) => {
     return res.status(500).send({ message: error.message || error });
   }
 };
+
+const loginController = async (req, res) => {
+  try {
+    const data = await loginService(req.body);
+
+    const dataToken = newDataToken(data);
+
+    if (!data.verified) {
+      const tokenEmail = createJWTEmail(dataToken);
+      const link = linkGenerator(tokenEmail);
+      await emailGenerator(data, link, "verification");
+    }
+    const tokenAccess = createJWTAccess(dataToken);
+    res.set("x-token-access", tokenAccess);
+    return res.status(200).send({ message: "Login Success ✅ " });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};
+
 module.exports = {
   registerController,
   keepLoginController,
   emailVerificationController,
   verificationController,
+  loginController,
 };
