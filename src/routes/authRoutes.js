@@ -4,6 +4,7 @@ const {
   keepLoginController,
   emailVerificationController,
   verificationController,
+  loginController,
 } = require("../controllers");
 const { verifyToken, verifyLastToken } = require("../lib");
 const Router = express.Router();
@@ -17,5 +18,6 @@ Router.get(
   verifyLastToken,
   verificationController
 );
+Router.post("/login", loginController);
 
 module.exports = Router;
