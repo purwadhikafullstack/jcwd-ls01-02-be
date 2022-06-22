@@ -1,5 +1,5 @@
 const { dbCon } = require("../connection");
-const { hashPassword } = require("../lib");
+const { hashPassword, hashMatch } = require("../lib");
 
 const registerService = async (data) => {
   let conn, sql, result, insertData;
@@ -123,4 +123,49 @@ const verificationService = async (data) => {
     throw new Error(error.message);
   }
 };
-module.exports = { registerService, keepLoginService, verificationService };
+
+const loginService = async (data) => {
+  let conn, sql, result;
+  let { username, email, password } = data;
+  try {
+    //  iniatiate pool connection
+    conn = await dbCon.promise().getConnection();
+
+    // username/email checking
+    let messageError = [];
+    sql = `SELECT * FROM users WHERE username = ? or email = ?`;
+    [result] = await conn.query(sql, [username, email]);
+    if (!result.length) {
+      messageError[0] = "Username or Email does not exist ⚠️";
+      throw { message: messageError };
+    }
+    // cek apakah password sudah sesuai
+    let hashedPassword = result[0].password;
+    result[0];
+    let match = await hashMatch(password, hashedPassword);
+    // console.log(match);
+    if (!match) {
+      messageError[1] = "Inncorect Password ⚠️";
+      throw { message: messageError };
+    }
+    if (result[0].verified) {
+      sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
+      let [resultVerified] = await conn.query(sql, result[0].id);
+      conn.release();
+      return { data: resultVerified[0] };
+    } else {
+      conn.release();
+      return result[0];
+    }
+  } catch (error) {
+    conn.release();
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
+module.exports = {
+  registerService,
+  keepLoginService,
+  verificationService,
+  loginService,
+};
