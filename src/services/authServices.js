@@ -152,7 +152,7 @@ const loginService = async (data) => {
       sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
       let [resultVerified] = await conn.query(sql, result[0].id);
       conn.release();
-      return { data: resultVerified[0] };
+      return result[0];
     } else {
       conn.release();
       return result[0];
