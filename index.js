@@ -2,7 +2,6 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
-// perubahan terbaru
 
 const { productRoutes, authRoutes, adminRoutes } = require("./src/routes");
 const PORT = process.env.PORT;

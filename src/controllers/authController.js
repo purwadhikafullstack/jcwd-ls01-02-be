@@ -96,7 +96,7 @@ const loginController = async (req, res) => {
     }
     const tokenAccess = createJWTAccess(dataToken);
     res.set("x-token-access", tokenAccess);
-    return res.status(200).send({ message: "Login Success ✅ " });
+    return res.status(200).send(data);
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
