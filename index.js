@@ -4,7 +4,7 @@ const cors = require("cors");
 const app = express();
 // perubahan terbaru
 
-const { productRoutes, authRoutes } = require("./src/routes");
+const { productRoutes, authRoutes, adminRoutes } = require("./src/routes");
 const PORT = process.env.PORT;
 
 morgan.token("date", () => {
@@ -26,5 +26,6 @@ app.use(express.static("public"));
 
 app.use("/product", productRoutes);
 app.use("/auth", authRoutes);
+app.use("/admin", adminRoutes);
 
 app.listen(PORT, () => console.log(`API running on Port ${PORT}`));
