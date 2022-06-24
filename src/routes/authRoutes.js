@@ -5,6 +5,7 @@ const {
   emailVerificationController,
   verificationController,
   loginController,
+  changePasswordProfileController,
 } = require("../controllers");
 const { verifyToken, verifyLastToken } = require("../lib");
 const Router = express.Router();
@@ -19,5 +20,10 @@ Router.get(
   verificationController
 );
 Router.post("/login", loginController);
+Router.post(
+  "/changepasswordprofile",
+  verifyToken,
+  changePasswordProfileController
+);
 
 module.exports = Router;

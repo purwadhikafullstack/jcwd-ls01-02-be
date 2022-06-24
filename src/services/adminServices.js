@@ -5,18 +5,15 @@ const adminLoginService = async (data) => {
   let conn, sql;
 
   try {
-    conn = await dbCon.promise().getConnection();
+    conn = dbCon.promise();
 
     sql = `select * from admin where (username = ? or email = ?) and password = ?`;
     let [result] = await conn.query(sql, [username, email, password]);
-    console.log(result);
     if (!result.length) {
       throw "Admin not found";
     }
-    conn.release();
-    return { success: true, data: result[0] };
+    return { data: result[0] };
   } catch (error) {
-    conn.release();
     console.log(error);
     throw new Error(error || "Network Error");
   }
