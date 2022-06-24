@@ -4,6 +4,9 @@ const {
   emailVerificationController,
   verificationController,
   loginController,
+  forgotPassword,
+  tokenPassword,
+  changePassword,
 } = require("./authController");
 const { loginAdminController } = require("./adminController");
 const { newProduct } = require("./productController");
@@ -16,4 +19,7 @@ module.exports = {
   verificationController,
   loginAdminController,
   loginController,
+  forgotPassword,
+  tokenPassword,
+  changePassword,
 };
