@@ -3,6 +3,7 @@ const {
   keepLoginService,
   verificationService,
   loginService,
+  changePasswordProfileService,
 } = require("./authServices");
 const { adminLoginService } = require("./adminServices");
 module.exports = {
@@ -10,5 +11,6 @@ module.exports = {
   keepLoginService,
   verificationService,
   adminLoginService,
-  loginService
+  loginService,
+  changePasswordProfileService,
 };

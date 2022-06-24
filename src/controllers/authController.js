@@ -1,4 +1,5 @@
 const { dbCon } = require("../connection");
+
 const {
   newDataToken,
   newCache,
@@ -13,6 +14,7 @@ const {
   keepLoginService,
   verificationService,
   loginService,
+  changePasswordProfileService,
 } = require("../services");
 
 const registerController = async (req, res) => {
@@ -156,6 +158,17 @@ const changePassword = async (req, res) => {
     return res.status(200).send({ message: "Password Changed ✅ " });
   } catch (error) {
     conn.release();
+    return res.status(500).send({ message: error.message });
+  }
+};
+
+const changePasswordProfileController = async (req, res) => {
+  try {
+    await changePasswordProfileService(req);
+    console.log("BERHASIL >>>>>>>>>>>");
+
+    return res.status(200).send({ message: "Success!" });
+  } catch (error) {
     return res.status(500).send({ message: error.message });
   }
 };

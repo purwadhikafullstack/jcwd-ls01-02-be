@@ -163,9 +163,43 @@ const loginService = async (data) => {
     throw new Error(error.message);
   }
 };
+
+const changePasswordProfileService = async (data) => {
+  const { id } = data.user;
+  let { oldPassword, newPassword } = data.body;
+  console.log(typeof newPassword);
+  let sql, conn, result;
+
+  try {
+    conn = await dbCon.promise().getConnection();
+
+    sql = `SELECT * FROM users WHERE id = ?`;
+    [result] = await conn.query(sql, [id]);
+
+    const hashedPassword = result[0].password;
+
+    const match = await hashMatch(oldPassword, hashedPassword);
+
+    if (!match) {
+      throw { message: "Incorrect Password" };
+    }
+
+    newPassword = await hashPassword(newPassword);
+
+    sql = `UPDATE users SET password = ? WHERE id = ?`;
+    await conn.query(sql, [newPassword, id]);
+
+    conn.release();
+  } catch (error) {
+    conn.release();
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   registerService,
   keepLoginService,
   verificationService,
   loginService,
+  changePasswordProfileService,
 };
