@@ -8,6 +8,7 @@ const {
   forgotPassword,
   tokenPassword,
   changePassword,
+  changePasswordProfileController,
 } = require("../controllers");
 const { verifyToken, verifyLastToken } = require("../lib");
 const Router = express.Router();
@@ -25,5 +26,10 @@ Router.post("/login", loginController);
 Router.post("/forgot-password", forgotPassword);
 Router.get("/token-password", verifyToken, verifyLastToken, tokenPassword);
 Router.post("/change-password", verifyToken, verifyLastToken, changePassword);
+Router.post(
+  "/change-password-profile",
+  verifyToken,
+  changePasswordProfileController
+);
 
 module.exports = Router;
