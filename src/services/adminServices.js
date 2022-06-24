@@ -2,15 +2,16 @@ const { dbCon } = require("../connection");
 
 const adminLoginService = async (data) => {
   let { username, email, password } = data;
-  let conn, sql;
+  let conn, sql, result;
 
   try {
     conn = dbCon.promise();
 
-    sql = `select * from admin where (username = ? or email = ?) and password = ?`;
-    let [result] = await conn.query(sql, [username, email, password]);
+    sql = `SELECT id, username, email FROM admin WHERE (username = ? OR email = ?) AND password = ?`;
+    [result] = await conn.query(sql, [username, email, password]);
+
     if (!result.length) {
-      throw "Admin not found";
+      throw { message: "Admin not found" };
     }
     return { data: result[0] };
   } catch (error) {
