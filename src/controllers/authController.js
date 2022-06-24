@@ -1,3 +1,4 @@
+const { dbCon } = require("../connection");
 const {
   newDataToken,
   newCache,
@@ -5,6 +6,7 @@ const {
   linkGenerator,
   emailGenerator,
   createJWTAccess,
+  hashPassword,
 } = require("../lib");
 const {
   registerService,
@@ -102,10 +104,69 @@ const loginController = async (req, res) => {
   }
 };
 
+// Forgot/Reset Password
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  // const data = req.body;
+  let sql, conn;
+  try {
+    conn = await dbCon.promise().getConnection();
+    sql = `SELECT * FROM users WHERE email = ? `;
+    let [requestedUser] = await conn.query(sql, email);
+    if (!requestedUser.length) {
+      throw { message: "There is no account registered with email ⚠️ " };
+    }
+    // console.log(requestedUser);
+    // const { id, username } = requestedUser[0];
+    // let createdAt = new Date().getTime();
+    const dataToken = newDataToken(data);
+    const tokenEmail = createJWTEmail(dataToken);
+    const link = linkGenerator(tokenEmail);
+    await emailGenerator(data, link, false);
+    return res
+      .status(200)
+      .send({ message: "E-mail reset password has been sent 📩 " });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: error.message || error });
+  }
+};
+
+const tokenPassword = async (req, res) => {
+  try {
+    return res.status(200).send({ message: "Password Changed ✅ " });
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};
+
+const changePassword = async (req, res) => {
+  const { id } = req.user;
+  const { password } = req.body;
+  let sql, conn;
+
+  try {
+    conn = await dbCon.promise().getConnection;
+    let updateData = {
+      password: hashPassword(password),
+    };
+    sql = `UPDATE users SET ? WHERE id = ?`;
+    await conn.query(sql, [updateData, id]);
+    conn.release();
+    return res.status(200).send({ message: "Password Changed ✅ " });
+  } catch (error) {
+    conn.release();
+    return res.status(500).send({ message: error.message });
+  }
+};
+
 module.exports = {
   registerController,
   keepLoginController,
   emailVerificationController,
   verificationController,
   loginController,
+  forgotPassword,
+  tokenPassword,
+  changePassword,
 };
