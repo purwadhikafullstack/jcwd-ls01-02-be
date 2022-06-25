@@ -5,9 +5,9 @@ const {
   emailVerificationController,
   verificationController,
   loginController,
-  forgotPassword,
-  tokenPassword,
-  changePassword,
+  forgotPasswordController,
+  tokenPasswordController,
+  resetPasswordController,
 } = require("../controllers");
 const { verifyToken, verifyLastToken } = require("../lib");
 const Router = express.Router();
@@ -22,8 +22,18 @@ Router.get(
   verificationController
 );
 Router.post("/login", loginController);
-Router.post("/forgot-password", forgotPassword);
-Router.get("/token-password", verifyToken, verifyLastToken, tokenPassword);
-Router.post("/change-password", verifyToken, verifyLastToken, changePassword);
+Router.post("/forgot-password", forgotPasswordController);
+Router.get(
+  "/token-password",
+  verifyToken,
+  verifyLastToken,
+  tokenPasswordController
+);
+Router.post(
+  "/change-password",
+  verifyToken,
+  verifyLastToken,
+  resetPasswordController
+);
 
 module.exports = Router;

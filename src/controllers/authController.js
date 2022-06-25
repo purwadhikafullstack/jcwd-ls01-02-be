@@ -13,6 +13,7 @@ const {
   keepLoginService,
   verificationService,
   loginService,
+  forgotPasswordService,
 } = require("../services");
 
 const registerController = async (req, res) => {
@@ -30,7 +31,7 @@ const registerController = async (req, res) => {
     const tokenEmail = createJWTEmail(dataToken);
 
     // creating an activation link to be sent on a verification email
-    const link = linkGenerator(tokenEmail);
+    const link = linkGenerator(tokenEmail, 1);
 
     // third parameter is the email type, verification = true, forget password = false
     await emailGenerator(data, link, true);
@@ -62,7 +63,7 @@ const emailVerificationController = async (req, res) => {
 
     const tokenEmail = createJWTEmail(dataToken);
 
-    const link = linkGenerator(tokenEmail);
+    const link = linkGenerator(tokenEmail, 1);
 
     await emailGenerator(data, link, true);
 
@@ -93,7 +94,7 @@ const loginController = async (req, res) => {
 
     if (!data.verified) {
       const tokenEmail = createJWTEmail(dataToken);
-      const link = linkGenerator(tokenEmail);
+      const link = linkGenerator(tokenEmail, 1);
       await emailGenerator(data, link, "verification");
     }
     const tokenAccess = createJWTAccess(dataToken);
@@ -105,34 +106,46 @@ const loginController = async (req, res) => {
 };
 
 // Forgot/Reset Password
-const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-  // const data = req.body;
-  let sql, conn;
+const forgotPasswordController = async (req, res) => {
+  //   // let createdAt = new Date().getTime();
+  //   const dataToken = newDataToken(data);
+  //   const tokenEmail = createJWTEmail(dataToken);
+  //   const link = linkGenerator(tokenEmail);
+  //   await emailGenerator(data, link, false);
+  //   return res
+  //     .status(200)
+  //     .send({ message: "E-mail reset password has been sent 📩 " });
+  // } catch (error) {
+  //   console.log(error);
+  //   return res.status(500).send({ message: error.message || error });
+  // }
+
   try {
-    conn = await dbCon.promise().getConnection();
-    sql = `SELECT * FROM users WHERE email = ? `;
-    let [requestedUser] = await conn.query(sql, email);
-    if (!requestedUser.length) {
-      throw { message: "There is no account registered with email ⚠️ " };
-    }
-    // console.log(requestedUser);
-    // const { id, username } = requestedUser[0];
-    // let createdAt = new Date().getTime();
+    // runtutan
+    // ngecek data dari frontend (email) ke database ada apa ngga
+    const data = await forgotPasswordService(req);
     const dataToken = newDataToken(data);
+    newCache(dataToken);
     const tokenEmail = createJWTEmail(dataToken);
-    const link = linkGenerator(tokenEmail);
+    const link = linkGenerator(tokenEmail, 0);
     await emailGenerator(data, link, false);
     return res
       .status(200)
       .send({ message: "E-mail reset password has been sent 📩 " });
+    // kalo ada
+    // data dapet daro database
+    // data token
+    // buat token
+    // buat link
+    // buat rmail
+    // kirim email dengan berisi link token
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error.message || error });
   }
 };
 
-const tokenPassword = async (req, res) => {
+const tokenPasswordController = async (req, res) => {
   try {
     return res.status(200).send({ message: "Password Changed ✅ " });
   } catch (error) {
@@ -140,13 +153,13 @@ const tokenPassword = async (req, res) => {
   }
 };
 
-const changePassword = async (req, res) => {
+const resetPasswordController = async (req, res) => {
   const { id } = req.user;
   const { password } = req.body;
   let sql, conn;
 
   try {
-    conn = await dbCon.promise().getConnection;
+    conn = await dbCon.promise().getConnection();
     let updateData = {
       password: hashPassword(password),
     };
@@ -166,7 +179,7 @@ module.exports = {
   emailVerificationController,
   verificationController,
   loginController,
-  forgotPassword,
-  tokenPassword,
-  changePassword,
+  forgotPasswordController,
+  tokenPasswordController,
+  resetPasswordController,
 };

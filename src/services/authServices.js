@@ -163,9 +163,26 @@ const loginService = async (data) => {
     throw new Error(error.message);
   }
 };
+const forgotPasswordService = async (data) => {
+  const { email } = data.body;
+  let sql, conn;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT id, username, email FROM users where email = ?`;
+    let [result] = await conn.query(sql, email);
+    if (!result.length) {
+      throw { message: "Email tidak terdaftar" };
+    }
+    return result[0];
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
 module.exports = {
   registerService,
   keepLoginService,
   verificationService,
   loginService,
+  forgotPasswordService,
 };

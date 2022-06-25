@@ -34,7 +34,7 @@ const createJWTAccess = (data) =>
 /*
   verifyToken function : function middleware yang digunakan untuk memverifikasi token sebelum request dapat lanjut ke proses selanjutnya
   pada token email/verification, token akan di-append dengan keyword verif yang mana akan menjadi sebagai berikut:
-  res.header.authorization : {token}_verif
+  res.header.authorization : {token} verif
   keyword tersebut akan mengidentifikasikan password apa yang akan digunakan untuk memverifikasi token
   verifyToken merupakan middleware yang wajib digunakan apabila terjadi suatu perubahan data pada user atau hal yang memerlukan authorization, contohnya:
   keeplogin, verification user, changepassword, membuat order, dsb.

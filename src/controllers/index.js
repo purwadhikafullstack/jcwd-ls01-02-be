@@ -4,9 +4,9 @@ const {
   emailVerificationController,
   verificationController,
   loginController,
-  forgotPassword,
-  tokenPassword,
-  changePassword,
+  forgotPasswordController,
+  tokenPasswordController,
+  resetPasswordController,
 } = require("./authController");
 const { newProduct } = require("./productController");
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
   emailVerificationController,
   verificationController,
   loginController,
-  forgotPassword,
-  tokenPassword,
-  changePassword,
+  forgotPasswordController,
+  tokenPasswordController,
+  resetPasswordController,
 };
