@@ -107,19 +107,6 @@ const loginController = async (req, res) => {
 
 // Forgot/Reset Password
 const forgotPasswordController = async (req, res) => {
-  //   // let createdAt = new Date().getTime();
-  //   const dataToken = newDataToken(data);
-  //   const tokenEmail = createJWTEmail(dataToken);
-  //   const link = linkGenerator(tokenEmail);
-  //   await emailGenerator(data, link, false);
-  //   return res
-  //     .status(200)
-  //     .send({ message: "E-mail reset password has been sent 📩 " });
-  // } catch (error) {
-  //   console.log(error);
-  //   return res.status(500).send({ message: error.message || error });
-  // }
-
   try {
     // runtutan
     // ngecek data dari frontend (email) ke database ada apa ngga
