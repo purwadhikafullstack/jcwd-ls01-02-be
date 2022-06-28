@@ -182,4 +182,5 @@ module.exports = {
   forgotPassword,
   tokenPassword,
   changePassword,
+  changePasswordProfileController,
 };

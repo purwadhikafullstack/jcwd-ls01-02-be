@@ -7,6 +7,7 @@ const {
   forgotPassword,
   tokenPassword,
   changePassword,
+  changePasswordProfileController,
 } = require("./authController");
 const { loginAdminController, newProduct } = require("./adminController");
 const {
@@ -27,4 +28,5 @@ module.exports = {
   changePassword,
   fetchProductsController,
   fetchProductDetailsController,
+  changePasswordProfileController,
 };
