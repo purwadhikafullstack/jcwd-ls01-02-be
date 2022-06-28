@@ -138,45 +138,35 @@ const loginService = async (data) => {
   let conn, sql, result;
   let { username, email, password } = data;
   try {
+    //  iniatiate pool connection
     conn = await dbCon.promise().getConnection();
 
+    // username/email checking
     let messageError = [];
     sql = `SELECT * FROM users WHERE username = ? or email = ?`;
     [result] = await conn.query(sql, [username, email]);
     if (!result.length) {
-      messageError[0] = "Username or Email does not exist";
+      messageError[0] = "Username or Email does not exist ⚠️";
       throw { message: messageError };
     }
-
-    const { id, password: hashedPassword, verified } = result[0];
-
+    // cek apakah password sudah sesuai
+    let hashedPassword = result[0].password;
+    result[0];
     let match = await hashMatch(password, hashedPassword);
-
+    // console.log(match);
     if (!match) {
-      messageError[1] = "Incorrect password";
+      messageError[1] = "Inncorect Password ⚠️";
       throw { message: messageError };
     }
-
-    if (verified) {
-      let finalResult;
-
-      sql = `SELECT ud.*, u.id, u.username, u.email, u.verified FROM users u JOIN user_details ud ON (u.id = ud.user_id) WHERE u.id = ?`;
-      [result] = await conn.query(sql, id);
-      finalResult = { ...result[0] };
-
-      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
-      [result] = await conn.query(sql, id);
-      finalResult = { ...finalResult, cart: [...result] };
-
-      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM products_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
-      [result] = await conn.query(sql, id);
-      finalResult = { ...finalResult, fav: [...result] };
-
+    if (result[0].verified) {
+      sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
+      let [resultVerified] = await conn.query(sql, result[0].id);
       conn.release();
-      return finalResult;
+      return result[0];
+    } else {
+      conn.release();
+      return result[0];
     }
-    conn.release();
-    return result[0];
   } catch (error) {
     conn.release();
     console.log(error);
@@ -216,10 +206,28 @@ const changePasswordProfileService = async (data) => {
   }
 };
 
+const forgotPasswordService = async (data) => {
+  const { email } = data.body;
+  let sql, conn;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT id, username, email FROM users where email = ?`;
+    let [result] = await conn.query(sql, email);
+    if (!result.length) {
+      throw { message: "Email tidak terdaftar" };
+    }
+    return result[0];
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   registerService,
   keepLoginService,
   verificationService,
   loginService,
   changePasswordProfileService,
+  forgotPasswordService,
 };
