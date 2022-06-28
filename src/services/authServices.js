@@ -91,7 +91,7 @@ const verificationService = async (data) => {
     conn = await dbCon.promise().getConnection();
 
     /* 
-      beginTranscation method apabila perlu melakukan metode transaksi mysql, dimana apabila terjadi kegagalan diantara query, 
+      beginTransaction method apabila perlu melakukan metode transaksi mysql, dimana apabila terjadi kegagalan diantara query, 
       semua query yang sudah berhasil dilakukan dapat di-rollback atau dihapus agar tidak terjadi pemngubahan data yang tidak utuh
     */
     await conn.beginTransaction();

@@ -6,6 +6,11 @@ const {
   changePasswordProfileService,
 } = require("./authServices");
 const { adminLoginService } = require("./adminServices");
+const {
+  fetchProductsService,
+  fetchProductDetailsService,
+} = require("./productServices");
+
 module.exports = {
   registerService,
   keepLoginService,
@@ -13,4 +18,6 @@ module.exports = {
   adminLoginService,
   loginService,
   changePasswordProfileService,
+  fetchProductsService,
+  fetchProductDetailsService,
 };
