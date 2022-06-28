@@ -1,21 +1,38 @@
-const { dbCon } = require("../connection");
+const {
+  fetchProductsService,
+  fetchProductDetailsService,
+} = require("../services");
 
-const newProduct = async (req, res) => {
-  const data = req.body;
-  console.log(data);
-  let conn, sql;
+const fetchProductsController = async (req, res) => {
   try {
-    conn = await dbCon.promise().getConnection();
-    sql = `INSERT INTO products SET ?`;
-    await conn.query(sql, data);
-    // sql timeline petugas nambah produk
-    conn.release();
-    return res.status(200).send("success");
+    const data = await fetchProductsService(req);
+
+    return res.send({
+      status: 200,
+      success: true,
+      message: "Products' data",
+      data,
+    });
   } catch (error) {
-    conn.release();
     console.log(error);
-    return res.status(500).send("fail");
+    return res.send({ status: 500, message: error.message || error });
   }
 };
 
-module.exports = { newProduct };
+const fetchProductDetailsController = async (req, res) => {
+  try {
+    const data = await fetchProductDetailsService(req);
+
+    return res.send({
+      status: 200,
+      success: true,
+      message: "Products' data",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({ status: 500, message: error.message || error });
+  }
+};
+
+module.exports = { fetchProductsController, fetchProductDetailsController };
