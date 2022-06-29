@@ -20,4 +20,79 @@ const adminLoginService = async (data) => {
   }
 };
 
-module.exports = { adminLoginService };
+const newProductService = async (data) => {
+  let {
+    name,
+    price,
+    photo,
+    promo,
+    category,
+    stock,
+    indikasi,
+    komposisi,
+    dosis,
+    kemasan,
+    golongan,
+    cara_penyimpanan,
+    principal,
+    NIE,
+    cara_pakai,
+    peringatan,
+    satuan,
+    tgl_kadaluarsa,
+    modal,
+    perhatian,
+    efek_samping,
+  } = data.body;
+  let conn, sql;
+  try {
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+
+    let dataProduct = {
+      name,
+      price,
+      photo,
+      category,
+      stock,
+      promo,
+    };
+    sql = `INSERT INTO products SET ?`;
+    let [resultProduct] = await conn.query(sql, dataProduct);
+    console.log(resultProduct);
+    console.log([resultProduct]);
+    console.log(resultProduct.insertId);
+    console.log([resultProduct.insertId]);
+
+    let product_id = resultProduct.insertId;
+    let dataProductDetails = {
+      indikasi,
+      komposisi,
+      dosis,
+      kemasan,
+      golongan,
+      cara_penyimpanan,
+      principal,
+      NIE,
+      cara_pakai,
+      peringatan,
+      satuan,
+      tgl_kadaluarsa,
+      modal,
+      perhatian,
+      efek_samping,
+      product_id,
+    };
+    sql = `INSERT INTO product_details SET ?`;
+    await conn.query(sql, dataProductDetails);
+
+    await conn.commit();
+    conn.release();
+    return { message: "success" };
+  } catch (error) {
+    await conn.rollback();
+    conn.release();
+    throw new Error(error.message || error);
+  }
+};
+module.exports = { adminLoginService, newProductService };

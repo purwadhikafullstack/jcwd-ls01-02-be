@@ -7,11 +7,20 @@ const fetchProductsService = async (data) => {
   // page = parseInt(page);
   let offset = limit * page;
   let conn, sql;
+  const { order } = data.query;
+  const { category } = data.params;
+  console.log(category);
   try {
     conn = dbCon.promise();
-    sql =
-      "SELECT id, name, price, photo, promo, stock, category FROM products WHERE stock > 0 ORDER BY name LIMIT ?, ?";
+    sql = `SELECT id, name, price, photo, promo, stock, category FROM products WHERE (stock > 0 ${
+      category === "semua" ? "" : `AND category = "${category}"`
+    }) ${order} LIMIT ?, ?`;
     let [dataProducts] = await conn.query(sql, [offset, limit]);
+    dataProducts = dataProducts.map((val) => {
+      let initPrice = val.promo + val.price;
+      val.promo = Math.round((val.promo / val.price) * 100);
+      return { ...val, initPrice };
+    });
     return dataProducts;
   } catch (error) {
     console.log(error);
@@ -20,14 +29,20 @@ const fetchProductsService = async (data) => {
 };
 
 const fetchProductDetailsService = async (data) => {
-  const { id } = data.params;
+  const { product_name } = data.params;
   let conn, sql;
   try {
     conn = dbCon.promise();
     sql =
-      "SELECT p.id, p.name, p.price, p.photo, p.promo, p.stock, p.category, pd.indikasi, pd.komposisi, pd.kemasan, pd.golongan, pd.cara_penyimpanan, pd.principal, pd.NIE, pd.cara_pakai, pd.peringatan FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE id = ?";
-    let [dataDetails] = await conn.query(sql, id);
-    return dataDetails;
+      "SELECT p.id, p.name, p.price, p.photo, p.promo, p.stock, p.category, pd.indikasi, pd.komposisi, pd.kemasan, pd.golongan, pd.cara_penyimpanan, pd.principal, pd.NIE, pd.cara_pakai, pd.peringatan, pd.satuan, pd.dosis, pd.perhatian, pd.efek_samping, pd.cara_pakai FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE p.name = ?";
+    let [dataDetails] = await conn.query(sql, product_name);
+    dataDetails = dataDetails[0];
+    dataDetails[0] = {
+      ...dataDetails,
+      initPrice: dataDetails.promo + dataDetails.price,
+      promo: Math.round((dataDetails.promo / dataDetails.price) * 100),
+    };
+    return dataDetails[0];
   } catch (error) {
     console.log(error);
     throw new Error(error.message || error);

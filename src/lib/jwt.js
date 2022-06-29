@@ -43,7 +43,6 @@ const createJWTAccess = (data) =>
 */
 const verifyToken = async (req, res, next) => {
   const authHeader = req.headers.authorization.split(" ");
-  console.log(authHeader);
 
   const token = authHeader[0];
   const verification = authHeader[1];

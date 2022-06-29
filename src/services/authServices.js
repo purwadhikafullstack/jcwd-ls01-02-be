@@ -38,6 +38,7 @@ const registerService = async (data) => {
     };
     [result] = await conn.query(sql, insertData);
 
+    console.log(result);
     sql = `SELECT id, username, email, verified from users where id = ?`;
     [result] = await conn.query(sql, [result.insertId]);
     // release the connection
