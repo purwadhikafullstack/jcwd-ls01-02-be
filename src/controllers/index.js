@@ -8,6 +8,7 @@ const {
   tokenPassword,
   changePassword,
   changePasswordProfileController,
+  profilePictureController,
 } = require("./authController");
 const { loginAdminController, newProduct } = require("./adminController");
 const {
@@ -29,4 +30,5 @@ module.exports = {
   fetchProductsController,
   fetchProductDetailsController,
   changePasswordProfileController,
+  profilePictureController,
 };

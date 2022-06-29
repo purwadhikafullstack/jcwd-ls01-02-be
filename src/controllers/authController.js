@@ -15,6 +15,7 @@ const {
   verificationService,
   loginService,
   changePasswordProfileService,
+  profilePictureService,
 } = require("../services");
 
 const registerController = async (req, res) => {
@@ -173,6 +174,15 @@ const changePasswordProfileController = async (req, res) => {
   }
 };
 
+const profilePictureController = async (req, res) => {
+  try {
+    const data = await profilePictureService(req.body);
+    return res.status(200).send(data);
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};
+
 module.exports = {
   registerController,
   keepLoginController,
@@ -183,4 +193,5 @@ module.exports = {
   tokenPassword,
   changePassword,
   changePasswordProfileController,
+  profilePictureController,
 };

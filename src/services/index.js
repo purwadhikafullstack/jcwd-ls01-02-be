@@ -4,6 +4,7 @@ const {
   verificationService,
   loginService,
   changePasswordProfileService,
+  profilePictureService,
 } = require("./authServices");
 const { adminLoginService } = require("./adminServices");
 const {
@@ -18,6 +19,7 @@ module.exports = {
   adminLoginService,
   loginService,
   changePasswordProfileService,
+  profilePictureService,
   fetchProductsService,
   fetchProductDetailsService,
 };
