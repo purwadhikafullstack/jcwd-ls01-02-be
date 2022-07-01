@@ -30,7 +30,6 @@ const newProductService = async (data) => {
     stock,
     indikasi,
     komposisi,
-    dosis,
     kemasan,
     golongan,
     cara_penyimpanan,
@@ -41,8 +40,7 @@ const newProductService = async (data) => {
     satuan,
     tgl_kadaluarsa,
     modal,
-    perhatian,
-    efek_samping,
+    berat,
   } = data.body;
   let conn, sql;
   try {

@@ -29,7 +29,7 @@ const registerController = async (req, res) => {
     newCache(dataToken);
 
     //  creating email token to be embedded to an activation link
-    const tokenEmail = createJWTEmail(dataToken);
+    const tokenEmail = createJWTEmail(dataToken, 1);
 
     // creating an activation link to be sent on a verification email
     const link = linkGenerator(tokenEmail);
@@ -64,7 +64,7 @@ const emailVerificationController = async (req, res) => {
 
     const tokenEmail = createJWTEmail(dataToken);
 
-    const link = linkGenerator(tokenEmail);
+    const link = linkGenerator(tokenEmail, 1);
 
     await emailGenerator(data, link, true);
 

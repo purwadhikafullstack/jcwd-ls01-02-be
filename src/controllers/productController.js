@@ -2,6 +2,7 @@ const {
   fetchProductsService,
   fetchProductDetailsService,
 } = require("../services");
+const { pinjemDataGrup1 } = require("../services/productServices");
 
 const fetchProductsController = async (req, res) => {
   try {
@@ -35,4 +36,7 @@ const fetchProductDetailsController = async (req, res) => {
   }
 };
 
-module.exports = { fetchProductsController, fetchProductDetailsController };
+module.exports = {
+  fetchProductsController,
+  fetchProductDetailsController,
+};
