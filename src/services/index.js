@@ -10,6 +10,7 @@ const { adminLoginService } = require("./adminServices");
 const {
   fetchProductsService,
   fetchProductDetailsService,
+  filterProductService,
 } = require("./productServices");
 
 module.exports = {
@@ -22,4 +23,5 @@ module.exports = {
   profilePictureService,
   fetchProductsService,
   fetchProductDetailsService,
+  filterProductService,
 };

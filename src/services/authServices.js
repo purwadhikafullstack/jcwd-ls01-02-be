@@ -229,8 +229,12 @@ const profilePictureService = async (data) => {
   // let path = "/profile-photos";
   // let pathAva = "/profile-picture";
   const { id } = data.user;
+  console.log(data);
+
   let { addPhoto, editPhoto } = data.body;
+  console.log(data);
   // kenapa data.body? kenapa tidak hanya data saja? apa perbedaannya?
+
   let sql, conn, result;
 
   try {

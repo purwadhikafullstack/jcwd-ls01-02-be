@@ -176,6 +176,7 @@ const changePasswordProfileController = async (req, res) => {
 
 const profilePictureController = async (req, res) => {
   try {
+    console.log(req.body);
     const data = await profilePictureService(req.body);
     return res.status(200).send(data);
   } catch (error) {
