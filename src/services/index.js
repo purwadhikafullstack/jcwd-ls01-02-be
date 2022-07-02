@@ -11,11 +11,8 @@ const { adminLoginService, newProductService } = require("./adminServices");
 const {
   fetchProductsService,
   fetchProductDetailsService,
-<<<<<<< HEAD
   fetchPromoProductsService,
-=======
   filterProductService,
->>>>>>> 4a43629bc6e17585b1d9a64375ab0917ca777839
 } = require("./productServices");
 
 module.exports = {
