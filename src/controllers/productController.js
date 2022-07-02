@@ -2,6 +2,7 @@ const {
   fetchProductsService,
   fetchProductDetailsService,
   fetchPromoProductsService,
+  filterProductService,
 } = require("../services");
 
 const fetchProductsController = async (req, res) => {
@@ -51,8 +52,24 @@ const fetchPromoProductsController = async (req, res) => {
     return res.send({ status: 500, message: error.message || error });
   }
 };
+
+const filterProductController = async (req, res) => {
+  try {
+    const data = await filterProductService(req.query);
+
+    return res.send({
+      status: 200,
+      success: true,
+      message: "Product berhasil difilter",
+      data,
+    });
+  } catch (error) {
+    return res.send({ status: 500, message: error.message || error });
+  }
+};
 module.exports = {
   fetchProductsController,
   fetchProductDetailsController,
   fetchPromoProductsController,
+  filterProductController,
 };

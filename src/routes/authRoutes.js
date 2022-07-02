@@ -9,6 +9,7 @@ const {
   tokenPasswordController,
   changePassword,
   changePasswordProfileController,
+  profilePictureController,
   resetPasswordController,
 } = require("../controllers");
 const { verifyToken, verifyLastToken } = require("../lib");
@@ -42,5 +43,6 @@ Router.post(
   verifyToken,
   changePasswordProfileController
 );
+Router.post("/profilepicture", profilePictureController);
 
 module.exports = Router;

@@ -15,6 +15,7 @@ const {
   verificationService,
   loginService,
   changePasswordProfileService,
+  profilePictureService,
 } = require("../services");
 
 const registerController = async (req, res) => {
@@ -163,6 +164,17 @@ const changePasswordProfileController = async (req, res) => {
   }
 };
 
+const profilePictureController = async (req, res) => {
+  try {
+    console.log(req.body);
+    const data = await profilePictureService(req.body);
+    return res.status(200).send(data);
+  } catch (error) {
+   conn.release();
+    return res.status(500).send({ message: error.message });
+  }
+};
+
 const resetPasswordController = async (req, res) => {
   const { id } = req.user;
   const { password } = req.body;
@@ -193,5 +205,6 @@ module.exports = {
   tokenPasswordController,
   changePassword,
   changePasswordProfileController,
+  profilePictureController,
   resetPasswordController,
 };
