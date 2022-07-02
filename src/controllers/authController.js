@@ -30,7 +30,7 @@ const registerController = async (req, res) => {
     newCache(dataToken);
 
     //  creating email token to be embedded to an activation link
-    const tokenEmail = createJWTEmail(dataToken);
+    const tokenEmail = createJWTEmail(dataToken, 1);
 
     // creating an activation link to be sent on a verification email
     const link = linkGenerator(tokenEmail);
@@ -65,7 +65,7 @@ const emailVerificationController = async (req, res) => {
 
     const tokenEmail = createJWTEmail(dataToken);
 
-    const link = linkGenerator(tokenEmail);
+    const link = linkGenerator(tokenEmail, 1);
 
     await emailGenerator(data, link, true);
 
@@ -96,7 +96,7 @@ const loginController = async (req, res) => {
 
     if (!data.verified) {
       const tokenEmail = createJWTEmail(dataToken);
-      const link = linkGenerator(tokenEmail);
+      const link = linkGenerator(tokenEmail, 1);
       await emailGenerator(data, link, "verification");
     }
     const tokenAccess = createJWTAccess(dataToken);
@@ -108,23 +108,13 @@ const loginController = async (req, res) => {
 };
 
 // Forgot/Reset Password
-const forgotPassword = async (req, res) => {
-  const { email } = req.body;
-  // const data = req.body;
-  let sql, conn;
+const forgotPasswordController = async (req, res) => {
   try {
-    conn = await dbCon.promise().getConnection();
-    sql = `SELECT * FROM users WHERE email = ? `;
-    let [requestedUser] = await conn.query(sql, email);
-    if (!requestedUser.length) {
-      throw { message: "There is no account registered with email ⚠️ " };
-    }
-    // console.log(requestedUser);
-    // const { id, username } = requestedUser[0];
-    // let createdAt = new Date().getTime();
+    const data = await forgotPasswordService(req);
     const dataToken = newDataToken(data);
+    newCache(dataToken);
     const tokenEmail = createJWTEmail(dataToken);
-    const link = linkGenerator(tokenEmail);
+    const link = linkGenerator(tokenEmail, 0);
     await emailGenerator(data, link, false);
     return res
       .status(200)
@@ -135,7 +125,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-const tokenPassword = async (req, res) => {
+const tokenPasswordController = async (req, res) => {
   try {
     return res.status(200).send({ message: "Password Changed ✅ " });
   } catch (error) {
@@ -180,6 +170,27 @@ const profilePictureController = async (req, res) => {
     const data = await profilePictureService(req.body);
     return res.status(200).send(data);
   } catch (error) {
+   conn.release();
+    return res.status(500).send({ message: error.message });
+  }
+};
+
+const resetPasswordController = async (req, res) => {
+  const { id } = req.user;
+  const { password } = req.body;
+  let sql, conn;
+
+  try {
+    conn = await dbCon.promise().getConnection();
+    let updateData = {
+      password: hashPassword(password),
+    };
+    sql = `UPDATE users SET ? WHERE id = ?`;
+    await conn.query(sql, [updateData, id]);
+    conn.release();
+    return res.status(200).send({ message: "Password Changed ✅ " });
+  } catch (error) {
+    conn.release();
     return res.status(500).send({ message: error.message });
   }
 };
@@ -190,9 +201,10 @@ module.exports = {
   emailVerificationController,
   verificationController,
   loginController,
-  forgotPassword,
-  tokenPassword,
+  forgotPasswordController,
+  tokenPasswordController,
   changePassword,
   changePasswordProfileController,
   profilePictureController,
+  resetPasswordController,
 };

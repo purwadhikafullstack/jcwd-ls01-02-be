@@ -3,6 +3,7 @@ const {
   fetchProductDetailsService,
   filterProductService,
 } = require("../services");
+const { pinjemDataGrup1 } = require("../services/productServices");
 
 const fetchProductsController = async (req, res) => {
   try {

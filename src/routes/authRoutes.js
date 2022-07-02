@@ -5,11 +5,12 @@ const {
   emailVerificationController,
   verificationController,
   loginController,
-  forgotPassword,
-  tokenPassword,
+  forgotPasswordController,
+  tokenPasswordController,
   changePassword,
   changePasswordProfileController,
   profilePictureController,
+  resetPasswordController,
 } = require("../controllers");
 const { verifyToken, verifyLastToken } = require("../lib");
 const Router = express.Router();
@@ -24,9 +25,19 @@ Router.get(
   verificationController
 );
 Router.post("/login", loginController);
-Router.post("/forgot-password", forgotPassword);
-Router.get("/token-password", verifyToken, verifyLastToken, tokenPassword);
-Router.post("/change-password", verifyToken, verifyLastToken, changePassword);
+Router.post("/forgot-password", forgotPasswordController);
+Router.get(
+  "/token-password",
+  verifyToken,
+  verifyLastToken,
+  tokenPasswordController
+);
+Router.post(
+  "/change-password",
+  verifyToken,
+  verifyLastToken,
+  resetPasswordController
+);
 Router.post(
   "/change-password-profile",
   verifyToken,
