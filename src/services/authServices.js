@@ -207,6 +207,49 @@ const changePasswordProfileService = async (data) => {
   }
 };
 
+const profilePictureService = async (data) => {
+  // Mengirim Profile Picture (Data disimpan di BODY -> Form Data) dan TOKEN jangan lupa disimpan di headers
+  // Melakukan Pengecekan apakah user ada atau engga? Dengan cara di cek id nya terdaftar/login tidak?
+  // kalau user ada melakukan "Menambahkan Photo" dan "Edit Photo", dan kalau usernya tidak ada throw error saja.
+  // Kalau user ada, melakukan add photo..
+  // Setelah itu, datanya disimpan kedalam sebuah variabel
+  // Kalau file fotonya besar, masukan pengkondisian dan kasih error
+  // Kalau user ingin update photo, lakukan query update
+  // Setelah itu datanya disimpan kedalam sebuah variabel
+
+  // let path = "/profile-photos";
+  // let pathAva = "/profile-picture";
+  const { id } = data.user;
+  console.log(data);
+
+  let { addPhoto, editPhoto } = data.body;
+  console.log(data);
+  // kenapa data.body? kenapa tidak hanya data saja? apa perbedaannya?
+
+  let sql, conn, result;
+
+  try {
+    conn = await dbCon.promise().getConnection();
+
+    sql = `SELECT * FROM users WHERE id = ?`;
+    [result] = await conn.query(sql, [id]);
+
+    // sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
+    // [result] = await conn.query(sql, [id]);
+
+    sql = `UPDATE user_details SET profile_picture = ? WHERE user_id = ?`;
+    [result] = await conn.query(sql, [addPhoto, id]);
+
+    sql = `UPDATE user_details SET profile_picture = ? WHERE user_id = ?`;
+    [result] = await conn.query(sql, [editPhoto, id]);
+
+    conn.release();
+  } catch (error) {
+    conn.release();
+    throw new Error(error.message);
+}
+};
+
 const forgotPasswordService = async (data) => {
   const { email } = data.body;
   let sql, conn;
@@ -230,5 +273,6 @@ module.exports = {
   verificationService,
   loginService,
   changePasswordProfileService,
+  profilePictureService,
   forgotPasswordService,
 };

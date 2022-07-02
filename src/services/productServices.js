@@ -58,13 +58,22 @@ const fetchProductDetailsService = async (data) => {
   }
 };
 
-const pinjemDataGrup1 = async () => {
-  let sql, conn;
+const filterProductService = async (data) => {
+  let { name, category } = data;
+  console.log(data);
+  let conn, sql;
+
   try {
-    conn = dbCon.promise();
-    sql = `SELECT * FROM produk WHERE butuh_resep = "Tidak" `;
-    let [result] = await conn.query(sql);
-    return result;
+    conn = await dbCon.promise().getConnection();
+
+    sql = `SELECT * FROM products WHERE name LIKE "%${name}%" ${
+      category == "all" ? "" : `AND category = "${category}"`
+    }`;
+
+    let [filterNameAndCategory] = await conn.query(sql);
+
+    return filterNameAndCategory;
+
   } catch (error) {
     throw new Error(error.message || error);
   }
@@ -73,5 +82,5 @@ const pinjemDataGrup1 = async () => {
 module.exports = {
   fetchProductsService,
   fetchProductDetailsService,
-  pinjemDataGrup1,
+  filterProductService,
 };

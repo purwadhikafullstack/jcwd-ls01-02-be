@@ -1,6 +1,7 @@
 const {
   fetchProductsService,
   fetchProductDetailsService,
+  filterProductService,
 } = require("../services");
 const { pinjemDataGrup1 } = require("../services/productServices");
 
@@ -36,7 +37,23 @@ const fetchProductDetailsController = async (req, res) => {
   }
 };
 
+const filterProductController = async (req, res) => {
+  try {
+    const data = await filterProductService(req.query);
+
+    return res.send({
+      status: 200,
+      success: true,
+      message: "Product berhasil difilter",
+      data,
+    });
+  } catch (error) {
+    return res.send({ status: 500, message: error.message || error });
+  }
+};
+
 module.exports = {
   fetchProductsController,
   fetchProductDetailsController,
+  filterProductController,
 };
