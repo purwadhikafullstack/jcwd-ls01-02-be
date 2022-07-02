@@ -38,23 +38,14 @@ const fetchProductDetailsController = async (req, res) => {
 
 const filterProductController = async (req, res) => {
   try {
-    const dataName = await filterProductService(req.query.name);
-    // const dataCategory = await filterProductService(req.query.category);
+    const data = await filterProductService(req.query);
 
     return res.send({
       status: 200,
       success: true,
       message: "Product berhasil difilter",
-      dataName,
+      data,
     });
-    // else if (dataCategory) {
-    //   return res.send({
-    //     status: 200,
-    //     success: true,
-    //     message: "Category berhasil difilter",
-    //     dataCategory,
-    //   });
-    // }
   } catch (error) {
     return res.send({ status: 500, message: error.message || error });
   }

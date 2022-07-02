@@ -34,28 +34,22 @@ const fetchProductDetailsService = async (data) => {
   }
 };
 
-// --- Filter Product by Name and Category --- //
 const filterProductService = async (data) => {
-  let name = data;
-  // let category = data;
+  let { name, category } = data;
+  console.log(data);
   let conn, sql;
 
   try {
     conn = await dbCon.promise().getConnection();
-    if (name) {
-      sql = `SELECT * FROM products WHERE name LIKE "%${name}%"`;
 
-      let [filterName] = await conn.query(sql);
+    sql = `SELECT * FROM products WHERE name LIKE "%${name}%" ${
+      category == "all" ? "" : `AND category = "${category}"`
+    }`;
+    console.log(sql);
 
-      return filterName;
-    }
-    // else if (name && category) {
-    //   sql = `SELECT * FROM products WHERE name LIKE "%${name}%" AND category LIKE "%${category}%"`;
+    let [filterNameAndCategory] = await conn.query(sql);
 
-    //   let [filterCategory] = await conn.query(sql);
-
-    //   return filterCategory;
-    // }
+    return filterNameAndCategory;
   } catch (error) {
     throw new Error(error.message || error);
   }
