@@ -10,6 +10,7 @@ const { adminLoginService, newProductService } = require("./adminServices");
 const {
   fetchProductsService,
   fetchProductDetailsService,
+  fetchPromoProductsService,
 } = require("./productServices");
 
 module.exports = {
@@ -23,4 +24,5 @@ module.exports = {
   fetchProductDetailsService,
   forgotPasswordService,
   newProductService,
+  fetchPromoProductsService,
 };

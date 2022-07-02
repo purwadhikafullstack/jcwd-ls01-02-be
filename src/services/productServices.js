@@ -25,7 +25,7 @@ const fetchProductsService = async (data) => {
       val.promo = Math.round((val.promo / val.price) * 100);
       return { ...val, initPrice, total };
     });
-    console.log(dataProducts[0]);
+
     return dataProducts;
   } catch (error) {
     console.log(error);
@@ -58,14 +58,20 @@ const fetchProductDetailsService = async (data) => {
   }
 };
 
-const pinjemDataGrup1 = async () => {
-  let sql, conn;
+const fetchPromoProductsService = async () => {
+  let conn, sql;
   try {
     conn = dbCon.promise();
-    sql = `SELECT * FROM produk WHERE butuh_resep = "Tidak" `;
-    let [result] = await conn.query(sql);
-    return result;
+    sql = `SELECT id, name, price, photo, promo, stock, category, promo/price*100 as percent FROM products ORDER BY percent DESC LIMIT 10`;
+    let [resultPromo] = await conn.query(sql);
+    resultPromo = resultPromo.map((val) => {
+      let initPrice = val.promo + val.price;
+      val.promo = Math.round((val.promo / val.price) * 100);
+      return { ...val, initPrice };
+    });
+    return resultPromo;
   } catch (error) {
+    console.log(error);
     throw new Error(error.message || error);
   }
 };
@@ -73,5 +79,5 @@ const pinjemDataGrup1 = async () => {
 module.exports = {
   fetchProductsService,
   fetchProductDetailsService,
-  pinjemDataGrup1,
+  fetchPromoProductsService,
 };

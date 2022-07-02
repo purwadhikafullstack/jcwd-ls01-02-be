@@ -1,8 +1,8 @@
 const {
   fetchProductsService,
   fetchProductDetailsService,
+  fetchPromoProductsService,
 } = require("../services");
-const { pinjemDataGrup1 } = require("../services/productServices");
 
 const fetchProductsController = async (req, res) => {
   try {
@@ -36,7 +36,23 @@ const fetchProductDetailsController = async (req, res) => {
   }
 };
 
+const fetchPromoProductsController = async (req, res) => {
+  try {
+    const data = await fetchPromoProductsService();
+    console.log(data);
+    return res.send({
+      status: 200,
+      success: true,
+      message: "Products' data with highest promo",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({ status: 500, message: error.message || error });
+  }
+};
 module.exports = {
   fetchProductsController,
   fetchProductDetailsController,
+  fetchPromoProductsController,
 };

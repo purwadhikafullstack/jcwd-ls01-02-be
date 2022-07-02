@@ -14,6 +14,7 @@ const { loginAdminController, newProduct } = require("./adminController");
 const {
   fetchProductsController,
   fetchProductDetailsController,
+  fetchPromoProductsController,
 } = require("./productController");
 
 module.exports = {
@@ -31,4 +32,5 @@ module.exports = {
   fetchProductDetailsController,
   changePasswordProfileController,
   resetPasswordController,
+  fetchPromoProductsController,
 };
