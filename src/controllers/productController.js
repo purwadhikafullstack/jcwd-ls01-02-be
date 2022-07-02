@@ -40,7 +40,7 @@ const fetchProductDetailsController = async (req, res) => {
 const fetchPromoProductsController = async (req, res) => {
   try {
     const data = await fetchPromoProductsService();
-    console.log(data);
+
     return res.send({
       status: 200,
       success: true,
