@@ -1,10 +1,10 @@
 const { dbCon } = require("../connection");
 
 const fetchProductsService = async (data) => {
-  let { order, page } = data.query;
-  let limit = 24;
+  let { order, page, limit } = data.query;
   console.log(page);
   page = parseInt(page);
+  limit = parseInt(limit);
   let offset = limit * page;
   let conn, sql;
   const { category } = data.params;
@@ -36,7 +36,6 @@ const fetchProductsService = async (data) => {
 const fetchProductDetailsService = async (data) => {
   const { product_name } = data.params;
   let conn, sql;
-  console.log(product_name);
   try {
     conn = dbCon.promise();
     sql =
@@ -78,7 +77,6 @@ const fetchPromoProductsService = async () => {
 
 const filterProductService = async (data) => {
   let { name, category } = data;
-  console.log(data);
   let conn, sql;
 
   try {
