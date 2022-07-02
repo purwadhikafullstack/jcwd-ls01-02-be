@@ -2,11 +2,8 @@ const express = require("express");
 const {
   fetchProductsController,
   fetchProductDetailsController,
-<<<<<<< HEAD
   fetchPromoProductsController,
-=======
   filterProductController,
->>>>>>> 4a43629bc6e17585b1d9a64375ab0917ca777839
 } = require("../controllers");
 
 const Router = express.Router();
