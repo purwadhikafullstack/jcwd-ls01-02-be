@@ -18,6 +18,7 @@ const {
   fetchPromoProductsController,
   filterProductController,
 } = require("./productController");
+const { updateProfile, getUserDetails } = require("./profileControllers");
 
 module.exports = {
   newProduct,
@@ -37,4 +38,6 @@ module.exports = {
   filterProductController,
   resetPasswordController,
   fetchPromoProductsController,
+  updateProfile,
+  getUserDetails,
 };
