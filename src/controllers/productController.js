@@ -1,6 +1,8 @@
 const {
   fetchProductsService,
   fetchProductDetailsService,
+  fetchPromoProductsService,
+  filterProductService,
 } = require("../services");
 
 const fetchProductsController = async (req, res) => {
@@ -35,4 +37,39 @@ const fetchProductDetailsController = async (req, res) => {
   }
 };
 
-module.exports = { fetchProductsController, fetchProductDetailsController };
+const fetchPromoProductsController = async (req, res) => {
+  try {
+    const data = await fetchPromoProductsService();
+
+    return res.send({
+      status: 200,
+      success: true,
+      message: "Products' data with highest promo",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.send({ status: 500, message: error.message || error });
+  }
+};
+
+const filterProductController = async (req, res) => {
+  try {
+    const data = await filterProductService(req.query);
+
+    return res.send({
+      status: 200,
+      success: true,
+      message: "Product berhasil difilter",
+      data,
+    });
+  } catch (error) {
+    return res.send({ status: 500, message: error.message || error });
+  }
+};
+module.exports = {
+  fetchProductsController,
+  fetchProductDetailsController,
+  fetchPromoProductsController,
+  filterProductController,
+};

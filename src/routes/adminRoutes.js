@@ -3,6 +3,6 @@ const { loginAdminController, newProduct } = require("../controllers");
 const Router = express.Router();
 
 Router.post("/adminlogin", loginAdminController);
-Router.post("/newproduct", newProduct);
+Router.post("/new-product", newProduct);
 
 module.exports = Router;
