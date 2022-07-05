@@ -14,14 +14,14 @@ const registerService = async (data) => {
 
     [result] = await conn.query(sql, username);
     if (result.length) {
-      messageError[0] = "Username has already been registered";
+      messageError[0] = "Username yang kamu pilih sudah terdaftar";
     }
 
     // email checking if it has already been registered
     sql = `SELECT id FROM users WHERE email =?`;
     [result] = await conn.query(sql, email);
     if (result.length) {
-      messageError[1] = "Email has already been registered";
+      messageError[1] = "Email yang kamu pilih sudah terdaftar";
     }
 
     // throw error if both validations true
@@ -144,17 +144,17 @@ const loginService = async (data) => {
 
     // username/email checking
     let messageError = [];
-    sql = `SELECT id, username, email, verified FROM users WHERE username = ? or email = ?`;
+    sql = `SELECT id, username, email, verified, password FROM users WHERE username = ? or email = ?`;
     [result] = await conn.query(sql, [username, email]);
     if (!result.length) {
       messageError[0] = "Akun yang kamu masukkan tidak terdaftar";
       throw { message: messageError };
     }
     // cek apakah password sudah sesuai
+    console.log(result[0]);
     let hashedPassword = result[0].password;
-    result[0];
     let match = await hashMatch(password, hashedPassword);
-    // console.log(match);
+    console.log(match);
     if (!match) {
       messageError[1] = "Password yang kamu masukkan salah";
       throw { message: messageError };
@@ -187,7 +187,7 @@ const loginService = async (data) => {
   }
 };
 
-const changePasswordProfileService = async (data) => {
+const changePasswordService = async (data) => {
   const { id } = data.user;
   let { oldPassword, newPassword } = data.body;
   console.log(typeof newPassword);
@@ -284,7 +284,7 @@ module.exports = {
   keepLoginService,
   verificationService,
   loginService,
-  changePasswordProfileService,
+  changePasswordService,
   profilePictureService,
   forgotPasswordService,
 };

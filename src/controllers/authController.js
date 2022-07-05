@@ -31,10 +31,10 @@ const registerController = async (req, res) => {
     newCache(dataToken);
 
     //  creating email token to be embedded to an activation link
-    const tokenEmail = createJWTEmail(dataToken, 1);
+    const tokenEmail = createJWTEmail(dataToken);
 
     // creating an activation link to be sent on a verification email
-    const link = linkGenerator(tokenEmail);
+    const link = linkGenerator(tokenEmail, 1);
 
     // third parameter is the email type, verification = true, forget password = false
     await emailGenerator(data, link, true);
@@ -178,13 +178,13 @@ const forgotPasswordController = async (req, res) => {
 
 const tokenPasswordController = async (req, res) => {
   try {
-    console.log(res.data.data);
     return res.status(200).send({
       status: 200,
       success: true,
       message: "Token berhasil tervalidasi",
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       status: 500,
       success: false,
@@ -222,7 +222,7 @@ const resetPasswordController = async (req, res) => {
   try {
     conn = await dbCon.promise().getConnection();
     let updateData = {
-      password: hashPassword(password),
+      password: await hashPassword(password),
     };
     sql = `UPDATE users SET ? WHERE id = ?`;
     await conn.query(sql, [updateData, id]);

@@ -3,7 +3,7 @@ const {
   keepLoginService,
   verificationService,
   loginService,
-  changePasswordProfileService,
+  changePasswordService,
   profilePictureService,
   forgotPasswordService,
 } = require("./authServices");
@@ -21,7 +21,7 @@ module.exports = {
   verificationService,
   adminLoginService,
   loginService,
-  changePasswordProfileService,
+  changePasswordService,
   profilePictureService,
   fetchProductsService,
   fetchProductDetailsService,
