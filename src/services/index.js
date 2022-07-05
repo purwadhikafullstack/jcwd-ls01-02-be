@@ -14,6 +14,11 @@ const {
   fetchPromoProductsService,
   filterProductService,
 } = require("./productServices");
+const {
+  fetchProvincesService,
+  fetchCitiesService,
+} = require("./rajaOngkirServices");
+const { addNewAddressService } = require("./profileService");
 
 module.exports = {
   registerService,
@@ -29,4 +34,7 @@ module.exports = {
   forgotPasswordService,
   newProductService,
   fetchPromoProductsService,
+  fetchProvincesService,
+  fetchCitiesService,
+  addNewAddressService,
 };

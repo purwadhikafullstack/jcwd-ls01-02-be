@@ -17,7 +17,15 @@ const {
   fetchPromoProductsController,
   filterProductController,
 } = require("./productController");
-const { updateProfile, getUserDetails } = require("./profileControllers");
+const {
+  updateProfile,
+  getUserDetails,
+  addNewAddressController,
+} = require("./profileControllers");
+const {
+  fetchProvincesController,
+  fetchCitiesController,
+} = require("./rajaOngkirController");
 
 module.exports = {
   newProduct,
@@ -38,4 +46,7 @@ module.exports = {
   fetchPromoProductsController,
   updateProfile,
   getUserDetails,
+  fetchProvincesController,
+  fetchCitiesController,
+  addNewAddressController,
 };

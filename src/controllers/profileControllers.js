@@ -1,5 +1,6 @@
 const { dbCon } = require("../connection");
 const fs = require("fs");
+const { addNewAddressService } = require("../services");
 
 const updateProfile = async (req, res) => {
   let path = "/profile-photos";
@@ -72,4 +73,13 @@ const getUserDetails = async (req, res) => {
   }
 };
 
-module.exports = { updateProfile, getUserDetails };
+const addNewAddressController = async (req, res) => {
+  try {
+    await addNewAddressService(req);
+    return res.status(200).send("Berhasil");
+  } catch (error) {
+    return res.status(500).send("gagal");
+  }
+};
+
+module.exports = { updateProfile, getUserDetails, addNewAddressController };

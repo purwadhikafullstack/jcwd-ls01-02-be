@@ -1,5 +1,9 @@
 const express = require("express");
-const { updateProfile, getUserDetails } = require("../controllers");
+const {
+  updateProfile,
+  getUserDetails,
+  addNewAddressController,
+} = require("../controllers");
 const { verifyToken, upload } = require("../lib");
 const Router = express.Router();
 
@@ -9,5 +13,6 @@ const uploader = upload("/profile-photos", "PROFILE").fields([
 
 Router.patch("/profile-update", verifyToken, uploader, updateProfile);
 Router.get("/user", getUserDetails);
+Router.post("/new-address", verifyToken, addNewAddressController);
 
 module.exports = Router;
