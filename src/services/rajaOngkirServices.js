@@ -6,7 +6,6 @@ const fetchProvincesService = async () => {
     conn = dbCon.promise();
     sql = `SELECT id, province FROM provinces`;
     let [resProvince] = await conn.query(sql);
-    console.log(resProvince);
     return resProvince;
   } catch (error) {
     console.log(error);
@@ -22,7 +21,6 @@ const fetchCitiesService = async (data) => {
     conn = dbCon.promise();
     sql = `SELECT id, city, postal_code FROM cities WHERE province_id = ?`;
     let [resCity] = await conn.query(sql, province_id);
-    console.log(resCity);
     return resCity;
   } catch (error) {
     console.log(error);
