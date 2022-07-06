@@ -14,6 +14,12 @@ const {
   fetchPromoProductsService,
   filterProductService,
 } = require("./productServices");
+const {
+  addToCartService,
+  getCartServices,
+  editQuantityonCartServices,
+  deleteProductCartServices,
+} = require("./transactionServices");
 
 module.exports = {
   registerService,
@@ -29,4 +35,8 @@ module.exports = {
   forgotPasswordService,
   newProductService,
   fetchPromoProductsService,
+  addToCartService,
+  getCartServices,
+  editQuantityonCartServices,
+  deleteProductCartServices,
 };

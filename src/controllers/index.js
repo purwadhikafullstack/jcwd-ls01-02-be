@@ -18,6 +18,12 @@ const {
   fetchPromoProductsController,
   filterProductController,
 } = require("./productController");
+const {
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
+} = require("./transactionController");
 
 module.exports = {
   newProduct,
@@ -37,4 +43,8 @@ module.exports = {
   filterProductController,
   resetPasswordController,
   fetchPromoProductsController,
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
 };
