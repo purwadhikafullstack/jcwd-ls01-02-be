@@ -16,7 +16,9 @@ const fetchProductsController = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.send({ status: 500, message: error.message || error });
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
   }
 };
 
@@ -24,15 +26,16 @@ const fetchProductDetailsController = async (req, res) => {
   try {
     const data = await fetchProductDetailsService(req);
 
-    return res.send({
-      status: 200,
+    return res.status(200).send({
       success: true,
       message: "Products' data",
       data,
     });
   } catch (error) {
     console.log(error);
-    return res.send({ status: 500, message: error.message || error });
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
   }
 };
 
@@ -40,15 +43,16 @@ const fetchPromoProductsController = async (req, res) => {
   try {
     const data = await fetchPromoProductsService();
 
-    return res.send({
-      status: 200,
+    return res.status(200).send({
       success: true,
       message: "Products' data with highest promo",
       data,
     });
   } catch (error) {
     console.log(error);
-    return res.send({ status: 500, message: error.message || error });
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
   }
 };
 
@@ -56,14 +60,15 @@ const filterProductController = async (req, res) => {
   try {
     const data = await filterProductService(req.query);
 
-    return res.send({
-      status: 200,
+    return res.status(200).send({
       success: true,
       message: "Product berhasil difilter",
       data,
     });
   } catch (error) {
-    return res.send({ status: 500, message: error.message || error });
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
   }
 };
 module.exports = {
