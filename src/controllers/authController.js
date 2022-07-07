@@ -16,6 +16,7 @@ const {
   loginService,
   changePasswordProfileService,
   profilePictureService,
+  forgotPasswordService,
 } = require("../services");
 
 const registerController = async (req, res) => {
@@ -30,37 +31,56 @@ const registerController = async (req, res) => {
     newCache(dataToken);
 
     //  creating email token to be embedded to an activation link
-    const tokenEmail = createJWTEmail(dataToken, 1);
+    const tokenEmail = createJWTEmail(dataToken);
 
     // creating an activation link to be sent on a verification email
-    const link = linkGenerator(tokenEmail);
+    const link = linkGenerator(tokenEmail, 1);
 
     // third parameter is the email type, verification = true, forget password = false
     await emailGenerator(data, link, true);
 
     const tokenAccess = createJWTAccess(dataToken);
     res.set("x-token-access", tokenAccess);
-    return res.status(200).send(data);
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      message: "User berhasil didaftarkan",
+      data,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ message: error.message });
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 const keepLoginController = async (req, res) => {
   try {
     let data = await keepLoginService(req);
-    return res.status(200).send(data);
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      message: "User berhasil log in",
+      data,
+    });
   } catch (error) {
-    return res.status(500).send({ message: error.message });
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 const emailVerificationController = async (req, res) => {
   try {
     const data = req.body;
+    console.log(data);
     const dataToken = newDataToken(data);
-    //
+
     newCache(dataToken);
 
     const tokenEmail = createJWTEmail(dataToken);
@@ -69,28 +89,44 @@ const emailVerificationController = async (req, res) => {
 
     await emailGenerator(data, link, true);
 
-    return res
-      .status(200)
-      .send({ message: "e-mail verification has been sent" });
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      message: "Email verifikasi terkirim",
+      data,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ message: error.message || error });
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 const verificationController = async (req, res) => {
   try {
     const data = await verificationService(req);
-    return res.status(200).send(data);
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      message: "User berhasil diverifikasi",
+      data,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ message: error.message || error });
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 const loginController = async (req, res) => {
   try {
-    const data = await loginService(req.body);
+    const data = await loginService(req);
 
     const dataToken = newDataToken(data);
 
@@ -101,9 +137,18 @@ const loginController = async (req, res) => {
     }
     const tokenAccess = createJWTAccess(dataToken);
     res.set("x-token-access", tokenAccess);
-    return res.status(200).send(data);
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      message: "User berhasil log in",
+      data,
+    });
   } catch (error) {
-    return res.status(500).send({ message: error.message });
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -116,47 +161,41 @@ const forgotPasswordController = async (req, res) => {
     const tokenEmail = createJWTEmail(dataToken);
     const link = linkGenerator(tokenEmail, 0);
     await emailGenerator(data, link, false);
-    return res
-      .status(200)
-      .send({ message: "E-mail reset password has been sent 📩 " });
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      message: "Email reset password telah terkirim",
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ message: error.message || error });
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 const tokenPasswordController = async (req, res) => {
   try {
-    return res.status(200).send({ message: "Password Changed ✅ " });
+    return res.status(200).send({
+      status: 200,
+      success: true,
+      message: "Token berhasil tervalidasi",
+    });
   } catch (error) {
-    return res.status(500).send({ message: error.message });
+    console.log(error);
+    return res.status(500).send({
+      status: 500,
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 const changePassword = async (req, res) => {
-  const { id } = req.user;
-  const { password } = req.body;
-  let sql, conn;
-
   try {
-    conn = await dbCon.promise().getConnection;
-    let updateData = {
-      password: hashPassword(password),
-    };
-    sql = `UPDATE users SET ? WHERE id = ?`;
-    await conn.query(sql, [updateData, id]);
-    conn.release();
-    return res.status(200).send({ message: "Password Changed ✅ " });
-  } catch (error) {
-    conn.release();
-    return res.status(500).send({ message: error.message });
-  }
-};
-
-const changePasswordProfileController = async (req, res) => {
-  try {
-    await changePasswordProfileService(req);
-    console.log("BERHASIL >>>>>>>>>>>");
+    await changePasswordService(req);
 
     return res.status(200).send({ message: "Success!" });
   } catch (error) {
@@ -170,7 +209,7 @@ const profilePictureController = async (req, res) => {
     const data = await profilePictureService(req.body);
     return res.status(200).send(data);
   } catch (error) {
-   conn.release();
+    conn.release();
     return res.status(500).send({ message: error.message });
   }
 };
@@ -183,7 +222,7 @@ const resetPasswordController = async (req, res) => {
   try {
     conn = await dbCon.promise().getConnection();
     let updateData = {
-      password: hashPassword(password),
+      password: await hashPassword(password),
     };
     sql = `UPDATE users SET ? WHERE id = ?`;
     await conn.query(sql, [updateData, id]);
@@ -204,7 +243,6 @@ module.exports = {
   forgotPasswordController,
   tokenPasswordController,
   changePassword,
-  changePasswordProfileController,
   profilePictureController,
   resetPasswordController,
 };

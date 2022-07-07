@@ -7,6 +7,11 @@ const {
   productRoutes,
   authRoutes,
   adminRoutes,
+<<<<<<< HEAD
+=======
+  profileRoutes,
+  rajaOngkirRoutes,
+>>>>>>> d047b68b97027b421d216b9e15604cbccd3980e1
   transactionRoutes,
 } = require("./src/routes");
 const PORT = process.env.PORT;
@@ -31,6 +36,8 @@ app.use(express.static("public"));
 app.use("/product", productRoutes);
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
+app.use("/profile", profileRoutes);
 app.use("/transaction", transactionRoutes);
+app.use("/raja-ongkir", rajaOngkirRoutes);
 
 app.listen(PORT, () => console.log(`API running on Port ${PORT}`));
