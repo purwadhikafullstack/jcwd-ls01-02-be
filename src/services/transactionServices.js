@@ -1,9 +1,15 @@
-// const { dbCon } = require("../connection");
-// const db = require("../connection/mysqldb");
+const { dbCon } = require("../connection");
+const db = require("../connection/mysqldb");
 
-// const getTransactionData = async (data) => {
-//   let getTransactionDataQuery = `SELECT * from `;
-// };
+const getTransactionService = async (data) => {
+  let { orders } = data.params;
+  let conn, sql;
+
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT * FROM checkout_cart td inner join orders on td. `;
+  } catch (error) {}
+};
 
 // const confirmTransaction = async (data) => {
 //   let confirmQuery = `UPDATE orders set orders_status = "Order Berhasil" where orders_id = ${req.params.orders_id}; `;
