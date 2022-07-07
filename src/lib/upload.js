@@ -7,9 +7,12 @@ const upload = (destination, fileNamePrefix) => {
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       const dirAva = "/profile-picture";
+      const dirRec = "/prescription-photo";
       let directory;
       if (file.fieldname === "profile_picture") {
         directory = defaultPath + destination + dirAva;
+      } else if (file.fieldname === "prescription_photo") {
+        directory = defaultPath + destination + dirRec;
       } else {
         directory = defaultPath + destination;
       }
@@ -22,13 +25,17 @@ const upload = (destination, fileNamePrefix) => {
     filename: function (req, file, cb) {
       let originalName = file.originalname;
       const fileAva = "AVATAR";
-
+      const fileRec = "RECEIPE";
       let extention = originalName.split(".");
       let fileName;
       if (file.fieldname === "profile_picture") {
-        fileName = `${fileNamePrefix}${fileAva}${
-          Date.now() + Math.round(Math.random() * 500000)
-        }.${extention[extention.length - 1]}`;
+        fileName = `${fileNamePrefix}${fileAva}${Date.now()}.${
+          extention[extention.length - 1]
+        }`;
+      } else if (file.fieldname === "prescription_photo") {
+        fileName = `${fileNamePrefix}${fileRec}${Date.now()}.${
+          extention[extention.length - 1]
+        }`;
       } else {
         fileName = `${fileNamePrefix}${Date.now()}.${
           extention[extention.length - 1]

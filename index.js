@@ -8,6 +8,7 @@ const {
   authRoutes,
   adminRoutes,
   profileRoutes,
+  transactionRoutes,
 } = require("./src/routes");
 const PORT = process.env.PORT;
 
@@ -32,5 +33,6 @@ app.use("/product", productRoutes);
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/profile", profileRoutes);
+app.use("/receipe", transactionRoutes);
 
 app.listen(PORT, () => console.log(`API running on Port ${PORT}`));

@@ -19,6 +19,7 @@ const {
   filterProductController,
 } = require("./productController");
 const { updateProfile, getUserDetails } = require("./profileControllers");
+const { uploadReceipe } = require("./transactionController");
 
 module.exports = {
   newProduct,
@@ -40,4 +41,5 @@ module.exports = {
   fetchPromoProductsController,
   updateProfile,
   getUserDetails,
+  uploadReceipe,
 };
