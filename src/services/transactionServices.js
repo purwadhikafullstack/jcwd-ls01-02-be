@@ -26,7 +26,11 @@ const addToCartServices = async (data) => {
       // if (!resultInsertProduct) {
       //   throw { message: "Produk gagal ditambahkan" };
       // }
-      return resultInsertProduct;
+      sql = `SELECT * FROM cart WHERE user_id = ?`;
+
+      let [resultAddtoCart] = await conn.query(sql, [id]);
+
+      return resultAddtoCart;
     } else {
       sql = `SELECT qty FROM cart WHERE user_id = ? AND product_id = ?`;
 
@@ -90,7 +94,11 @@ const editQuantityonCartServices = async (data) => {
     let [updateQuantity] = await conn.query(sql, [quantity, id, productId]);
     // console.log(updateQuantity);
 
-    return updateQuantity;
+    sql = `SELECT * FROM cart WHERE user_id = ?`;
+
+    let [resultQuantity] = await conn.query(sql, [id]);
+
+    return resultQuantity;
   } catch (error) {
     console.log(error);
     throw new Error(error.message || error);
@@ -102,13 +110,18 @@ const deleteProductCartServices = async (data) => {
   const { productId } = data.body;
   // console.log(data.user, ">>>>>>>>>>>>> DATA USERRRRRR");
   // console.log(data.body, ">>>>>>>>>>>>> DATA BOOOOOODDDDDYYYYYY");
+  let sql, conn;
   try {
-    conn = dbCon.promise();
+    conn = await dbCon.promise().getConnection();
 
     sql = `DELETE FROM cart WHERE user_id = ? AND product_id = ?`;
     let [deleteProduct] = await conn.query(sql, [id, productId]);
+
+    sql = `SELECT * FROM cart WHERE user_id = ?`;
+
+    let [resultProductLeft] = await conn.query(sql, [id]);
     // console.log(deleteProduct);
-    return deleteProduct;
+    return resultProductLeft;
   } catch (error) {
     console.log(error);
     throw new Error(error.message || error);
