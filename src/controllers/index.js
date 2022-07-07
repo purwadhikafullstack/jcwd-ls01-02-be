@@ -21,6 +21,7 @@ const {
   updateProfile,
   getUserDetails,
   addNewAddressController,
+  changePrimaryAddressController,
 } = require("./profileControllers");
 const {
   fetchProvincesController,
@@ -55,4 +56,5 @@ module.exports = {
   addNewAddressController,
   getPrimaryAddressController,
   getAllAddressesController,
+  changePrimaryAddressController,
 };

@@ -7,7 +7,6 @@ const getPrimaryAddressController = async (req, res) => {
   try {
     const data = await getPrimaryAddressService(req);
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "Primary Address",
       data,
@@ -22,7 +21,6 @@ const getAllAddressesController = async (req, res) => {
   try {
     const data = await getAllAddressesService(req);
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "All Addresses",
       data,

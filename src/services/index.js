@@ -18,7 +18,10 @@ const {
   fetchProvincesService,
   fetchCitiesService,
 } = require("./rajaOngkirServices");
-const { addNewAddressService } = require("./profileService");
+const {
+  addNewAddressService,
+  changePrimaryAddressService,
+} = require("./profileService");
 const {
   getPrimaryAddressService,
   getAllAddressesService,
@@ -43,4 +46,5 @@ module.exports = {
   addNewAddressService,
   getPrimaryAddressService,
   getAllAddressesService,
+  changePrimaryAddressService,
 };

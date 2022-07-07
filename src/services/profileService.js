@@ -56,4 +56,28 @@ const addNewAddressService = async (data) => {
   }
 };
 
-module.exports = { addNewAddressService };
+const changePrimaryAddressService = async (data) => {
+  const { id: user_id } = data.user;
+  const { id } = data.body;
+  let conn, sql;
+  try {
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+
+    sql = `UPDATE address SET primary_address = "0" WHERE user_id = ?`;
+    await conn.query(sql, user_id);
+
+    sql = `UPDATE address SET primary_address= true WHERE id = ?`;
+    await conn.query(sql, id);
+
+    sql = `UPDATE user_details SET address_id = ? WHERE user_id = ?`;
+    await conn.query(sql, [id, user_id]);
+
+    await conn.commit();
+    conn.release();
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
+module.exports = { addNewAddressService, changePrimaryAddressService };

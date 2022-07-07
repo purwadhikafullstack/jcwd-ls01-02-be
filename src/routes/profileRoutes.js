@@ -3,6 +3,7 @@ const {
   updateProfile,
   getUserDetails,
   addNewAddressController,
+  changePrimaryAddressController,
 } = require("../controllers");
 const { verifyToken, upload } = require("../lib");
 const Router = express.Router();
@@ -14,5 +15,10 @@ const uploader = upload("/profile-photos", "PROFILE").fields([
 Router.patch("/profile-update", verifyToken, uploader, updateProfile);
 Router.get("/user", getUserDetails);
 Router.post("/new-address", verifyToken, addNewAddressController);
+Router.patch(
+  "/change-primary-address",
+  verifyToken,
+  changePrimaryAddressController
+);
 
 module.exports = Router;
