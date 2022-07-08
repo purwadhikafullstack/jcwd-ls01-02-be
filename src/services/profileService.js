@@ -14,12 +14,20 @@ const addNewAddressService = async (data) => {
     alamat,
     primaryAddress,
   } = data.body;
-  console.log(data.body);
+  console.log({ primaryAddress });
 
   let sql, conn;
   try {
     conn = await dbCon.promise().getConnection();
     await conn.beginTransaction();
+    if (primaryAddress) {
+      sql = `SELECT id FROM address WHERE user_id = ? AND primary_address = "1"`;
+      let [resultPrimary] = await conn.query(sql, id);
+      if (resultPrimary.length) {
+        sql = `UPDATE address SET primary_address = "0" WHERE id = ?`;
+        await conn.query(sql, resultPrimary[0].id);
+      }
+    }
     sql = `INSERT INTO address SET ?`;
     let insertData = {
       user_id: id,
@@ -33,21 +41,22 @@ const addNewAddressService = async (data) => {
       alamat,
       primary_address: primaryAddress,
     };
+    console.log(insertData);
     let [resultAddress] = await conn.query(sql, insertData);
 
     if (primaryAddress) {
-      sql = `SELECT id FROM address WHERE user_id = ? AND primary_address = "1"`;
-      let [resultPrimary] = await conn.query(sql, id);
-      if (resultPrimary.length) {
-        sql = `UPDATE address SET primary_address = "0" WHERE id = ?`;
-        await conn.query(sql, resultPrimary[0].id);
-      }
       sql = `UPDATE user_details SET address_id = ? WHERE user_id = ?`;
-      await conn.query(sql, [resultAddress.insertId, id]);
+      let [primary] = await conn.query(sql, [resultAddress.insertId, id]);
+      sql = `SELECT address_id FROM user_details WHERE user_id =  ?`;
+      [primary] = await conn.query(sql, id);
+      console.log(primary[0]);
+      await conn.commit();
+      conn.release();
+      return primary[0];
     }
-
     await conn.commit();
     conn.release();
+    return true;
   } catch (error) {
     conn.rollback();
     conn.release();

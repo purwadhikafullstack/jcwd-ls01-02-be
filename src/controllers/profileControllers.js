@@ -78,8 +78,12 @@ const getUserDetails = async (req, res) => {
 
 const addNewAddressController = async (req, res) => {
   try {
-    await addNewAddressService(req);
-    return res.status(200).send("Berhasil");
+    const data = await addNewAddressService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Alamat baru berhasil ditambahkan",
+      data,
+    });
   } catch (error) {
     return res.status(500).send("gagal");
   }

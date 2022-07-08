@@ -6,6 +6,7 @@ const {
 const getPrimaryAddressController = async (req, res) => {
   try {
     const data = await getPrimaryAddressService(req);
+    console.log(data);
     return res.status(200).send({
       success: true,
       message: "Primary Address",
