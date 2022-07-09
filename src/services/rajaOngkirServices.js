@@ -1,3 +1,4 @@
+const { default: axios } = require("axios");
 const { dbCon } = require("../connection");
 
 const fetchProvincesService = async () => {
@@ -28,4 +29,42 @@ const fetchCitiesService = async (data) => {
   }
 };
 
-module.exports = { fetchProvincesService, fetchCitiesService };
+const fetchCostService = async (data) => {
+  let { origin, destination, weight, courier } = data.body;
+  try {
+    let res = await axios.post(
+      "https://api.rajaongkir.com/starter/cost",
+      {
+        origin,
+        destination,
+        weight,
+        courier,
+      },
+      {
+        headers: { key: process.env.API_KEY },
+      }
+    );
+    let { costs } = res.data.rajaongkir.results[0];
+    console.log(costs);
+    const delivery = costs.map((val) => {
+      courier = courier.toUpperCase();
+      courier = courier === "POS" ? `${courier} Indonesia` : courier;
+      return {
+        kurir: courier,
+        jenis: val.service,
+        harga: val.cost[0].value,
+        durasi: val.cost[0].etd.split(" ")[0],
+      };
+    });
+    console.log(delivery);
+    return delivery;
+  } catch (error) {
+    console.log(error.data);
+    throw new Error(error);
+  }
+};
+module.exports = {
+  fetchProvincesService,
+  fetchCitiesService,
+  fetchCostService,
+};

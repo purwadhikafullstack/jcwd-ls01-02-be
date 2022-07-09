@@ -27,6 +27,7 @@ const {
 const {
   fetchProvincesController,
   fetchCitiesController,
+  fetchCostController,
 } = require("./rajaOngkirController");
 const {
   getPrimaryAddressController,
@@ -64,4 +65,5 @@ module.exports = {
   changePrimaryAddressController,
   rejectOrderController,
   confirmOrderController,
+  fetchCostController,
 };

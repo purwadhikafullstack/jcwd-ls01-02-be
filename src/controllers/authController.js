@@ -42,7 +42,6 @@ const registerController = async (req, res) => {
     const tokenAccess = createJWTAccess(dataToken);
     res.set("x-token-access", tokenAccess);
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "User berhasil didaftarkan",
       data,
@@ -50,7 +49,6 @@ const registerController = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).send({
-      status: 500,
       success: false,
       message: error.message,
     });
@@ -61,14 +59,12 @@ const keepLoginController = async (req, res) => {
   try {
     let data = await keepLoginService(req);
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "User berhasil log in",
       data,
     });
   } catch (error) {
     return res.status(500).send({
-      status: 500,
       success: false,
       message: error.message,
     });
@@ -78,7 +74,6 @@ const keepLoginController = async (req, res) => {
 const emailVerificationController = async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
     const dataToken = newDataToken(data);
 
     newCache(dataToken);
@@ -90,7 +85,6 @@ const emailVerificationController = async (req, res) => {
     await emailGenerator(data, link, true);
 
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "Email verifikasi terkirim",
       data,
@@ -109,7 +103,6 @@ const verificationController = async (req, res) => {
   try {
     const data = await verificationService(req);
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "User berhasil diverifikasi",
       data,
@@ -117,7 +110,6 @@ const verificationController = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).send({
-      status: 500,
       success: false,
       message: error.message,
     });
@@ -138,14 +130,12 @@ const loginController = async (req, res) => {
     const tokenAccess = createJWTAccess(dataToken);
     res.set("x-token-access", tokenAccess);
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "User berhasil log in",
       data,
     });
   } catch (error) {
     return res.status(500).send({
-      status: 500,
       success: false,
       message: error.message,
     });
@@ -162,14 +152,12 @@ const forgotPasswordController = async (req, res) => {
     const link = linkGenerator(tokenEmail, 0);
     await emailGenerator(data, link, false);
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "Email reset password telah terkirim",
     });
   } catch (error) {
     console.log(error);
     return res.status(500).send({
-      status: 500,
       success: false,
       message: error.message,
     });
@@ -179,14 +167,12 @@ const forgotPasswordController = async (req, res) => {
 const tokenPasswordController = async (req, res) => {
   try {
     return res.status(200).send({
-      status: 200,
       success: true,
       message: "Token berhasil tervalidasi",
     });
   } catch (error) {
     console.log(error);
     return res.status(500).send({
-      status: 500,
       success: false,
       message: error.message,
     });
@@ -197,7 +183,9 @@ const changePassword = async (req, res) => {
   try {
     await changePasswordService(req);
 
-    return res.status(200).send({ message: "Success!" });
+    return res
+      .status(200)
+      .send({ success: 200, message: "Password telah terganti" });
   } catch (error) {
     return res.status(500).send({ message: error.message });
   }
