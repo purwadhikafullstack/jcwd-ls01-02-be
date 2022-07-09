@@ -54,6 +54,8 @@ const uploadReceipe = async (req, res) => {
 const {
   getPrimaryAddressService,
   getAllAddressesService,
+  rejectOrderService,
+  confirmOrderService,
 } = require("../services");
 
 const getPrimaryAddressController = async (req, res) => {
@@ -84,8 +86,38 @@ const getAllAddressesController = async (req, res) => {
   }
 };
 
+const rejectOrderController = async (req, res) => {
+  try {
+    const data = await rejectOrderService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Transaksi Dibatalkan",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+const confirmOrderController = async (req, res) => {
+  try {
+    const data = await confirmOrderService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Transaksi Dibatalkan",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getPrimaryAddressController,
   getAllAddressesController,
   uploadReceipe,
+  rejectOrderController,
+  confirmOrderController,
 };

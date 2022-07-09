@@ -32,6 +32,8 @@ const {
   getPrimaryAddressController,
   getAllAddressesController,
   uploadReceipe,
+  rejectOrderController,
+  confirmOrderController,
 } = require("./transactionController");
 
 module.exports = {
@@ -60,4 +62,6 @@ module.exports = {
   getPrimaryAddressController,
   getAllAddressesController,
   changePrimaryAddressController,
+  rejectOrderController,
+  confirmOrderController,
 };

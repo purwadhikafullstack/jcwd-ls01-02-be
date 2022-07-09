@@ -25,6 +25,8 @@ const {
 const {
   getPrimaryAddressService,
   getAllAddressesService,
+  rejectOrderService,
+  confirmOrderService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -47,4 +49,6 @@ module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
   changePrimaryAddressService,
+  rejectOrderService,
+  confirmOrderService,
 };
