@@ -15,12 +15,6 @@ const {
   filterProductService,
 } = require("./productServices");
 const {
-<<<<<<< HEAD
-  addToCartService,
-  getCartServices,
-  editQuantityonCartServices,
-  deleteProductCartServices,
-=======
   fetchProvincesService,
   fetchCitiesService,
 } = require("./rajaOngkirServices");
@@ -31,7 +25,10 @@ const {
 const {
   getPrimaryAddressService,
   getAllAddressesService,
->>>>>>> d047b68b97027b421d216b9e15604cbccd3980e1
+  addToCartService,
+  getCartServices,
+  editQuantityonCartServices,
+  deleteProductCartServices,
 } = require("./transactionServices");
 
 module.exports = {
@@ -48,17 +45,14 @@ module.exports = {
   forgotPasswordService,
   newProductService,
   fetchPromoProductsService,
-<<<<<<< HEAD
   addToCartService,
   getCartServices,
   editQuantityonCartServices,
   deleteProductCartServices,
-=======
   fetchProvincesService,
   fetchCitiesService,
   addNewAddressService,
   getPrimaryAddressService,
   getAllAddressesService,
   changePrimaryAddressService,
->>>>>>> d047b68b97027b421d216b9e15604cbccd3980e1
 };

@@ -144,6 +144,7 @@ const loginController = async (req, res) => {
       data,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       status: 500,
       success: false,

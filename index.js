@@ -7,11 +7,8 @@ const {
   productRoutes,
   authRoutes,
   adminRoutes,
-<<<<<<< HEAD
-=======
   profileRoutes,
   rajaOngkirRoutes,
->>>>>>> d047b68b97027b421d216b9e15604cbccd3980e1
   transactionRoutes,
 } = require("./src/routes");
 const PORT = process.env.PORT;

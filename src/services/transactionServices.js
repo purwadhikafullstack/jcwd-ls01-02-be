@@ -1,6 +1,5 @@
 const { dbCon } = require("../connection");
 
-<<<<<<< HEAD
 const addToCartServices = async (data) => {
   const { id } = data.user;
   const { productId, quantity } = data.body;
@@ -129,13 +128,6 @@ const deleteProductCartServices = async (data) => {
   }
 };
 
-module.exports = {
-  addToCartServices,
-  getCartServices,
-  editQuantityonCartServices,
-  deleteProductCartServices,
-};
-=======
 const getPrimaryAddressService = async (data) => {
   const { id } = data.user;
   let { address_id } = data.query;
@@ -183,5 +175,11 @@ const getAllAddressesService = async (data) => {
     throw new Error(error.message);
   }
 };
-module.exports = { getPrimaryAddressService, getAllAddressesService };
->>>>>>> d047b68b97027b421d216b9e15604cbccd3980e1
+module.exports = {
+  getPrimaryAddressService,
+  getAllAddressesService,
+  addToCartServices,
+  getCartServices,
+  editQuantityonCartServices,
+  deleteProductCartServices,
+};
