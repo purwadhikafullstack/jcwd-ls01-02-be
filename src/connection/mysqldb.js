@@ -21,7 +21,7 @@ db.getConnection((err, conn) => {
   if (err) {
     return console.log(err);
   }
-  return console.log(`connected as id ${conn?.threadId}`);
+  return console.log(`Connected`);
 });
 
 module.exports = db;
