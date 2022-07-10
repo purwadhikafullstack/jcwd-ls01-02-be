@@ -3,7 +3,14 @@ const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
 
-const { productRoutes, authRoutes, adminRoutes } = require("./src/routes");
+const {
+  productRoutes,
+  authRoutes,
+  adminRoutes,
+  profileRoutes,
+  rajaOngkirRoutes,
+  transactionRoutes,
+} = require("./src/routes");
 const PORT = process.env.PORT;
 
 morgan.token("date", () => {
@@ -26,5 +33,8 @@ app.use(express.static("public"));
 app.use("/product", productRoutes);
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
+app.use("/profile", profileRoutes);
+app.use("/transaction", transactionRoutes);
+app.use("/raja-ongkir", rajaOngkirRoutes);
 
 app.listen(PORT, () => console.log(`API running on Port ${PORT}`));

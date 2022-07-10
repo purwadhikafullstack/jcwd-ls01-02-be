@@ -5,7 +5,7 @@ const linkGenerator = (data, type) => {
       ? process.env.FRONTEND_HOST
       : process.env.DEVELOPMENT_HOST;
   const path = type ? "verification" : "reset-password";
-  return `${host}/${path}/verification/${data}`;
+  return `${host}/${path}/${data}`;
 };
 
 module.exports = { linkGenerator };

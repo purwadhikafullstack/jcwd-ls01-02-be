@@ -7,7 +7,6 @@ const {
   forgotPasswordController,
   tokenPasswordController,
   changePassword,
-  changePasswordProfileController,
   profilePictureController,
   resetPasswordController,
 } = require("./authController");
@@ -18,6 +17,21 @@ const {
   fetchPromoProductsController,
   filterProductController,
 } = require("./productController");
+const {
+  updateProfile,
+  getUserDetails,
+  addNewAddressController,
+  changePrimaryAddressController,
+} = require("./profileControllers");
+const {
+  fetchProvincesController,
+  fetchCitiesController,
+  fetchCostController,
+} = require("./rajaOngkirController");
+const {
+  getPrimaryAddressController,
+  getAllAddressesController,
+} = require("./transactionController");
 
 module.exports = {
   newProduct,
@@ -32,9 +46,17 @@ module.exports = {
   changePassword,
   fetchProductsController,
   fetchProductDetailsController,
-  changePasswordProfileController,
   profilePictureController,
   filterProductController,
   resetPasswordController,
   fetchPromoProductsController,
+  updateProfile,
+  getUserDetails,
+  fetchProvincesController,
+  fetchCitiesController,
+  addNewAddressController,
+  getPrimaryAddressController,
+  getAllAddressesController,
+  changePrimaryAddressController,
+  fetchCostController,
 };
