@@ -66,7 +66,8 @@ const verifyToken = async (req, res, next) => {
 const verifyLastToken = async (req, res, next) => {
   const { createdAt, id } = req.user;
   let cache = myCache.get(id);
-  if (createdAt === cache?.createdAt) {
+//   if (createdAt === cache?.createdAt) {
+  if (createdAt === cache.createdAt) {
     next();
   } else {
     console.log(`gagal lewat verify last token`);
