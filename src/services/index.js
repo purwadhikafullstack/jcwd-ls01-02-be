@@ -7,7 +7,11 @@ const {
   profilePictureService,
   forgotPasswordService,
 } = require("./authServices");
-const { adminLoginService, newProductService } = require("./adminServices");
+const {
+  adminLoginService,
+  newProductService,
+  filterProductsService,
+} = require("./adminServices");
 const {
   fetchProductsService,
   fetchProductDetailsService,
@@ -49,4 +53,5 @@ module.exports = {
   getAllAddressesService,
   changePrimaryAddressService,
   fetchCostService,
+  filterProductsService,
 };

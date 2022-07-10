@@ -1,5 +1,8 @@
-const db = require("../connection/mysqldb");
-const { adminLoginService, newProductService } = require("../services");
+const {
+  adminLoginService,
+  newProductService,
+  filterProductsService,
+} = require("../services");
 
 const loginAdminController = async (req, res) => {
   try {
@@ -22,4 +25,21 @@ const newProduct = async (req, res) => {
   }
 };
 
-module.exports = { loginAdminController, newProduct };
+const filterProductsController = async (req, res) => {
+  try {
+    console.log(req.query);
+    const data = await filterProductsService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Product filter",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
+module.exports = { loginAdminController, newProduct, filterProductsController };
