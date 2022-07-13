@@ -32,7 +32,7 @@ const {
 const {
   getPrimaryAddressController,
   getAllAddressesController,
-  uploadReceipe,
+  uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
 } = require("./transactionController");
@@ -56,7 +56,7 @@ module.exports = {
   fetchPromoProductsController,
   updateProfile,
   getUserDetails,
-  uploadReceipe,
+  uploadReceipeController,
   fetchProvincesController,
   fetchCitiesController,
   addNewAddressController,

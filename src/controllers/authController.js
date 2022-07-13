@@ -57,13 +57,15 @@ const registerController = async (req, res) => {
 
 const keepLoginController = async (req, res) => {
   try {
-    let data = await keepLoginService(req);
+    console.log(req.user);
+    let data = await keepLoginService(req.user);
     return res.status(200).send({
       success: true,
       message: "User berhasil log in",
       data,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       success: false,
       message: error.message,
@@ -135,6 +137,7 @@ const loginController = async (req, res) => {
       data,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       success: false,
       message: error.message,

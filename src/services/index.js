@@ -28,6 +28,7 @@ const {
   getAllAddressesService,
   rejectOrderService,
   confirmOrderService,
+  uploadReceipeService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -53,4 +54,5 @@ module.exports = {
   rejectOrderService,
   confirmOrderService,
   fetchCostService,
+  uploadReceipeService,
 };

@@ -70,6 +70,7 @@ const getAllTransactionService = async (data) => {
   }
 };
 
+
 const rejectOrderService = async (data) => {
   let (orders_id) = data.query
   let sql, conn;
@@ -98,8 +99,48 @@ try {
   
 }
 }
+
+const uploadReceipeService = async (data) => {
+  const { id } = data
+  console.log("ini req", data.file)
+  let path = "/prescription-photo";
+//   const imagePath = prescription_photo
+//   ? `${path}${prescription_photo[0].filename}`
+//     : null;
+//   console.log(imagePath)
+// if (imagePath) {
+//   data.prescription_photo = imagePath;
+// }
+let conn, sql;
+try {
+  conn = await dbCon.promise().getConnection()
+  sql = `select prescription_photo from orders where id = ?`
+  let [result0] = await conn.query(sql, id)
+  console.log(result0, "ini photo");
+  console.log(result0.length, "ini length");
+
+  if (imagePath) {
+    if (result0[0].prescription_photo) {
+      fs.unlinkSync("./public" + result0.prescription_photo)
+    }
+  }
+  sql = `update users set ? where id = ?`
+  let updateData = {
+    prescription_photo : imagePath
+  }
+  await conn.query(sql, [updateData, id])
+  sql = `select prestriction_photo from orders where id = ?`
+  let [result] = await conn.query(sql, id)
+  conn.release()
+  return res.status(200).send(result[0])
+} catch (error) {
+  console.log(error)
+  throw new Error(error.message)
+  
+}
+}
 module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
-   rejectOrderService, confirmOrderService, getAllTransactionService 
+   rejectOrderService, confirmOrderService, getAllTransactionService , uploadReceipeService
 };

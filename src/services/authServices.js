@@ -53,7 +53,9 @@ const registerService = async (data) => {
 };
 
 const keepLoginService = async (data) => {
-  const { id } = data.user;
+  const { id } = data;
+  console.log(data);
+  console.log(id);
   let conn, sql, result;
   try {
     conn = await dbCon.promise().getConnection();

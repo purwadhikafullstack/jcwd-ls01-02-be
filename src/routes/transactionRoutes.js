@@ -1,16 +1,26 @@
 const express = require("express");
 const {
-  uploadReceipe,
   getPrimaryAddressController,
   getAllAddressesController,
 } = require("../controllers");
-const { verifyToken, upload } = require("../lib");
-const Router = express.Router();
-const uploader = upload("/prescription-photo", "RECEIPE").fields([
-  { name: "prescription_photo", maxCount: 1 },
-]);
 
-Router.post("/prescription-photo", verifyToken, uploader, uploadReceipe);
+const {
+  uploadReceipeController,
+} = require("../controllers/transactionController");
+
+const { verifyToken, upload } = require("../lib");
+
+const Router = express.Router();
+
+const uploader = upload("/prescription-photo", "RECEIPE").single(
+  "prescription_photo"
+);
+Router.post(
+  "/prescription-photo",
+  verifyToken,
+  uploader,
+  uploadReceipeController
+);
 
 Router.get("/primary-address", verifyToken, getPrimaryAddressController);
 Router.get("/all-addresses", verifyToken, getAllAddressesController);

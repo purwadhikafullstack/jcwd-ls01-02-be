@@ -6,42 +6,20 @@ const upload = (destination, fileNamePrefix) => {
   const defaultPath = "./public";
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      const dirAva = "/profile-picture";
-      const dirRec = "/prescription-photo";
-      let directory;
-      if (file.fieldname === "profile_picture") {
-        directory = defaultPath + destination + dirAva;
-      } else if (file.fieldname === "prescription_photo") {
-        directory = defaultPath + destination + dirRec;
+      const dir = defaultPath + destination;
+      if (fs.existsSync(dir)) {
+        console.log(dir, "exist ya");
+        cb(null, dir);
       } else {
-        directory = defaultPath + destination;
+        fs.mkdir(dir, { recursive: true }, (err) => cb(err, dir));
+        console.log(dir, "create");
       }
-      fs.existsSync(directory)
-        ? cb(null, directory)
-        : fs.mkdir(directory, { recursive: true }, (error) =>
-            cb(error, directory)
-          );
     },
     filename: function (req, file, cb) {
       let originalName = file.originalname;
-      const fileAva = "AVATAR";
-      const fileRec = "RECEIPE";
-      let extention = originalName.split(".");
-      let fileName;
-      if (file.fieldname === "profile_picture") {
-        fileName = `${fileNamePrefix}${fileAva}${Date.now()}.${
-          extention[extention.length - 1]
-        }`;
-      } else if (file.fieldname === "prescription_photo") {
-        fileName = `${fileNamePrefix}${fileRec}${Date.now()}.${
-          extention[extention.length - 1]
-        }`;
-      } else {
-        fileName = `${fileNamePrefix}${Date.now()}.${
-          extention[extention.length - 1]
-        }`;
-      }
-      cb(null, fileName);
+      let ext = originalName.split(".");
+      let filename = fileNamePrefix + Date.now() + "." + ext[ext.length - 1];
+      cb(null, filename);
     },
   });
 
@@ -49,7 +27,10 @@ const upload = (destination, fileNamePrefix) => {
     const ext = /\.(jpg|jpeg|png|gif|JPEG|JPG)$/;
     console.log("file:", file);
     if (!file.originalname.match(ext)) {
-      return cb(new Error("Only listed file types are allowed"), false);
+      return cb(
+        new Error("Tipe ekstensi file yang anda masukkan tidak didukung!"),
+        false
+      );
     }
     cb(null, true);
   };
@@ -57,6 +38,9 @@ const upload = (destination, fileNamePrefix) => {
   return multer({
     storage,
     fileFilter,
+    limits: {
+      fileSize: 10 * 1024 * 1024,
+    },
   });
 };
 
