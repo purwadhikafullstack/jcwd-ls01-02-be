@@ -71,6 +71,7 @@ const filterProductController = async (req, res) => {
       .send({ success: false, message: error.message || error });
   }
 };
+
 module.exports = {
   fetchProductsController,
   fetchProductDetailsController,

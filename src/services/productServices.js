@@ -16,7 +16,7 @@ const fetchProductsService = async (data) => {
     })`;
     let [resultTotal] = await conn.query(sql);
     let total = resultTotal[0].total;
-    sql = `SELECT id, name, price, photo, promo, stock, category FROM products WHERE (stock > 0 ${
+    sql = `SELECT id, name, price, photo, promo, stock, category, berat, satuan, golongan FROM products WHERE (stock > 0 ${
       category === "semua" ? "" : `AND category = "${category}"`
     }) ${order} LIMIT ?, ?`;
     let [dataProducts] = await conn.query(sql, [offset, limit]);
@@ -39,7 +39,7 @@ const fetchProductDetailsService = async (data) => {
   try {
     conn = dbCon.promise();
     sql =
-      "SELECT p.id, p.name, p.price, p.photo, p.promo, p.stock, p.category, pd.indikasi, pd.komposisi, pd.kemasan, pd.golongan, pd.cara_penyimpanan, pd.principal, pd.NIE, pd.cara_pakai, pd.peringatan, pd.satuan, pd.cara_pakai FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE p.name = ?";
+      "SELECT p.id, p.name, p.price, p.photo, p.promo, p.stock, p.category, pd.indikasi, pd.komposisi, pd.kemasan, p.golongan, p.berat, pd.cara_penyimpanan, pd.principal, pd.NIE, pd.cara_pakai, pd.peringatan, p.satuan, pd.cara_pakai FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE p.name = ?";
     let [dataDetails] = await conn.query(sql, product_name);
     if (!dataDetails.length) {
       throw { message: "no product found" };

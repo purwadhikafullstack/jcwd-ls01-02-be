@@ -93,4 +93,52 @@ const newProductService = async (data) => {
     throw new Error(error.message || error);
   }
 };
-module.exports = { adminLoginService, newProductService };
+
+const filterProductsService = async (data) => {
+  let { order, page, limit, terms, category } = data.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
+  console.log(order);
+  let offset = limit * page;
+  let conn, sql;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT id, name, price, photo, promo, stock, category, berat, golongan, satuan FROM products WHERE (stock > 0 AND name LIKE "%${terms}%" ${
+      category === "semua" ? "" : `AND category = "${category}"`
+    }) ${order} LIMIT ?, ?`;
+
+    let [products] = await conn.query(sql, [offset, limit]);
+
+    return products;
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
+const getOrdersService = async (data) => {
+  const { status } = data.params;
+  let sql, conn;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id)  ${
+      status === "all" ? "" : `WHERE o.status = "${status}"`
+    }`;
+    let [orders] = await conn.query(sql);
+    return orders;
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
+const validPrescriptionService = async (data) => {
+  const { cartOrder, namaDokter, namaPasien } = data.body;
+  console.log(data.body);
+};
+
+module.exports = {
+  adminLoginService,
+  newProductService,
+  filterProductsService,
+  getOrdersService,
+  validPrescriptionService,
+};

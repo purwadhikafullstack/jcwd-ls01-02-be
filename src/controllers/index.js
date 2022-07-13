@@ -10,7 +10,13 @@ const {
   profilePictureController,
   resetPasswordController,
 } = require("./authController");
-const { loginAdminController, newProduct } = require("./adminController");
+const {
+  loginAdminController,
+  newProduct,
+  filterProductsController,
+  getOrdersController,
+  validPrescriptionController,
+} = require("./adminController");
 const {
   fetchProductsController,
   fetchProductDetailsController,
@@ -66,4 +72,7 @@ module.exports = {
   rejectOrderController,
   confirmOrderController,
   fetchCostController,
+  filterProductsController,
+  getOrdersController,
+  validPrescriptionController,
 };

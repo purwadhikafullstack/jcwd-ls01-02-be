@@ -15,6 +15,7 @@ const db = mysql.createPool({
   database,
   port: 3306,
   connectionLimit: 10,
+  dateStrings: true,
 });
 
 db.getConnection((err, conn) => {
