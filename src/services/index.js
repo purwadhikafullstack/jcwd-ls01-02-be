@@ -11,6 +11,8 @@ const {
   adminLoginService,
   newProductService,
   filterProductsService,
+  getOrdersService,
+  validPrescriptionService,
 } = require("./adminServices");
 const {
   fetchProductsService,
@@ -54,4 +56,6 @@ module.exports = {
   changePrimaryAddressService,
   fetchCostService,
   filterProductsService,
+  getOrdersService,
+  validPrescriptionService,
 };

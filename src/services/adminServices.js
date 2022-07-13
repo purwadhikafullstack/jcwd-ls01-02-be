@@ -115,8 +115,30 @@ const filterProductsService = async (data) => {
   }
 };
 
+const getOrdersService = async (data) => {
+  const { status } = data.params;
+  let sql, conn;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id)  ${
+      status === "all" ? "" : `WHERE o.status = "${status}"`
+    }`;
+    let [orders] = await conn.query(sql);
+    return orders;
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
+const validPrescriptionService = async (data) => {
+  const { cartOrder, namaDokter, namaPasien } = data.body;
+  console.log(data.body);
+};
+
 module.exports = {
   adminLoginService,
   newProductService,
   filterProductsService,
+  getOrdersService,
+  validPrescriptionService,
 };

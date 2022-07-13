@@ -2,7 +2,6 @@ const multer = require("multer");
 const fs = require("fs");
 
 const upload = (destination, fileNamePrefix) => {
-  console.log(`Proses upload`);
   const defaultPath = "./public";
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {

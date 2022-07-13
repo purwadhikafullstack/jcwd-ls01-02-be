@@ -17,6 +17,7 @@ const {
   changePasswordProfileService,
   profilePictureService,
   forgotPasswordService,
+  changePasswordService,
 } = require("../services");
 
 const registerController = async (req, res) => {

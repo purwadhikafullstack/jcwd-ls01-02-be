@@ -14,6 +14,8 @@ const {
   loginAdminController,
   newProduct,
   filterProductsController,
+  getOrdersController,
+  validPrescriptionController,
 } = require("./adminController");
 const {
   fetchProductsController,
@@ -64,4 +66,6 @@ module.exports = {
   changePrimaryAddressController,
   fetchCostController,
   filterProductsController,
+  getOrdersController,
+  validPrescriptionController,
 };
