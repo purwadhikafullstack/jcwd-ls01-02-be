@@ -13,6 +13,7 @@ const {
   filterProductsService,
   getOrdersService,
   validPrescriptionService,
+  getProductsService,
 } = require("./adminServices");
 const {
   fetchProductsService,
@@ -58,4 +59,5 @@ module.exports = {
   filterProductsService,
   getOrdersService,
   validPrescriptionService,
+  getProductsService,
 };
