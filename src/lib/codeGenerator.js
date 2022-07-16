@@ -10,19 +10,14 @@ const dateGenerator = () => {
 
 userIdCodeGenerator = (id) => {
   const idCode = [0, 0, 0];
-  let total = 0;
   let code = "";
-  for (let i = 1; idCode[0] <= 25 && idCode[1] <= 25; i += 100) {
-    // if (i <= 99) {
-    //   idCode[0] = alphabetList[idCode[0]];
-    //   idCode[1] = alphabetList[idCode[1]];
-    //   idCode[2] = i > 9 ? i : "0" + i;
-    //   idCode.forEach((val) => (code = code + `${val}`));
-    // }
-
-    i -= 99;
-    total += 99;
-
+  for (let i = id; i > 0; i -= 99) {
+    if (i <= 99) {
+      idCode[0] = alphabetList[idCode[0]];
+      idCode[1] = alphabetList[idCode[1]];
+      idCode[2] = i > 9 ? i : "0" + i;
+      idCode.forEach((val) => (code = code + `${val}`));
+    }
     idCode[1]++;
     if (idCode[1] > 25) {
       idCode[0]++;
