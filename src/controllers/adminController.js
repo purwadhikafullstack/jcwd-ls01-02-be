@@ -4,6 +4,7 @@ const {
   filterProductsService,
   getOrdersService,
   validPrescriptionService,
+  getProductsService,
 } = require("../services");
 
 const loginAdminController = async (req, res) => {
@@ -74,10 +75,27 @@ const validPrescriptionController = async (req, res) => {
   }
 };
 
+const getProductsController = async (req, res) => {
+  try {
+    const data = await getProductsService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Data Products",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   loginAdminController,
   newProduct,
   filterProductsController,
   getOrdersController,
   validPrescriptionController,
+  getProductsController,
 };

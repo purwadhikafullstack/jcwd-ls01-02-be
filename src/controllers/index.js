@@ -16,6 +16,7 @@ const {
   filterProductsController,
   getOrdersController,
   validPrescriptionController,
+  getProductsController,
 } = require("./adminController");
 const {
   fetchProductsController,
@@ -75,4 +76,5 @@ module.exports = {
   filterProductsController,
   getOrdersController,
   validPrescriptionController,
+  getProductsController,
 };

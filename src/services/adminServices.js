@@ -131,14 +131,85 @@ const getOrdersService = async (data) => {
 };
 
 const validPrescriptionService = async (data) => {
-  const { cartOrder, namaDokter, namaPasien } = data.body;
+  const { cart_checkout, namaDokter, namaPasien, id } = data.body;
+  const status = 2;
+
   console.log(data.body);
+  let sql, conn, insertData;
+  try {
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+
+    sql = `UPDATE orders SET status = ? WHERE id = ?`;
+    await conn.query(sql, [status, id]);
+
+    sql = `INSERT INTO order_prescription SET ?`;
+    insertData = {
+      order_id: id,
+      nama_pasien: namaPasien,
+      nama_dokter: namaDokter,
+    };
+    await conn.query(sql, insertData);
+
+    console.log(cart_checkout);
+    insertData = cart_checkout.map((val) => {
+      return {
+        product_id: val.id,
+        qty: val.qty,
+        dosis: val.dosis,
+        order_id: id,
+      };
+    });
+    for (const data of insertData) {
+      sql = `INSERT INTO checkout_cart SET ?`;
+      await conn.query(sql, data);
+    }
+
+    await conn.commit();
+    conn.release();
+  } catch (error) {
+    conn.rollback();
+    conn.release();
+    throw new Error(error.message || error);
+  }
 };
 
+const getProductsService = async (data) => {
+  let { terms, category, golongan, page, limit, order } = data.query;
+  page = parseInt(page);
+  limit = parseInt(limit);
+  console.log(order);
+  let offset = limit * page;
+  let conn, sql;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT COUNT(id) as total FROM products WHERE (stock > 0 
+      ${terms === "" ? "" : `AND terms LIKE "%${category}%"`} 
+      ${category === "all" ? "" : `AND category = "${category}"`} 
+      ${golongan === "all" ? "" : `AND golongan = "${golongan}"`})`;
+    let [resultTotal] = await conn.query(sql);
+    let total = resultTotal[0].total;
+    sql = `SELECT p.id, p.name, p.price, p.stock, p.category, p.satuan, p.golongan, pd.product_code, pd.NIE, pd.modal FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE (id > 0 
+      ${terms === "" ? "" : `AND terms LIKE "%${category}%"`}
+      ${category === "all" ? "" : `AND category = "${category}"`} 
+      ${golongan === "all" ? "" : `AND golongan = "${golongan}"`}) 
+      ${order} LIMIT ?, ?`;
+    let [dataProducts] = await conn.query(sql, [offset, limit]);
+    let responseData = {
+      products: dataProducts,
+      total,
+    };
+
+    return responseData;
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
 module.exports = {
   adminLoginService,
   newProductService,
   filterProductsService,
   getOrdersService,
   validPrescriptionService,
+  getProductsService,
 };
