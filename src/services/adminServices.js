@@ -1,4 +1,5 @@
 const { dbCon } = require("../connection");
+const { productCodeGenerator } = require("../lib/codeGenerator");
 
 const adminLoginService = async (data) => {
   let { username, email, password } = data;
@@ -23,25 +24,26 @@ const adminLoginService = async (data) => {
 const newProductService = async (data) => {
   let {
     name,
-    price,
-    photo,
-    promo,
+    NIE,
     category,
-    stock,
+    golongan,
+    tgl_kadaluarsa,
     indikasi,
     komposisi,
-    kemasan,
-    golongan,
     cara_penyimpanan,
     principal,
-    NIE,
     cara_pakai,
     peringatan,
+    stock,
     satuan,
-    tgl_kadaluarsa,
+    kemasan,
+    price,
     modal,
+    promo,
     berat,
+    photo,
   } = data.body;
+
   let conn, sql;
   try {
     conn = await dbCon.promise().getConnection();
@@ -51,34 +53,34 @@ const newProductService = async (data) => {
       name,
       price,
       photo,
-      category,
-      stock,
       promo,
+      stock,
+      category,
+      berat,
+      satuan,
+      golongan,
     };
     sql = `INSERT INTO products SET ?`;
     let [resultProduct] = await conn.query(sql, dataProduct);
-    console.log(resultProduct);
-    console.log([resultProduct]);
-    console.log(resultProduct.insertId);
-    console.log([resultProduct.insertId]);
-
     let product_id = resultProduct.insertId;
+
+    let insertData = {
+      no_produk: productCodeGenerator(category, golongan, product_id),
+    };
+    sql = `UPDATE products SET ? WHERE id = ?`;
+    await conn.query(sql, [insertData, product_id]);
+
     let dataProductDetails = {
       indikasi,
       komposisi,
-      dosis,
       kemasan,
-      golongan,
       cara_penyimpanan,
       principal,
       NIE,
       cara_pakai,
       peringatan,
-      satuan,
       tgl_kadaluarsa,
       modal,
-      perhatian,
-      efek_samping,
       product_id,
     };
     sql = `INSERT INTO product_details SET ?`;
@@ -87,6 +89,72 @@ const newProductService = async (data) => {
     await conn.commit();
     conn.release();
     return { message: "success" };
+  } catch (error) {
+    await conn.rollback();
+    conn.release();
+    throw new Error(error.message || error);
+  }
+};
+const editProductService = async (data) => {
+  let {
+    name,
+    NIE,
+    category,
+    golongan,
+    tgl_kadaluarsa,
+    indikasi,
+    komposisi,
+    cara_penyimpanan,
+    principal,
+    cara_pakai,
+    peringatan,
+    stock,
+    satuan,
+    kemasan,
+    price,
+    modal,
+    promo,
+    berat,
+    photo,
+    id,
+  } = data.body;
+
+  let conn, sql;
+  try {
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+
+    let dataProduct = {
+      name,
+      price,
+      photo,
+      promo,
+      stock,
+      category,
+      berat,
+      satuan,
+      golongan,
+    };
+    sql = `UPDATE products SET ? WHERE id = ?`;
+    await conn.query(sql, [dataProduct, id]);
+
+    let dataProductDetails = {
+      indikasi,
+      komposisi,
+      kemasan,
+      cara_penyimpanan,
+      principal,
+      NIE,
+      cara_pakai,
+      peringatan,
+      tgl_kadaluarsa,
+      modal,
+    };
+    sql = `UPDATE product_details SET ? WHERE product_id = ?`;
+    await conn.query(sql, [dataProductDetails, id]);
+
+    await conn.commit();
+    conn.release();
   } catch (error) {
     await conn.rollback();
     conn.release();
@@ -117,12 +185,20 @@ const filterProductsService = async (data) => {
 
 const getOrdersService = async (data) => {
   const { status } = data.params;
+  const { terms, sinceDate, toDate } = data.query;
   let sql, conn;
   try {
     conn = dbCon.promise();
-    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id)  ${
-      status === "all" ? "" : `WHERE o.status = "${status}"`
-    }`;
+    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE o.id > 0 
+    ${status === "all" ? "" : `AND o.status = "${status}"`} 
+    ${
+      terms
+        ? `AND (u.username LIKE "%${terms}%" OR o.transaction_code LIKE "%${terms}%")`
+        : ""
+    } 
+    ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
+    ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
+      `;
     let [orders] = await conn.query(sql);
     return orders;
   } catch (error) {
@@ -176,23 +252,27 @@ const validPrescriptionService = async (data) => {
 
 const getProductsService = async (data) => {
   let { terms, category, golongan, page, limit, order } = data.query;
+  console.log(data.query);
   page = parseInt(page);
   limit = parseInt(limit);
-  console.log(order);
+  category = category === "all" ? category : parseInt(category);
+  golongan = golongan === "all" ? golongan : parseInt(golongan);
+
+  console.log({ page, limit, category, golongan });
   let offset = limit * page;
   let conn, sql;
   try {
     conn = dbCon.promise();
     sql = `SELECT COUNT(id) as total FROM products WHERE (stock > 0 
-      ${terms === "" ? "" : `AND terms LIKE "%${category}%"`} 
-      ${category === "all" ? "" : `AND category = "${category}"`} 
-      ${golongan === "all" ? "" : `AND golongan = "${golongan}"`})`;
+      ${terms ? `AND name LIKE "%${terms}%"` : ""} 
+      ${category === "all" ? "" : `AND category = ${category}`} 
+      ${golongan === "all" ? "" : `AND golongan = ${golongan}`})`;
     let [resultTotal] = await conn.query(sql);
     let total = resultTotal[0].total;
-    sql = `SELECT p.id, p.name, p.price, p.stock, p.category, p.satuan, p.golongan, pd.product_code, pd.NIE, pd.modal FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE (id > 0 
-      ${terms === "" ? "" : `AND terms LIKE "%${category}%"`}
-      ${category === "all" ? "" : `AND category = "${category}"`} 
-      ${golongan === "all" ? "" : `AND golongan = "${golongan}"`}) 
+    sql = `SELECT p.id, p.name, p.price, p.stock, p.category, p.satuan, p.golongan, p.no_produk, pd.NIE, pd.modal FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE (id > 0 
+      ${terms === "" ? "" : `AND name LIKE "%${terms}%"`}
+      ${category === "all" ? "" : `AND category = ${category}`} 
+      ${golongan === "all" ? "" : `AND golongan = ${golongan}`}) 
       ${order} LIMIT ?, ?`;
     let [dataProducts] = await conn.query(sql, [offset, limit]);
     let responseData = {
@@ -205,6 +285,22 @@ const getProductsService = async (data) => {
     throw new Error(error.message || error);
   }
 };
+
+const getProductDetailsService = async (data) => {
+  const { id } = data.query;
+  let conn, sql;
+  try {
+    conn = dbCon.promise();
+
+    sql = `SELECT p.name, p.price, p.photo, p.promo, p.stock, p.category, p.berat, p.satuan, p.golongan, p.no_produk, pd.indikasi, pd.komposisi, pd.kemasan, pd.cara_penyimpanan, pd.principal, pd.NIE, pd.cara_pakai, pd.peringatan, pd.product_id, pd.tgl_kadaluarsa, pd.modal FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE p.id = ?`;
+    let [result] = await conn.query(sql, id);
+
+    return result[0];
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
 module.exports = {
   adminLoginService,
   newProductService,
@@ -212,4 +308,6 @@ module.exports = {
   getOrdersService,
   validPrescriptionService,
   getProductsService,
+  getProductDetailsService,
+  editProductService,
 };

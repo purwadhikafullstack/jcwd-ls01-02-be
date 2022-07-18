@@ -5,6 +5,8 @@ const {
   getOrdersService,
   validPrescriptionService,
   getProductsService,
+  getProductDetailsService,
+  editProductService,
 } = require("../services");
 
 const loginAdminController = async (req, res) => {
@@ -18,9 +20,19 @@ const loginAdminController = async (req, res) => {
   }
 };
 
-const newProduct = async (req, res) => {
+const newProductController = async (req, res) => {
   try {
     await newProductService(req);
+    return res.status(200).send("success");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("failed");
+  }
+};
+
+const editProductController = async (req, res) => {
+  try {
+    await editProductService(req);
     return res.status(200).send("success");
   } catch (error) {
     console.log(error);
@@ -91,11 +103,29 @@ const getProductsController = async (req, res) => {
   }
 };
 
+const getProductDetailsController = async (req, res) => {
+  try {
+    const data = await getProductDetailsService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Data Product's Details",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   loginAdminController,
-  newProduct,
+  newProductController,
   filterProductsController,
   getOrdersController,
   validPrescriptionController,
   getProductsController,
+  getProductDetailsController,
+  editProductController,
 };
