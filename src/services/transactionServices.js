@@ -76,7 +76,8 @@ const rejectOrderService = async (data) => {
   let sql, conn;
   try {
     conn = dbCon.promise();
-    sql = `update orders set status = "Transaksi dibatalkan" where orders_id = ${req.params.orders_id}`;
+    sql = `SELECT * FROM orders where id = ?`
+    sql = `update orders set status = "Transaksi dibatalkan" where id = ${req.params.orders_id}`;
     console.log(orders_id)
     return orders_id
   } catch (error) {
@@ -90,7 +91,8 @@ let (orders_id) = data.query
 let sql, conn
 try {
   conn = dbCon.promise();
-  sql = `update orders set status = "Transaksi Diterima" where orders_id = ${req.params.orders_id}`
+  sql = `SELECT * FROM orders where id = ?`
+  sql = `update orders set status = "Transaksi Diterima" where id = ${req.params.orders_id}`
   console.log(orders_id)
   return orders_id
 } catch (error) {

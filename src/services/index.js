@@ -69,10 +69,7 @@ module.exports = {
   getOrdersService,
   validPrescriptionService,
   getProductsService,
-<<<<<<< HEAD
   deleteProductService,
-=======
   getProductDetailsService,
   editProductService,
->>>>>>> dcbcd8baa3aab29aa1c71ce56223339de6ba9a90
 };
