@@ -72,9 +72,21 @@ const filterProductController = async (req, res) => {
   }
 };
 
+const deleteProductController = async (req, res) => {
+  const { id } = req.query;
+  const data = { id: id };
+  try {
+    const result = await deleteProductService(data);
+    return res.status(200).send({ message: "Delete product success" });
+  } catch (error) {
+    return res.status(500).send({ message: error.message || error });
+  }
+};
+
 module.exports = {
   fetchProductsController,
   fetchProductDetailsController,
   fetchPromoProductsController,
   filterProductController,
+  deleteProductController,
 };

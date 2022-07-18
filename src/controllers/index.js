@@ -23,6 +23,7 @@ const {
   fetchProductDetailsController,
   fetchPromoProductsController,
   filterProductController,
+  deleteProductController,
 } = require("./productController");
 
 const {
@@ -77,4 +78,5 @@ module.exports = {
   getOrdersController,
   validPrescriptionController,
   getProductsController,
+  deleteProductController,
 };

@@ -95,9 +95,37 @@ const filterProductService = async (data) => {
   }
 };
 
+const deleteProductService = async (data) => {
+  const { id } = data;
+  let conn, sql;
+  try {
+    conn = await dbCon.promise().getConnection();
+    sql = `SELECT id from products where id = ?`;
+    let [haveProduct] = await conn.query(sql, id);
+    if (!haveProduct.length) {
+      throw "Product not found";
+    }
+    sql = `SELECT * FROM products where id = ? AND is_deleted = "?"`;
+    let [alreadyDeletedProduct] = await conn.query(sql, [id, "YES"]);
+    console.log(alreadyDeletedProduct[0]);
+    if (alreadyDeletedProduct.length) {
+      throw "Product already deleted!";
+    }
+    sql = `UPDATE products SET is_deleted = ? WHERE id = ?`;
+    let [result] = await conn.query(sql, ["YES", id]);
+    return { data: result };
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message || error);
+  } finally {
+    conn.release();
+  }
+};
+
 module.exports = {
   fetchProductsService,
   fetchProductDetailsService,
   fetchPromoProductsService,
   filterProductService,
+  deleteProductService,
 };

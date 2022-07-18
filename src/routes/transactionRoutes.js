@@ -15,17 +15,17 @@ const { dateGenerator, codeGenerator } = require("../lib/codeGenerator");
 
 const Router = express.Router();
 
-// const uploader = upload("/prescription-photo", "RECEIPE").single(
-//   "prescription_photo"
-// );
-// Router.post(
-//   "/prescription-photo",
-//   verifyToken,
-//   uploader,
-//   uploadReceipeController
-// );
+const uploader = upload("/prescription-photo", "RECEIPE").single(
+  "prescription_photo"
+);
+Router.post(
+  "/prescription-photo",
+  verifyToken,
+  uploader,
+  uploadReceipeController
+);
 
-Router.post("/uploadresep", verifyToken, uploadReceipeController);
+// Router.post("/uploadresep", verifyToken, uploadReceipeController);
 Router.get("/primary-address", verifyToken, getPrimaryAddressController);
 Router.get("/all-addresses", verifyToken, getAllAddressesController);
 Router.post("/order", async (req, res) => {

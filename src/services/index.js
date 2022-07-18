@@ -20,6 +20,7 @@ const {
   fetchProductDetailsService,
   fetchPromoProductsService,
   filterProductService,
+  deleteProductService,
 } = require("./productServices");
 const {
   fetchProvincesService,
@@ -66,4 +67,5 @@ module.exports = {
   getOrdersService,
   validPrescriptionService,
   getProductsService,
+  deleteProductService,
 };

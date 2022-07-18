@@ -17,50 +17,6 @@ const uploadReceipeController = async (req, res) => {
   }
 };
 
-// const uploadReceipeController = (req, res) => {
-//   try {
-//     const path = "Public/resep";
-//     const upload = upload(path, "RESEP").fields([{ name: "image" }]);
-//     const { id } = data.id;
-//     upload(req, res, (error) => {
-//       if (error) {
-//         return res
-//           .status(500)
-//           .send({ message: "Uplous Resep failed !", error: error.message });
-//       }
-//       const { image } = req.files;
-//       const imagePath = image ? path + "/" + image[0].filename : null;
-
-//       var sql = `INSERT INTO orders (prescription_photo, User_id) VALUES ('${imagePath}', '${id}');`;
-//       dbCon.query(sql, (error, results) => {
-//         console.log("ini results", results);
-//         console.log("ini err", error);
-//         if (error) {
-//           return res
-//             .status(500)
-//             .send({ message: "Server Error", error: error.message });
-//         }
-
-//         sql = `SELECT * from orders where User_id = ${id};`;
-//         dbCon.query(sql, id, (error2, results2) => {
-//           console.log("ini results2", results2);
-//           if (error2) {
-//             return res
-//               .status(500)
-//               .send({ message: "Server Error", error: error.message });
-//           }
-
-//           return res.status(200).send(results2);
-//         });
-//       });
-//     });
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({ message: "Server Error", error: error.message });
-//   }
-// };
-
 const {
   getPrimaryAddressService,
   getAllAddressesService,
