@@ -12,11 +12,13 @@ const {
 } = require("./authController");
 const {
   loginAdminController,
-  newProduct,
   filterProductsController,
   getOrdersController,
   validPrescriptionController,
   getProductsController,
+  newProductController,
+  getProductDetailsController,
+  editProductController,
 } = require("./adminController");
 const {
   fetchProductsController,
@@ -41,7 +43,7 @@ const {
 } = require("./transactionController");
 
 module.exports = {
-  newProduct,
+  newProductController,
   registerController,
   keepLoginController,
   emailVerificationController,
@@ -70,4 +72,6 @@ module.exports = {
   getOrdersController,
   validPrescriptionController,
   getProductsController,
+  getProductDetailsController,
+  editProductController,
 };

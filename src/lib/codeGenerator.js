@@ -35,7 +35,42 @@ const codeGenerator = (type, date, id) => {
   date[1] = date[1].split(":").join("");
   dateCode = date[0] + date[1];
   let idCode = userIdCodeGenerator(id);
-  return `${suffix}-${dateCode}-${idCode}`;
+  return `${suffix}${dateCode}${idCode}`;
+};
+
+const productCodeGenerator = (category, golongan, id) => {
+  console.log({ category, golongan, id });
+  const code = [];
+  if (category == 1) {
+    code[0] = "O";
+  } else if (category == 2) {
+    code[0] = "N";
+  } else if (category == 3) {
+    code[0] = "H";
+  } else if (category == 4) {
+    code[0] = "V";
+  } else if (category == 5) {
+    code[0] = "A";
+  } else if (category == 6) {
+    code[0] = "P";
+  } else if (category == 7) {
+    code[0] = "I";
+  }
+  if (golongan == 1) {
+    code[1] = "OB";
+  } else if (golongan == 2) {
+    code[1] = "OK";
+  } else if (golongan == 3) {
+    code[1] = "OT";
+  } else if (golongan == 4) {
+    code[1] = "MD";
+  } else if (golongan == 5) {
+    code[1] = "LL";
+  }
+
+  code[0] = code[0] + code[1];
+  code[1] = userIdCodeGenerator(id);
+  return code.join("-");
 };
 
 const alphabetList = [
@@ -67,4 +102,4 @@ const alphabetList = [
   "Z",
 ];
 
-module.exports = { dateGenerator, codeGenerator };
+module.exports = { dateGenerator, codeGenerator, productCodeGenerator };
