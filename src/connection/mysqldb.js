@@ -1,5 +1,4 @@
 const mysql = require("mysql2");
-const { Client } = require("ssh2");
 require("dotenv").config();
 
 const host = process.env.HOST;
