@@ -1,5 +1,6 @@
 const multer = require("multer");
 const fs = require("fs");
+const sharp = require("sharp");
 
 const upload = (destination, fileNamePrefix) => {
   const defaultPath = "./public";
@@ -52,4 +53,11 @@ const upload = (destination, fileNamePrefix) => {
   });
 };
 
-module.exports = { upload };
+const imageProcess = async (file, path) => {
+  try {
+    await sharp(file.buffer).resize({ width: 500, height: 500 }).toFile(path);
+  } catch (error) {
+    throw { message: "Gagal menyimpan foto" };
+  }
+};
+module.exports = { upload, imageProcess };
