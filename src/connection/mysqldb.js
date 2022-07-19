@@ -1,7 +1,6 @@
 const mysql = require("mysql2");
 const { Client } = require("ssh2");
 require("dotenv").config();
-const sshClient = new Client();
 
 const host = process.env.HOST;
 const user = process.env.USER_NAME;

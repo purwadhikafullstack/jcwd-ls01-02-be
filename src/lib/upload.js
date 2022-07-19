@@ -1,5 +1,6 @@
 const multer = require("multer");
 const fs = require("fs");
+import isJpg from "is-jpg";
 
 const upload = (destination, fileNamePrefix) => {
   const defaultPath = "./public";
@@ -52,4 +53,12 @@ const upload = (destination, fileNamePrefix) => {
   });
 };
 
-module.exports = { upload };
+const convertToJpg = async (data) => {
+  console.log(data);
+  if (isJpg(data)) {
+    return true;
+  }
+  return false;
+};
+
+module.exports = { upload, convertToJpg };

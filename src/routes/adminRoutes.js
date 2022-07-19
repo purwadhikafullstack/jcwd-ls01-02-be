@@ -15,6 +15,7 @@ const {
   codeGenerator,
   productCodeGenerator,
 } = require("../lib/codeGenerator");
+const { convertToJpg } = require("../lib/upload");
 const Router = express.Router();
 
 Router.post("/adminlogin", loginAdminController);
@@ -25,6 +26,15 @@ Router.get("/orders/:status", getOrdersController);
 Router.post("/order/valid-prescription", validPrescriptionController);
 Router.get("/products", getProductsController);
 Router.get("/product-details", getProductDetailsController);
+Router.post("/upload", convertToJpg, async (req, res) => {
+  try {
+    console.log(req);
+    return res.status(200).send("jpg");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+});
 Router.post("/order", async (req, res) => {
   // let { id } = req.query;
   // let { id: user_id } = req.user;
@@ -34,7 +44,7 @@ Router.post("/order", async (req, res) => {
     conn = dbCon.promise();
     let date = dateGenerator();
     let prescription_photo = "/prescriptions/resep.jpg";
-    let user_id = 65;
+    let user_id = 77;
     let insertData = {
       user_id,
       prescription_photo,
