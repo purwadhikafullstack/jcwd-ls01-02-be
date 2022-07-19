@@ -15,7 +15,6 @@ const {
   codeGenerator,
   productCodeGenerator,
 } = require("../lib/codeGenerator");
-const { convertToJpg } = require("../lib/upload");
 const Router = express.Router();
 
 Router.post("/adminlogin", loginAdminController);
@@ -26,7 +25,7 @@ Router.get("/orders/:status", getOrdersController);
 Router.post("/order/valid-prescription", validPrescriptionController);
 Router.get("/products", getProductsController);
 Router.get("/product-details", getProductDetailsController);
-Router.post("/upload", convertToJpg, async (req, res) => {
+Router.post("/upload", async (req, res) => {
   try {
     console.log(req);
     return res.status(200).send("jpg");
