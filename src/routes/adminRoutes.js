@@ -57,7 +57,7 @@ Router.post("/order", async (req, res) => {
     conn = dbCon.promise();
     let date = dateGenerator();
     let prescription_photo = "/prescriptions/resep.jpg";
-    let user_id = 77;
+    let user_id = 61;
     let insertData = {
       user_id,
       prescription_photo,
