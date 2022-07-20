@@ -1,7 +1,6 @@
 const { dbCon } = require("../connection");
+const { query } = require("../connection/mysqldb");
 const db = require("../connection/mysqldb");
-
-
 
 const getPrimaryAddressService = async (data) => {
   const { id } = data.user;
@@ -58,52 +57,50 @@ const getAllAddressesService = async (data) => {
 };
 
 const getAllTransactionService = async (data) => {
-
   let conn, sql;
 
   try {
     conn = dbCon.promise();
     sql = `SELECT orders, user_id, status, date_requested, total, selected_address, shipping_method from orders join user on orders.orders_id = user_id`;
   } catch (error) {
-    console.log(error)
-    throw new Error(error.message)
+    console.log(error);
+    throw new Error(error.message);
   }
 };
 
-
 const rejectOrderService = async (data) => {
-  let (orders_id) = data.query
+  console.log(data.query);
+
   let sql, conn;
   try {
     conn = dbCon.promise();
-    sql = `SELECT * FROM orders where id = ?`
-    sql = `update orders set status = "Transaksi dibatalkan" where id = ${req.params.orders_id}`;
-    console.log(orders_id)
-    return orders_id
+    sql = `SELECT * FROM orders where id = ?`;
+    await conn.query(sql, [data.query.id]);
+    sql = `update orders set status = "Dibatalkan" where id = ${data.query.id}`;
+    await conn.query(sql);
   } catch (error) {
-    console.log(error)
-    throw new Error(error.message)
+    console.log(error);
+    throw new Error(error.message);
   }
 };
 
 const confirmOrderService = async (data) => {
-let (orders_id) = data.query
-let sql, conn
-try {
-  conn = dbCon.promise();
-  sql = `SELECT * FROM orders where id = ?`
-  sql = `update orders set status = "Transaksi Diterima" where id = ${req.params.orders_id}`
-  console.log(orders_id)
-  return orders_id
-} catch (error) {
-  console.log(error)
-  throw new Error (error.message)
-  
-}
-}
+  console.log(data.query);
+  let sql, conn;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT * FROM orders where id = ?`;
+    await conn.query(sql, [data.query.id]);
+    sql = `update orders set status = "Transaksi-Diterima" where id = ${data.query.id}`;
+    await conn.query(sql);
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
 
 const uploadReceipeService = async (data) => {
-  const { id } = data
+  const { id } = data;
   let { prescription_photo, user_id } = data.body;
   // console.log("ini req", data.file)
   // let path = "/prescription-photo";
@@ -112,25 +109,27 @@ const uploadReceipeService = async (data) => {
   //   : null;
   // console.log(imagePath)
 
-let conn, sql;
-try {
-  conn = dbCon.promise()
-  let insertData = {
-    user_id,
-    prescription_photo,
-    status: 1,
+  let conn, sql;
+  try {
+    conn = dbCon.promise();
+    let insertData = {
+      user_id,
+      prescription_photo,
+      status: 1,
+    };
+    sql = `INSERT INTO orders set ?`;
+    await conn.query(sql, insertData);
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
   }
-  sql = `INSERT INTO orders set ?`
-  await conn.query(sql, insertData)
-} catch (error) {
-  console.log(error)
-  throw new Error(error.message)
-}
-}
+};
 
 module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
-  rejectOrderService, confirmOrderService, getAllTransactionService,
-  uploadReceipeService
+  rejectOrderService,
+  confirmOrderService,
+  getAllTransactionService,
+  uploadReceipeService,
 };

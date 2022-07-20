@@ -7,6 +7,8 @@ const {
 
 const {
   uploadReceipeController,
+  rejectOrderController,
+  confirmOrderController,
 } = require("../controllers/transactionController");
 
 const { verifyToken, upload } = require("../lib");
@@ -52,5 +54,6 @@ Router.post("/order", async (req, res) => {
     return res.status(500).send("failed");
   }
 });
-
+Router.patch("/order/reject", rejectOrderController);
+Router.patch("/order/confirm", confirmOrderController);
 module.exports = Router;

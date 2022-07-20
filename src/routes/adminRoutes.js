@@ -9,6 +9,7 @@ const {
   newProductController,
   getProductDetailsController,
   editProductController,
+  deleteProductController,
 } = require("../controllers");
 const {
   dateGenerator,
@@ -25,6 +26,7 @@ Router.get("/orders/:status", getOrdersController);
 Router.post("/order/valid-prescription", validPrescriptionController);
 Router.get("/products", getProductsController);
 Router.get("/product-details", getProductDetailsController);
+Router.delete("/delete-product", deleteProductController);
 Router.post("/order", async (req, res) => {
   // let { id } = req.query;
   // let { id: user_id } = req.user;

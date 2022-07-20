@@ -16,13 +16,13 @@ const {
   getProductsService,
   getProductDetailsService,
   editProductService,
+  deleteProductService,
 } = require("./adminServices");
 const {
   fetchProductsService,
   fetchProductDetailsService,
   fetchPromoProductsService,
   filterProductService,
-  deleteProductService,
 } = require("./productServices");
 const {
   fetchProvincesService,

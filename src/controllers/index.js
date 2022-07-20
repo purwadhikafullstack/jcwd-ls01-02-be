@@ -19,13 +19,13 @@ const {
   newProductController,
   getProductDetailsController,
   editProductController,
+  deleteProductController,
 } = require("./adminController");
 const {
   fetchProductsController,
   fetchProductDetailsController,
   fetchPromoProductsController,
   filterProductController,
-  deleteProductController,
 } = require("./productController");
 
 const {
