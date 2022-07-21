@@ -74,25 +74,48 @@ Router.post("/order", async (req, res) => {
   }
 });
 
-Router.patch("/kode", async (req, res) => {
-  let conn;
+Router.post("/stok", async (req, res) => {
+  let conn, sql;
   try {
     conn = await dbCon.promise().getConnection();
     await conn.beginTransaction();
     const datas = req.body;
     console.log(req.body);
+
+    // let sql = `SELECT pd.product_id, pd.tgl_kadaluarsa, p.stock FROM product_details pd JOIN products p ON (pd.product_id = p.id)`;
+    let id = 2;
+    let insertData;
     for (const data of datas) {
-      const { category, golongan, id } = data;
-      let insertData = {
-        no_produk: productCodeGenerator(category, golongan, id),
+      const { product_id, tgl_kadaluarsa, stock } = data;
+      insertData = {
+        product_id,
+        tgl_kadaluarsa,
+        stock,
       };
-      let sql = `UPDATE products SET ? WHERE id = ?`;
-      await conn.query(sql, [insertData, id]);
+      sql = `INSERT INTO product_stock SET ?`;
+      await conn.query(sql, insertData);
+
+      insertData = {
+        admin_id: id,
+        aktivitas: 1,
+        masuk: stock,
+        sisa: stock,
+        product_id,
+      };
+      sql = `INSERT INTO admin_logger SET ?`;
+      await conn.query(sql, insertData);
+
+      if (id === 4) {
+        id = 2;
+      } else {
+        id++;
+      }
     }
+    // let [data] = await conn.query(sql);
 
     await conn.commit();
     conn.release();
-    return res.status(200).send("succeed");
+    return res.status(200).send("success");
   } catch (error) {
     console.log(error);
     await conn.rollback();
