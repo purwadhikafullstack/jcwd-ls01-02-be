@@ -105,21 +105,19 @@ const editQuantityonCartServices = async (data) => {
   }
 };
 
-const deleteProductCartServices = async (data) => {
-  const { id } = data.user;
-  const { productId } = data.body;
-  // console.log(data.user, ">>>>>>>>>>>>> DATA USERRRRRR");
-  // console.log(data.body, ">>>>>>>>>>>>> DATA BOOOOOODDDDDYYYYYY");
+const deleteProductCartServices = async (data, user) => {
+  // const { id } = data.user;
+  console.log(data, ">>>>>>>>>>>>> DATA USERRRRRR");
   let sql, conn;
   try {
     conn = await dbCon.promise().getConnection();
 
-    sql = `DELETE FROM cart WHERE user_id = ? AND product_id = ?`;
-    let [deleteProduct] = await conn.query(sql, [id, productId]);
+    sql = `DELETE FROM cart WHERE user_id = ? AND id = ?`;
+    let [deleteProduct] = await conn.query(sql, [user, data]);
 
     sql = `SELECT * FROM cart WHERE user_id = ?`;
 
-    let [resultProductLeft] = await conn.query(sql, [id]);
+    let [resultProductLeft] = await conn.query(sql, [user]);
     // console.log(deleteProduct);
     return resultProductLeft;
   } catch (error) {
@@ -175,6 +173,61 @@ const getAllAddressesService = async (data) => {
     throw new Error(error.message);
   }
 };
+
+const paymentPhotoService = async (req, res) => {
+  let path = "/payment";
+  let pathAva = "/payment-photo";
+  const data = JSON.parse(req.body.data);
+  const { payment_photo } = req.files;
+  const imagePathAva = payment_photo
+    ? `${path}${pathAva}/${payment_photo[0].filename}`
+    : null;
+
+  if (imagePathAva) {
+    data.payment_photo = imagePathAva;
+  }
+
+  const { id } = req.user;
+  let conn, sql;
+  try {
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+    sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
+    let [result] = await conn.query(sql, [id]);
+    if (!result.length) {
+      throw { message: "id not found" };
+    }
+    // sql = `SELECT id FROM users WHERE username = ?`;
+    // let [usernameFound] = await conn.query(sql, data.username);
+    // // error jika tidak unique
+    // if (usernameFound.length && usernameFound[0].id !== id) {
+    //   throw {
+    //     message: "Username has already been used! Try a different one!",
+    //   };
+    // }
+    sql = `UPDATE users JOIN user_details ON (users.id = user_details.user_id) SET ? WHERE users.id = ?`;
+    await conn.query(sql, [data, id]);
+
+    if (imagePathAva && result[0].payment_photo) {
+      fs.unlinkSync(`./public${result[0].payment_photo}`);
+    }
+
+    sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
+    let [result1] = await conn.query(sql, id);
+    await conn.commit();
+    conn.release();
+    return res.status(200).send(result1[0]);
+  } catch (error) {
+    if (imagePathAva) {
+      fs.unlinkSync("./public" + imagePathAva);
+    }
+    conn.rollback();
+    conn.release();
+    console.log(error);
+    return res.status(500).send({ message: error.message || error });
+  }
+};
+
 module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
@@ -182,4 +235,5 @@ module.exports = {
   getCartServices,
   editQuantityonCartServices,
   deleteProductCartServices,
+  paymentPhotoService,
 };

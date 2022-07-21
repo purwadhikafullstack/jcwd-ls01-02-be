@@ -52,7 +52,11 @@ const editQuantityonCartController = async (req, res) => {
 
 const deleteProductCartController = async (req, res) => {
   try {
-    const data = await deleteProductCartServices(req);
+    console.log(req.user, "QUERRYYYY");
+    const data = await deleteProductCartServices(
+      req.query.productId,
+      req.user.id
+    );
     return res.send({
       status: 200,
       success: true,
@@ -60,6 +64,7 @@ const deleteProductCartController = async (req, res) => {
       data,
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).send({ message: error.message || error });
   }
 };
