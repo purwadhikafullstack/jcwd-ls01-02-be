@@ -1,10 +1,16 @@
-const dateGenerator = () => {
+const fs = require("fs");
+
+const dateGenerator = (full) => {
   const current = new Date();
   const date = ("0" + current.getDate()).slice(-2);
   const month = ("0" + (current.getMonth() + 1)).slice(-2);
   const year = current.getFullYear().toString().substring(2);
   const hours = ("0" + current.getHours()).slice(-2);
   const minutes = ("0" + current.getMinutes()).slice(-2);
+  if (full) {
+    const seconds = ("0" + current.getSeconds()).slice(-2);
+    return `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
+  }
   return `${year}-${month}-${date} ${hours}:${minutes}`;
 };
 
@@ -36,6 +42,25 @@ const codeGenerator = (type, date, id) => {
   dateCode = date[0] + date[1];
   let idCode = userIdCodeGenerator(id);
   return `${suffix}${dateCode}${idCode}`;
+};
+
+const photoNameGenerator = (file, dir, suffix) => {
+  const defaultPath = "./public";
+  console.log(file);
+  fs.access(defaultPath + dir, (error) => {
+    if (error) fs.mkdirSync(defaultPath + dir);
+  });
+
+  let originalName = file.originalname;
+  let extention = originalName.split(".");
+  let currentDate = dateGenerator(1).split(" ");
+  currentDate[0] = currentDate[0].split("-").join("");
+  currentDate[1] = currentDate[1].split(":").join("");
+  let date = currentDate[0] + currentDate[1];
+  let fileName = `${suffix}${date}.${extention[extention.length - 1]}`;
+  let path = `${defaultPath + dir}/${fileName}`;
+  let photo = `${dir}/${fileName}`;
+  return { path, photo };
 };
 
 const productCodeGenerator = (category, golongan, id) => {
@@ -102,4 +127,9 @@ const alphabetList = [
   "Z",
 ];
 
-module.exports = { dateGenerator, codeGenerator, productCodeGenerator };
+module.exports = {
+  dateGenerator,
+  codeGenerator,
+  productCodeGenerator,
+  photoNameGenerator,
+};

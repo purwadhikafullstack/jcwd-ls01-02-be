@@ -16,17 +16,40 @@ const {
   codeGenerator,
   productCodeGenerator,
 } = require("../lib/codeGenerator");
+const multer = require("multer");
+const { imageProcess } = require("../lib/upload");
+const storage = multer.memoryStorage();
+const uploads = multer({ storage });
+
 const Router = express.Router();
 
 Router.post("/adminlogin", loginAdminController);
-Router.post("/new-product", newProductController);
-Router.patch("/edit-product", editProductController);
+Router.post(
+  "/new-product",
+  uploads.single("product_photo"),
+  newProductController
+);
+Router.patch(
+  "/edit-product",
+  uploads.single("product_photo"),
+  editProductController
+);
 Router.get("/filter-products", filterProductsController);
 Router.get("/orders/:status", getOrdersController);
 Router.post("/order/valid-prescription", validPrescriptionController);
 Router.get("/products", getProductsController);
 Router.get("/product-details", getProductDetailsController);
 Router.delete("/delete-product", deleteProductController);
+Router.post("/upload", uploads.single("file"), async (req, res) => {
+  try {
+    console.log(req.file);
+    await imageProcess(req.file, "/products", "PRODUCT");
+    return res.status(200).send("jpg");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+});
 Router.post("/order", async (req, res) => {
   // let { id } = req.query;
   // let { id: user_id } = req.user;
@@ -36,7 +59,7 @@ Router.post("/order", async (req, res) => {
     conn = dbCon.promise();
     let date = dateGenerator();
     let prescription_photo = "/prescriptions/resep.jpg";
-    let user_id = 65;
+    let user_id = 61;
     let insertData = {
       user_id,
       prescription_photo,

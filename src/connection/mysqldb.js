@@ -1,7 +1,5 @@
 const mysql = require("mysql2");
-const { Client } = require("ssh2");
 require("dotenv").config();
-const sshClient = new Client();
 
 const host = process.env.HOST;
 const user = process.env.USER_NAME;
@@ -22,7 +20,7 @@ db.getConnection((err, conn) => {
   if (err) {
     return console.log(err);
   }
-  return console.log(`connected as id ${conn?.threadId}`);
+  return console.log(`Connected`);
 });
 
 module.exports = db;

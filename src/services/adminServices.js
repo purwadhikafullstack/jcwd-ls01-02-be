@@ -1,5 +1,9 @@
 const { dbCon } = require("../connection");
-const { productCodeGenerator } = require("../lib/codeGenerator");
+const {
+  productCodeGenerator,
+  photoNameGenerator,
+} = require("../lib/codeGenerator");
+const { imageProcess } = require("../lib/upload");
 
 const adminLoginService = async (data) => {
   let { username, email, password } = data;
@@ -22,6 +26,7 @@ const adminLoginService = async (data) => {
 };
 
 const newProductService = async (data) => {
+  const parsedData = JSON.parse(data.body.data);
   let {
     name,
     NIE,
@@ -41,8 +46,9 @@ const newProductService = async (data) => {
     modal,
     promo,
     berat,
-    photo,
-  } = data.body;
+  } = parsedData;
+
+  const dataPhoto = photoNameGenerator(data.file, "/products", "PRODUCT");
 
   let conn, sql;
   try {
@@ -52,7 +58,7 @@ const newProductService = async (data) => {
     let dataProduct = {
       name,
       price,
-      photo,
+      photo: dataPhoto.photo,
       promo,
       stock,
       category,
@@ -86,6 +92,8 @@ const newProductService = async (data) => {
     sql = `INSERT INTO product_details SET ?`;
     await conn.query(sql, dataProductDetails);
 
+    await imageProcess(data.file, dataPhoto.path);
+
     await conn.commit();
     conn.release();
     return { message: "success" };
@@ -95,7 +103,11 @@ const newProductService = async (data) => {
     throw new Error(error.message || error);
   }
 };
+
 const editProductService = async (data) => {
+  console.log(data.body);
+  console.log(data.file);
+  const parsedData = JSON.parse(data.body.data);
   let {
     name,
     NIE,
@@ -115,9 +127,12 @@ const editProductService = async (data) => {
     modal,
     promo,
     berat,
-    photo,
     id,
-  } = data.body;
+  } = parsedData;
+  let dataPhoto;
+  if (data.file) {
+    dataPhoto = photoNameGenerator(data.file, "/products", "PRODUCT");
+  }
 
   let conn, sql;
   try {
@@ -127,9 +142,7 @@ const editProductService = async (data) => {
     let dataProduct = {
       name,
       price,
-      photo,
       promo,
-      stock,
       category,
       berat,
       satuan,
@@ -152,6 +165,24 @@ const editProductService = async (data) => {
     };
     sql = `UPDATE product_details SET ? WHERE product_id = ?`;
     await conn.query(sql, [dataProductDetails, id]);
+
+    if (stock) {
+      sql = `SELECT stock FROM products WHERE id = ?`;
+      let [prevStock] = await conn.query(sql, id);
+      console.log(prevStock);
+      let insertStock = {
+        stock: Number(stock) + Number(prevStock[0].stock),
+      };
+      console.log({ insertStock });
+      sql = `UPDATE products SET ? WHERE id = ?`;
+      await conn.query(sql, [insertStock, id]);
+    }
+    if (dataPhoto) {
+      let insertPhoto = { photo: dataPhoto.photo };
+      sql = `UPDATE products SET ? WHERE id = ?`;
+      await conn.query(sql, [insertPhoto, id]);
+      await imageProcess(data.file, dataPhoto.path);
+    }
 
     await conn.commit();
     conn.release();
@@ -269,8 +300,6 @@ const getProductsService = async (data) => {
   console.log(order);
   page = parseInt(page);
   limit = parseInt(limit);
-  category = category === "all" ? category : parseInt(category);
-  golongan = golongan === "all" ? golongan : parseInt(golongan);
 
   console.log({ page, limit, category, golongan });
   let offset = limit * page;
@@ -279,14 +308,14 @@ const getProductsService = async (data) => {
     conn = dbCon.promise();
     sql = `SELECT COUNT(id) as total FROM products WHERE (stock > 0 
       ${terms ? `AND name LIKE "%${terms}%"` : ""} 
-      ${category === "all" ? "" : `AND category = ${category}`} 
-      ${golongan === "all" ? "" : `AND golongan = ${golongan}`})`;
+      ${category === "all" ? "" : `AND category = "${category}"`} 
+      ${golongan === "all" ? "" : `AND golongan = "${golongan}"`})`;
     let [resultTotal] = await conn.query(sql);
     let total = resultTotal[0].total;
     sql = `SELECT p.id, p.name, p.price, p.stock, p.category, p.satuan, p.golongan, p.no_produk, pd.NIE, pd.modal FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE (id > 0 
       ${terms === "" ? "" : `AND name LIKE "%${terms}%"`}
-      ${category === "all" ? "" : `AND category = ${category}`} 
-      ${golongan === "all" ? "" : `AND golongan = ${golongan}`}) 
+      ${category === "all" ? "" : `AND category = "${category}"`} 
+      ${golongan === "all" ? "" : `AND golongan = "${golongan}"`}) 
       ${order} LIMIT ?, ?`;
     let [dataProducts] = await conn.query(sql, [offset, limit]);
     let responseData = {
@@ -332,29 +361,17 @@ const getReportService = async (data) => {
 };
 
 const deleteProductService = async (data) => {
-  const { id } = data;
+  console.log(data.query);
   let conn, sql;
   try {
     conn = await dbCon.promise().getConnection();
-    sql = `SELECT id from products where id = ?`;
-    let [haveProduct] = await conn.query(sql, id);
-    if (!haveProduct.length) {
-      throw "Product not found";
-    }
-    sql = `SELECT * FROM products where id = ? AND is_deleted = "?"`;
-    let [alreadyDeletedProduct] = await conn.query(sql, [id, "YES"]);
-    console.log(alreadyDeletedProduct[0]);
-    if (alreadyDeletedProduct.length) {
-      throw "Product already deleted!";
-    }
-    sql = `UPDATE products SET is_deleted = ? WHERE id = ?`;
-    let [result] = await conn.query(sql, ["YES", id]);
-    return { data: result };
+    sql = `SELECT * from products where id = ?`;
+    await conn.query(sql, [data.query.id]);
+    sql = `DELETE FROM products where id = ${data.query.id}`;
+    await conn.query(sql);
   } catch (error) {
     console.log(error);
     throw new Error(error.message || error);
-  } finally {
-    conn.release();
   }
 };
 

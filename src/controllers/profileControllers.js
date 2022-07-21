@@ -6,6 +6,7 @@ const {
 } = require("../services");
 
 const updateProfile = async (req, res) => {
+  console.log(req.file);
   let path = "/profile-photos";
   let pathAva = "/profile-picture";
   const data = JSON.parse(req.body.data);
@@ -39,9 +40,9 @@ const updateProfile = async (req, res) => {
     sql = `UPDATE users JOIN user_details ON (users.id = user_details.user_id) SET ? WHERE users.id = ?`;
     await conn.query(sql, [data, id]);
 
-    if (imagePathAva && result[0].profile_picture) {
-      fs.unlinkSync(`./public${result[0].profile_picture}`);
-    }
+    // if (imagePathAva && result[0].profile_picture) {
+    //   fs.unlinkSync(`./public${result[0].profile_picture}`);
+    // }
 
     sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
     let [result1] = await conn.query(sql, id);

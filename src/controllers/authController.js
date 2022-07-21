@@ -14,7 +14,6 @@ const {
   keepLoginService,
   verificationService,
   loginService,
-  changePasswordProfileService,
   profilePictureService,
   forgotPasswordService,
   changePasswordService,
@@ -79,6 +78,7 @@ const emailVerificationController = async (req, res) => {
     const data = req.body;
     const dataToken = newDataToken(data);
 
+    console.log({ dataToken });
     newCache(dataToken);
 
     const tokenEmail = createJWTEmail(dataToken);
@@ -124,8 +124,9 @@ const loginController = async (req, res) => {
     const data = await loginService(req);
 
     const dataToken = newDataToken(data);
-
+    console.log({ dataToken });
     if (!data.verified) {
+      newCache(dataToken);
       const tokenEmail = createJWTEmail(dataToken);
       const link = linkGenerator(tokenEmail, 1);
       await emailGenerator(data, link, "verification");

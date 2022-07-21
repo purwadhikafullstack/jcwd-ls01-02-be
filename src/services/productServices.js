@@ -24,10 +24,14 @@ const fetchProductsService = async (data) => {
     dataProducts = dataProducts.map((val) => {
       let initPrice = val.promo + val.price;
       val.promo = Math.round((val.promo / val.price) * 100);
-      return { ...val, initPrice, total };
+      return { ...val, initPrice };
     });
+    let responseData = {
+      products: dataProducts,
+      total,
+    };
 
-    return dataProducts;
+    return responseData;
   } catch (error) {
     console.log(error);
     throw new Error(error.message || error);
@@ -62,7 +66,7 @@ const fetchPromoProductsService = async () => {
   let conn, sql;
   try {
     conn = dbCon.promise();
-    sql = `SELECT id, name, price, photo, promo, stock, category, promo/price*100 as percent FROM products ORDER BY percent DESC LIMIT 10`;
+    sql = `SELECT id, name, price, photo, promo, stock, category, promo/price*100 as percent FROM products ORDER BY percent DESC LIMIT 17`;
     let [resultPromo] = await conn.query(sql);
     resultPromo = resultPromo.map((val) => {
       let initPrice = val.promo + val.price;

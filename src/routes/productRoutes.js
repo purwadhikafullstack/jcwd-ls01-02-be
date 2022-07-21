@@ -5,7 +5,6 @@ const {
   fetchProductDetailsController,
   fetchPromoProductsController,
   filterProductController,
-  filterProductsController,
 } = require("../controllers");
 
 const Router = express.Router();
