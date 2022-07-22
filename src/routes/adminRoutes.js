@@ -9,12 +9,10 @@ const {
   newProductController,
   getProductDetailsController,
   editProductController,
+  getNameController,
+  addStockController,
 } = require("../controllers");
-const {
-  dateGenerator,
-  codeGenerator,
-  productCodeGenerator,
-} = require("../lib/codeGenerator");
+const { dateGenerator, codeGenerator } = require("../lib/codeGenerator");
 const multer = require("multer");
 const { imageProcess } = require("../lib/upload");
 const storage = multer.memoryStorage();
@@ -38,6 +36,9 @@ Router.get("/orders/:status", getOrdersController);
 Router.post("/order/valid-prescription", validPrescriptionController);
 Router.get("/products", getProductsController);
 Router.get("/product-details", getProductDetailsController);
+Router.get("/get-name", getNameController);
+Router.post("/add-stock", addStockController);
+
 Router.post("/upload", uploads.single("file"), async (req, res) => {
   try {
     console.log(req.file);

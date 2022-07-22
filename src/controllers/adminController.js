@@ -7,6 +7,8 @@ const {
   getProductsService,
   getProductDetailsService,
   editProductService,
+  getNameService,
+  addStockService,
 } = require("../services");
 
 const loginAdminController = async (req, res) => {
@@ -119,6 +121,37 @@ const getProductDetailsController = async (req, res) => {
   }
 };
 
+const getNameController = async (req, res) => {
+  try {
+    const data = await getNameService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Data Product's name",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
+const addStockController = async (req, res) => {
+  try {
+    await addStockService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Stok berhasil bertambah",
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   loginAdminController,
   newProductController,
@@ -128,4 +161,6 @@ module.exports = {
   getProductsController,
   getProductDetailsController,
   editProductController,
+  getNameController,
+  addStockController,
 };

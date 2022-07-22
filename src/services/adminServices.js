@@ -60,7 +60,6 @@ const newProductService = async (data) => {
       price,
       photo: dataPhoto.photo,
       promo,
-      stock,
       category,
       berat,
       satuan,
@@ -85,12 +84,29 @@ const newProductService = async (data) => {
       NIE,
       cara_pakai,
       peringatan,
-      tgl_kadaluarsa,
       modal,
       product_id,
     };
     sql = `INSERT INTO product_details SET ?`;
     await conn.query(sql, dataProductDetails);
+
+    insertData = {
+      admin_id: id,
+      aktivitas: 1,
+      masuk: stock,
+      sisa: parseInt(total) + parseInt(stock),
+      product_id,
+    };
+    sql = `INSERT INTO admin_logger SET ?`;
+    await conn.query(sql, insertData);
+
+    insertData = {
+      product_id,
+      tgl_kadaluarsa,
+      stock,
+    };
+    sql = `INSERT INTO product_stock SET ?`;
+    await conn.query(sql, insertData);
 
     await imageProcess(data.file, dataPhoto.path);
 
@@ -113,14 +129,12 @@ const editProductService = async (data) => {
     NIE,
     category,
     golongan,
-    tgl_kadaluarsa,
     indikasi,
     komposisi,
     cara_penyimpanan,
     principal,
     cara_pakai,
     peringatan,
-    stock,
     satuan,
     kemasan,
     price,
@@ -160,23 +174,11 @@ const editProductService = async (data) => {
       NIE,
       cara_pakai,
       peringatan,
-      tgl_kadaluarsa,
       modal,
     };
     sql = `UPDATE product_details SET ? WHERE product_id = ?`;
     await conn.query(sql, [dataProductDetails, id]);
 
-    if (stock) {
-      sql = `SELECT stock FROM products WHERE id = ?`;
-      let [prevStock] = await conn.query(sql, id);
-      console.log(prevStock);
-      let insertStock = {
-        stock: Number(stock) + Number(prevStock[0].stock),
-      };
-      console.log({ insertStock });
-      sql = `UPDATE products SET ? WHERE id = ?`;
-      await conn.query(sql, [insertStock, id]);
-    }
     if (dataPhoto) {
       let insertPhoto = { photo: dataPhoto.photo };
       sql = `UPDATE products SET ? WHERE id = ?`;
@@ -202,7 +204,7 @@ const filterProductsService = async (data) => {
   let conn, sql;
   try {
     conn = dbCon.promise();
-    sql = `SELECT id, name, price, photo, promo, stock, category, berat, golongan, satuan FROM products WHERE (stock > 0 AND name LIKE "%${terms}%" ${
+    sql = `SELECT id, name, price, promo, satuan FROM products WHERE (stock > 0 AND name LIKE "%${terms}%" ${
       category === "semua" ? "" : `AND category = "${category}"`
     }) ${order} LIMIT ?, ?`;
 
@@ -297,8 +299,11 @@ const getProductsService = async (data) => {
       ${category === "all" ? "" : `AND category = "${category}"`} 
       ${golongan === "all" ? "" : `AND golongan = "${golongan}"`})`;
     let [resultTotal] = await conn.query(sql);
+
     let total = resultTotal[0].total;
-    sql = `SELECT p.id, p.name, p.price, p.stock, p.category, p.satuan, p.golongan, p.no_produk, pd.NIE, pd.modal FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE (id > 0 
+
+    sql = `SELECT DISTINCT p.id, p.name, p.price, p.category, p.satuan, p.golongan, p.no_produk, pd.NIE, pd.modal, (SELECT SUM(ps1.stock) FROM product_stock ps1 WHERE ps1.product_id = p.id) as stock
+    FROM products p JOIN product_details pd ON (p.id = pd.product_id) JOIN product_stock ps ON (p.id = ps.product_id) WHERE (p.id > 0 
       ${terms === "" ? "" : `AND name LIKE "%${terms}%"`}
       ${category === "all" ? "" : `AND category = "${category}"`} 
       ${golongan === "all" ? "" : `AND golongan = "${golongan}"`}) 
@@ -330,6 +335,61 @@ const getProductDetailsService = async (data) => {
   }
 };
 
+const getNameService = async (data) => {
+  const { id } = data.query;
+  let sql, conn;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT name, no_produk FROM products WHERE id = ?`;
+    let [result] = await conn.query(sql, id);
+
+    return result[0];
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
+const addStockService = async (data) => {
+  const { product_id, stock, tgl_kadaluarsa } = data.body;
+  let conn, sql, insertData;
+  let id = 4;
+  try {
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+
+    sql = `SELECT SUM(stock) as total FROM product_stock WHERE product_id = ?`;
+    let [totalResult] = await conn.query(sql, product_id);
+    console.log(totalResult[0]);
+    let total = totalResult[0].total;
+    console.log({ total, stock });
+    insertData = {
+      admin_id: id,
+      aktivitas: 1,
+      masuk: stock,
+      sisa: Number(total) + Number(stock),
+      product_id,
+    };
+    sql = `INSERT INTO admin_logger SET ?`;
+    await conn.query(sql, insertData);
+
+    insertData = {
+      product_id,
+      tgl_kadaluarsa,
+      stock,
+    };
+    sql = `INSERT INTO product_stock SET ?`;
+    await conn.query(sql, insertData);
+
+    await conn.commit();
+    conn.release();
+  } catch (error) {
+    console.log(error);
+    await conn.rollback();
+    conn.release();
+    throw new Error(error.message || error);
+  }
+};
+
 module.exports = {
   adminLoginService,
   newProductService,
@@ -339,4 +399,6 @@ module.exports = {
   getProductsService,
   getProductDetailsService,
   editProductService,
+  addStockService,
+  getNameService,
 };

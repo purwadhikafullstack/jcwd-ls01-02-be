@@ -19,6 +19,8 @@ const {
   newProductController,
   getProductDetailsController,
   editProductController,
+  addStockController,
+  getNameController,
 } = require("./adminController");
 const {
   fetchProductsController,
@@ -74,4 +76,6 @@ module.exports = {
   getProductsController,
   getProductDetailsController,
   editProductController,
+  getNameController,
+  addStockController,
 };
