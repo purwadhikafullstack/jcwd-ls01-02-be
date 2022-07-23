@@ -9,6 +9,8 @@ const {
   newProductController,
   getProductDetailsController,
   editProductController,
+  deleteProductController,
+  getReportController,
   getNameController,
   addStockController,
 } = require("../controllers");
@@ -36,6 +38,7 @@ Router.get("/orders/:status", getOrdersController);
 Router.post("/order/valid-prescription", validPrescriptionController);
 Router.get("/products", getProductsController);
 Router.get("/product-details", getProductDetailsController);
+Router.delete("/delete-product", deleteProductController);
 Router.get("/get-name", getNameController);
 Router.post("/add-stock", addStockController);
 
@@ -124,5 +127,5 @@ Router.post("/stok", async (req, res) => {
     return res.status(500).send("failed");
   }
 });
-
+Router.get("/report", getReportController);
 module.exports = Router;

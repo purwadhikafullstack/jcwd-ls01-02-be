@@ -7,6 +7,8 @@ const {
   getProductsService,
   getProductDetailsService,
   editProductService,
+  deleteProductService,
+  getReportService,
   getNameService,
   addStockService,
 } = require("../services");
@@ -120,6 +122,38 @@ const getProductDetailsController = async (req, res) => {
   }
 };
 
+const deleteProductController = async (req, res) => {
+  try {
+    console.log("ini delete");
+    console.log(req.query.id);
+    const data = await deleteProductService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Delete Product Success",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+const getReportController = async (req, res) => {
+  try {
+    const data = await getReportService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Data Report",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 const getNameController = async (req, res) => {
   try {
     const data = await getNameService(req);
@@ -160,6 +194,8 @@ module.exports = {
   getProductsController,
   getProductDetailsController,
   editProductController,
+  deleteProductController,
+  getReportController,
   getNameController,
   addStockController,
 };

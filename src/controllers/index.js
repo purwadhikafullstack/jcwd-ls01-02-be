@@ -19,6 +19,8 @@ const {
   newProductController,
   getProductDetailsController,
   editProductController,
+  deleteProductController,
+  getReportController,
   addStockController,
   getNameController,
 } = require("./adminController");
@@ -28,6 +30,7 @@ const {
   fetchPromoProductsController,
   filterProductController,
 } = require("./productController");
+
 const {
   updateProfile,
   getUserDetails,
@@ -42,6 +45,9 @@ const {
 const {
   getPrimaryAddressController,
   getAllAddressesController,
+  uploadReceipeController,
+  rejectOrderController,
+  confirmOrderController,
 } = require("./transactionController");
 
 module.exports = {
@@ -63,19 +69,24 @@ module.exports = {
   fetchPromoProductsController,
   updateProfile,
   getUserDetails,
+  uploadReceipeController,
   fetchProvincesController,
   fetchCitiesController,
   addNewAddressController,
   getPrimaryAddressController,
   getAllAddressesController,
   changePrimaryAddressController,
+  rejectOrderController,
+  confirmOrderController,
   fetchCostController,
   filterProductsController,
   getOrdersController,
   validPrescriptionController,
   getProductsController,
+  deleteProductController,
   getProductDetailsController,
   editProductController,
+  getReportController,
   getNameController,
   addStockController,
 };

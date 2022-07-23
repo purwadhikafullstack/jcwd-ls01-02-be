@@ -16,8 +16,13 @@ const {
   getProductsService,
   getProductDetailsService,
   editProductService,
+<<<<<<< HEAD
+  deleteProductService,
+  getReportService,
+=======
   getNameService,
   addStockService,
+>>>>>>> 3bd99f63a730da0dcd3e7df6beec86b2b1b4d431
 } = require("./adminServices");
 const {
   fetchProductsService,
@@ -37,6 +42,9 @@ const {
 const {
   getPrimaryAddressService,
   getAllAddressesService,
+  rejectOrderService,
+  confirmOrderService,
+  uploadReceipeService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -59,13 +67,21 @@ module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
   changePrimaryAddressService,
+  rejectOrderService,
+  confirmOrderService,
   fetchCostService,
+  uploadReceipeService,
   filterProductsService,
   getOrdersService,
   validPrescriptionService,
   getProductsService,
+  deleteProductService,
   getProductDetailsService,
   editProductService,
+<<<<<<< HEAD
+  getReportService,
+=======
   getNameService,
   addStockService,
+>>>>>>> 3bd99f63a730da0dcd3e7df6beec86b2b1b4d431
 };

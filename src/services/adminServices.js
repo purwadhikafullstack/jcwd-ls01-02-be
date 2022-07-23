@@ -218,10 +218,21 @@ const filterProductsService = async (data) => {
 
 const getOrdersService = async (data) => {
   const { status } = data.params;
-  const { terms, sinceDate, toDate } = data.query;
+  let { terms, sinceDate, toDate, page, limit, order } = data.query;
+  // const { terms, sinceDate, toDate } = data.query;
+  console.log(data.query);
+  page = parseInt(page);
+  limit = parseInt(limit);
+  console.log({ page, limit });
+  let offset = limit * page;
   let sql, conn;
   try {
     conn = dbCon.promise();
+    sql = `SELECT COUNT(id) as total FROM orders  
+      ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
+    let [resultTotal] = await conn.query(sql);
+    console.log(resultTotal);
+    let total = resultTotal[0].total;
     sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE o.id > 0 
     ${status === "all" ? "" : `AND o.status = "${status}"`} 
     ${
@@ -231,9 +242,11 @@ const getOrdersService = async (data) => {
     } 
     ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
     ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
-      `;
-    let [orders] = await conn.query(sql);
-    return orders;
+  ${order} LIMIT ?, ?`;
+    // let [orders] = await conn.query(sql);
+    let [orders] = await conn.query(sql, [offset, limit]);
+    let responseData = { orders, total };
+    return responseData;
   } catch (error) {
     throw new Error(error.message || error);
   }
@@ -286,6 +299,7 @@ const validPrescriptionService = async (data) => {
 const getProductsService = async (data) => {
   let { terms, category, golongan, page, limit, order } = data.query;
   console.log(data.query);
+  console.log(order);
   page = parseInt(page);
   limit = parseInt(limit);
 
@@ -330,6 +344,48 @@ const getProductDetailsService = async (data) => {
     let [result] = await conn.query(sql, id);
 
     return result[0];
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
+const deleteProductService = async (data) => {
+  console.log(data.query);
+  let conn, sql;
+  try {
+    conn = await dbCon.promise().getConnection();
+    sql = `SELECT * from products where id = ?`;
+    await conn.query(sql, [data.query.id]);
+    sql = `DELETE FROM products where id = ${data.query.id}`;
+    await conn.query(sql);
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message || error);
+  }
+};
+
+const getReportService = async (data) => {
+  let { terms, page, limit, order, sinceDate, toDate } = data.query;
+  console.log(data.query);
+  page = parseInt(page);
+  limit = parseInt(limit);
+  let offset = limit * page;
+  let conn, sql;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT COUNT(id) as total FROM sales_report
+    ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
+    let [resultTotal] = await conn.query(sql);
+    console.log(resultTotal);
+    let total = resultTotal[0].total;
+    sql = `SELECT * from sales_report 
+    ${sinceDate ? `AND sales_report.date >= "${sinceDate}"` : ""}
+    ${toDate ? `AND sales_report.date <= "${toDate}"` : ""}
+    ${terms === "" ? "" : `AND name LIKE "%${terms}%"`}
+    ${order} LIMIT ?,?`;
+    let [report] = await conn.query(sql, [offset, limit]);
+    let responseData = { report, total };
+    return responseData;
   } catch (error) {
     throw new Error(error.message || error);
   }
@@ -399,6 +455,8 @@ module.exports = {
   getProductsService,
   getProductDetailsService,
   editProductService,
+  deleteProductService,
+  getReportService,
   addStockService,
   getNameService,
 };
