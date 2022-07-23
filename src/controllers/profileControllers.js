@@ -92,10 +92,11 @@ const addNewAddressController = async (req, res) => {
 
 const changePrimaryAddressController = async (req, res) => {
   try {
-    await changePrimaryAddressService(req);
+    const data = await changePrimaryAddressService(req);
     return res.status(200).send({
       success: true,
-      message: "Primary Address Berhasil diubah",
+      message: "Primary Address Berhasil diubah, data semua address",
+      data,
     });
   } catch (error) {
     console.log(error);

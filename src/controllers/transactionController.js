@@ -1,5 +1,12 @@
 const { dbCon } = require("../connection");
 const fs = require("fs");
+const {
+  getPrimaryAddressService,
+  getAllAddressesService,
+  rejectOrderService,
+  confirmOrderService,
+  uploadReceipeService,
+} = require("../services");
 
 const uploadReceipeController = async (req, res) => {
   try {
@@ -12,14 +19,6 @@ const uploadReceipeController = async (req, res) => {
       .send({ success: false, message: error.message || error });
   }
 };
-
-const {
-  getPrimaryAddressService,
-  getAllAddressesService,
-  rejectOrderService,
-  confirmOrderService,
-  uploadReceipeService,
-} = require("../services");
 
 const getPrimaryAddressController = async (req, res) => {
   try {

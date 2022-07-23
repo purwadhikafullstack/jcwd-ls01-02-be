@@ -46,7 +46,12 @@ const upload = (destination, fileNamePrefix) => {
 
 const imageProcess = async (file, path) => {
   try {
-    await sharp(file.buffer).resize({ width: 500, height: 500 }).toFile(path);
+    let type = path.split("/");
+    if (type[2] === "prescriptions") {
+      await sharp(file.buffer).toFile(path);
+    } else {
+      await sharp(file.buffer).resize({ width: 500, height: 500 }).toFile(path);
+    }
   } catch (error) {
     throw { message: "Gagal menyimpan foto" };
   }

@@ -115,7 +115,7 @@ const uploadReceipeService = async (data) => {
     let date = dateGenerator();
     let insertData = {
       user_id: id,
-      prescription_photo: dataPhoto.prescription_photo,
+      prescription_photo: dataPhoto.photo,
       status: 1,
       transaction_code: codeGenerator("RESEP", date, id),
     };
