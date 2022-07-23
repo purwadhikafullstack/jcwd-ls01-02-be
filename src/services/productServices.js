@@ -7,11 +7,6 @@ const fetchProductsService = async (data) => {
   let offset = limit * page;
   let conn, sql;
   const { category } = data.params;
-<<<<<<< HEAD
-  console.log(data.params);
-  console.log(order);
-=======
->>>>>>> 3bd99f63a730da0dcd3e7df6beec86b2b1b4d431
   try {
     conn = dbCon.promise();
     sql = `SELECT COUNT(id) as total FROM products ${
