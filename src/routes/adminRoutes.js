@@ -10,6 +10,7 @@ const {
   getProductDetailsController,
   editProductController,
   deleteProductController,
+  getReportController,
 } = require("../controllers");
 const {
   dateGenerator,
@@ -102,5 +103,5 @@ Router.patch("/kode", async (req, res) => {
     return res.status(500).send("failed");
   }
 });
-
+Router.get("/report", getReportController);
 module.exports = Router;

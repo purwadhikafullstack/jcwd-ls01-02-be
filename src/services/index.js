@@ -17,6 +17,7 @@ const {
   getProductDetailsService,
   editProductService,
   deleteProductService,
+  getReportService,
 } = require("./adminServices");
 const {
   fetchProductsService,
@@ -72,4 +73,5 @@ module.exports = {
   deleteProductService,
   getProductDetailsService,
   editProductService,
+  getReportService,
 };

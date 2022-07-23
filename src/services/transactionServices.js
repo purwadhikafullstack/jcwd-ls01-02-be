@@ -91,7 +91,7 @@ const confirmOrderService = async (data) => {
     conn = dbCon.promise();
     sql = `SELECT * FROM orders where id = ?`;
     await conn.query(sql, [data.query.id]);
-    sql = `update orders set status = "Transaksi-Diterima" where id = ${data.query.id}`;
+    sql = `update orders set status = "Pesanan-Diterima" where id = ${data.query.id}`;
     await conn.query(sql);
   } catch (error) {
     console.log(error);

@@ -8,6 +8,7 @@ const {
   getProductDetailsService,
   editProductService,
   deleteProductService,
+  getReportService,
 } = require("../services");
 
 const loginAdminController = async (req, res) => {
@@ -136,6 +137,22 @@ const deleteProductController = async (req, res) => {
   }
 };
 
+const getReportController = async (req, res) => {
+  try {
+    const data = await getReportService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Data Report",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   loginAdminController,
   newProductController,
@@ -146,4 +163,5 @@ module.exports = {
   getProductDetailsController,
   editProductController,
   deleteProductController,
+  getReportController,
 };

@@ -344,22 +344,6 @@ const getProductDetailsService = async (data) => {
   }
 };
 
-const getReportService = async (data) => {
-  let { page, limit } = data.query;
-  console.log(data.query);
-  page = parseInt(page);
-  limit = parseInt(limit);
-  let offset = limit * page;
-  let conn, sql;
-  try {
-    conn = dbCon.promise();
-    sql = `SELECT a.id, a.aktivitas, a.keluar, a.masuk, a.stock, a.tanggal `;
-    let [result] = await conn.query(sql, [offset, limit]);
-  } catch (error) {
-    throw new Error(error.message || error);
-  }
-};
-
 const deleteProductService = async (data) => {
   console.log(data.query);
   let conn, sql;
@@ -375,6 +359,33 @@ const deleteProductService = async (data) => {
   }
 };
 
+const getReportService = async (data) => {
+  let { terms, page, limit, order, sinceDate, toDate } = data.query;
+  console.log(data.query);
+  page = parseInt(page);
+  limit = parseInt(limit);
+  let offset = limit * page;
+  let conn, sql;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT COUNT(id) as total FROM sales_report
+    ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
+    let [resultTotal] = await conn.query(sql);
+    console.log(resultTotal);
+    let total = resultTotal[0].total;
+    sql = `SELECT * from sales_report 
+    ${sinceDate ? `AND sales_report.date >= "${sinceDate}"` : ""}
+    ${toDate ? `AND sales_report.date <= "${toDate}"` : ""}
+    ${terms === "" ? "" : `AND name LIKE "%${terms}%"`}
+    ${order} LIMIT ?,?`;
+    let [report] = await conn.query(sql, [offset, limit]);
+    let responseData = { report, total };
+    return responseData;
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
 module.exports = {
   adminLoginService,
   newProductService,
@@ -385,4 +396,5 @@ module.exports = {
   getProductDetailsService,
   editProductService,
   deleteProductService,
+  getReportService,
 };
