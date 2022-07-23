@@ -16,8 +16,13 @@ const {
   getProductsService,
   getProductDetailsService,
   editProductService,
+<<<<<<< HEAD
   deleteProductService,
   getReportService,
+=======
+  getNameService,
+  addStockService,
+>>>>>>> 3bd99f63a730da0dcd3e7df6beec86b2b1b4d431
 } = require("./adminServices");
 const {
   fetchProductsService,
@@ -73,5 +78,10 @@ module.exports = {
   deleteProductService,
   getProductDetailsService,
   editProductService,
+<<<<<<< HEAD
   getReportService,
+=======
+  getNameService,
+  addStockService,
+>>>>>>> 3bd99f63a730da0dcd3e7df6beec86b2b1b4d431
 };

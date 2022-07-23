@@ -73,7 +73,7 @@ const keepLoginService = async (data) => {
       [result] = await conn.query(sql, id);
       finalResult = { ...finalResult, cart: [...result] };
 
-      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM products_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
+      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM product_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
       [result] = await conn.query(sql, id);
       finalResult = { ...finalResult, fav: [...result] };
 
