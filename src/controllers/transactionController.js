@@ -3,12 +3,8 @@ const fs = require("fs");
 
 const uploadReceipeController = async (req, res) => {
   try {
-    const data = await uploadReceipeService(req);
-    return res.status(200).send({
-      success: true,
-      message: "upload success",
-      data,
-    });
+    await uploadReceipeService(req);
+    return res.status(200).send("success");
   } catch (error) {
     console.log(error);
     return res

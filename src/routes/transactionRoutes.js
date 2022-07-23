@@ -4,6 +4,10 @@ const {
   getPrimaryAddressController,
   getAllAddressesController,
 } = require("../controllers");
+const multer = require("multer");
+const { imageProcess } = require("../lib/upload");
+const storage = multer.memoryStorage();
+const uploads = multer({ storage });
 
 const {
   uploadReceipeController,
@@ -17,15 +21,32 @@ const { dateGenerator, codeGenerator } = require("../lib/codeGenerator");
 
 const Router = express.Router();
 
-const uploader = upload("/prescription-photo", "RECEIPE").single(
-  "prescription_photo"
-);
+// const uploader = upload("/prescription-photo", "RECEIPE").single(
+//   "prescription_photo"
+// );
+// Router.post(
+//   "/prescription-photo",
+//   verifyToken,
+//   uploader,
+//   uploadReceipeController
+// );
+
 Router.post(
-  "/prescription-photo",
+  "/upload-resep",
+  uploads.single("prescription_photo"),
   verifyToken,
-  uploader,
   uploadReceipeController
 );
+// Router.post("/upload", uploads.single("file"), async (req, res) => {
+//   try {
+//     console.log(req.file);
+//     await imageProcess(req.file, "/prescription", "RESEP");
+//     return res.status(200).send("jpg");
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).send(error);
+//   }
+// });
 
 // Router.post("/uploadresep", verifyToken, uploadReceipeController);
 Router.get("/primary-address", verifyToken, getPrimaryAddressController);

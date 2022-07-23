@@ -1,6 +1,12 @@
 const { dbCon } = require("../connection");
 const { query } = require("../connection/mysqldb");
 const db = require("../connection/mysqldb");
+const {
+  dateGenerator,
+  photoNameGenerator,
+  codeGenerator,
+} = require("../lib/codeGenerator");
+const { imageProcess } = require("../lib/upload");
 
 const getPrimaryAddressService = async (data) => {
   const { id } = data.user;
@@ -100,25 +106,23 @@ const confirmOrderService = async (data) => {
 };
 
 const uploadReceipeService = async (data) => {
-  const { id } = data;
-  let { prescription_photo, user_id } = data.body;
-  // console.log("ini req", data.file)
-  // let path = "/prescription-photo";
-  // const imagePath = data.file
-  // ? `${path}/${data.file.filename}`
-  //   : null;
-  // console.log(imagePath)
-
+  const { id } = data.user;
+  const dataPhoto = photoNameGenerator(data.file, "/prescriptions", "RESEP");
+  console.log(dataPhoto);
   let conn, sql;
   try {
     conn = dbCon.promise();
+    let date = dateGenerator();
     let insertData = {
-      user_id,
-      prescription_photo,
+      user_id: id,
+      prescription_photo: dataPhoto.prescription_photo,
       status: 1,
+      transaction_code: codeGenerator("RESEP", date, id),
     };
     sql = `INSERT INTO orders set ?`;
     await conn.query(sql, insertData);
+    await imageProcess(data.file, dataPhoto.path);
+    return { message: "succes" };
   } catch (error) {
     console.log(error);
     throw new Error(error.message);
