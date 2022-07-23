@@ -91,10 +91,10 @@ const newProductService = async (data) => {
     await conn.query(sql, dataProductDetails);
 
     insertData = {
-      admin_id: id,
+      admin_id: 4,
       aktivitas: 1,
       masuk: stock,
-      sisa: parseInt(total) + parseInt(stock),
+      sisa: Number(stock),
       product_id,
     };
     sql = `INSERT INTO admin_logger SET ?`;
@@ -294,7 +294,7 @@ const getProductsService = async (data) => {
   let conn, sql;
   try {
     conn = dbCon.promise();
-    sql = `SELECT COUNT(id) as total FROM products WHERE (stock > 0 
+    sql = `SELECT COUNT(id) as total FROM products WHERE (stock >= 0 
       ${terms ? `AND name LIKE "%${terms}%"` : ""} 
       ${category === "all" ? "" : `AND category = "${category}"`} 
       ${golongan === "all" ? "" : `AND golongan = "${golongan}"`})`;
@@ -326,7 +326,7 @@ const getProductDetailsService = async (data) => {
   try {
     conn = dbCon.promise();
 
-    sql = `SELECT p.name, p.price, p.photo, p.promo, p.stock, p.category, p.berat, p.satuan, p.golongan, p.no_produk, pd.indikasi, pd.komposisi, pd.kemasan, pd.cara_penyimpanan, pd.principal, pd.NIE, pd.cara_pakai, pd.peringatan, pd.product_id, pd.tgl_kadaluarsa, pd.modal FROM products p JOIN product_details pd ON (p.id = pd.product_id) WHERE p.id = ?`;
+    sql = `SELECT p.name, p.price, p.photo, p.promo, (SELECT SUM(ps1.stock) FROM product_stock ps1 WHERE ps1.product_id = p.id) as stock , p.category, p.berat, p.satuan, p.golongan, p.no_produk, pd.indikasi, pd.komposisi, pd.kemasan, pd.cara_penyimpanan, pd.principal, pd.NIE, pd.cara_pakai, pd.peringatan, pd.product_id, pd.tgl_kadaluarsa, pd.modal FROM products p JOIN product_details pd ON (p.id = pd.product_id) JOIN product_stock ps ON (p.id = ps.product_id) WHERE p.id = ?`;
     let [result] = await conn.query(sql, id);
 
     return result[0];
