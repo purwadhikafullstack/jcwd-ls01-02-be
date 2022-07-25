@@ -1,12 +1,16 @@
 const express = require("express");
 const { dbCon } = require("../connection");
 const {
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
   getPrimaryAddressController,
   getAllAddressesController,
   getUserOrdersController,
 } = require("../controllers");
+const Router = express.Router();
 const multer = require("multer");
-const { imageProcess } = require("../lib/upload");
 const storage = multer.memoryStorage();
 const uploads = multer({ storage });
 
@@ -18,7 +22,11 @@ const {
 
 const { verifyToken, upload } = require("../lib");
 const { dateGenerator, codeGenerator } = require("../lib/codeGenerator");
-const Router = express.Router();
+
+Router.post("/addtocart", verifyToken, addToCartController);
+Router.get("/getcart", verifyToken, getCartController);
+Router.patch("/editquantity", verifyToken, editQuantityonCartController);
+Router.delete("/deleteproduct", verifyToken, deleteProductCartController);
 
 Router.post(
   "/upload-resep",
@@ -29,6 +37,7 @@ Router.post(
 
 Router.get("/primary-address", verifyToken, getPrimaryAddressController);
 Router.get("/all-addresses", verifyToken, getAllAddressesController);
+// Router.post("/uploadresep", verifyToken, uploadReceipeController);
 Router.post("/order", async (req, res) => {
   try {
     let date = dateGenerator();

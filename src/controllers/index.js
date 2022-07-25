@@ -37,6 +37,9 @@ const {
   getUserDetails,
   addNewAddressController,
   changePrimaryAddressController,
+  editAddressController,
+  getAllAddressesController,
+  getPrimaryAddressController,
 } = require("./profileControllers");
 const {
   fetchProvincesController,
@@ -46,6 +49,10 @@ const {
 const {
   getPrimaryAddressController,
   getAllAddressesController,
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
   uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
@@ -69,14 +76,16 @@ module.exports = {
   filterProductController,
   resetPasswordController,
   fetchPromoProductsController,
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
   updateProfile,
   getUserDetails,
   uploadReceipeController,
   fetchProvincesController,
   fetchCitiesController,
   addNewAddressController,
-  getPrimaryAddressController,
-  getAllAddressesController,
   changePrimaryAddressController,
   rejectOrderController,
   confirmOrderController,
@@ -91,6 +100,12 @@ module.exports = {
   getReportController,
   getNameController,
   addStockController,
+<<<<<<< HEAD
   getProductStockController,
   getUserOrdersController,
+=======
+  editAddressController,
+  getAllAddressesController,
+  getPrimaryAddressController,
+>>>>>>> 857df14ed78eca14f7717a33af4a20ea8badb0e4
 };
