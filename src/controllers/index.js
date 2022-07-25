@@ -46,8 +46,6 @@ const {
   fetchCostController,
 } = require("./rajaOngkirController");
 const {
-  getPrimaryAddressController,
-  getAllAddressesController,
   addToCartController,
   getCartController,
   editQuantityonCartController,
