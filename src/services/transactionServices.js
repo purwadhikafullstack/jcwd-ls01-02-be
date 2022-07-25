@@ -156,6 +156,7 @@ const getUserOrdersService = async (data) => {
     ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
   ${order} LIMIT ?, ?`;
     let [orders] = await conn.query(sql, [offset, limit]);
+    console.log(orders);
     let responseData = { orders, total };
     return responseData;
   } catch (error) {
