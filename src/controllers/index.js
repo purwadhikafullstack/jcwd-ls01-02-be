@@ -10,13 +10,27 @@ const {
   profilePictureController,
   resetPasswordController,
 } = require("./authController");
-const { loginAdminController, newProduct } = require("./adminController");
+const {
+  loginAdminController,
+  filterProductsController,
+  getOrdersController,
+  validPrescriptionController,
+  getProductsController,
+  newProductController,
+  getProductDetailsController,
+  editProductController,
+  deleteProductController,
+  getReportController,
+  addStockController,
+  getNameController,
+} = require("./adminController");
 const {
   fetchProductsController,
   fetchProductDetailsController,
   fetchPromoProductsController,
   filterProductController,
 } = require("./productController");
+
 const {
   updateProfile,
   getUserDetails,
@@ -26,6 +40,7 @@ const {
 const {
   fetchProvincesController,
   fetchCitiesController,
+  fetchCostController,
 } = require("./rajaOngkirController");
 const {
   getPrimaryAddressController,
@@ -34,10 +49,13 @@ const {
   getCartController,
   editQuantityonCartController,
   deleteProductCartController,
+  uploadReceipeController,
+  rejectOrderController,
+  confirmOrderController,
 } = require("./transactionController");
 
 module.exports = {
-  newProduct,
+  newProductController,
   registerController,
   keepLoginController,
   emailVerificationController,
@@ -59,10 +77,24 @@ module.exports = {
   deleteProductCartController,
   updateProfile,
   getUserDetails,
+  uploadReceipeController,
   fetchProvincesController,
   fetchCitiesController,
   addNewAddressController,
   getPrimaryAddressController,
   getAllAddressesController,
   changePrimaryAddressController,
+  rejectOrderController,
+  confirmOrderController,
+  fetchCostController,
+  filterProductsController,
+  getOrdersController,
+  validPrescriptionController,
+  getProductsController,
+  deleteProductController,
+  getProductDetailsController,
+  editProductController,
+  getReportController,
+  getNameController,
+  addStockController,
 };

@@ -42,11 +42,10 @@ const createJWTAccess = (data) =>
   keeplogin, verification user, changepassword, membuat order, dsb.
 */
 const verifyToken = async (req, res, next) => {
+  console.log("Ini Token", req.headers.authorization);
   const authHeader = req.headers.authorization.split(" ");
-
   const token = authHeader[0];
   const verification = authHeader[1];
-
   const key = verification
     ? process.env.JWT_SECRET_EMAIL
     : process.env.JWT_SECRET_ACCESS;
@@ -58,7 +57,7 @@ const verifyToken = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(error);
-    return res.status(401).send({ message: "Unauthorized user detected!" });
+    return res.status(401).send({ message: "Token expired!" });
   }
 };
 
@@ -66,12 +65,13 @@ const verifyToken = async (req, res, next) => {
 const verifyLastToken = async (req, res, next) => {
   const { createdAt, id } = req.user;
   let cache = myCache.get(id);
-  if (createdAt === cache?.createdAt) {
+  //   if (createdAt === cache?.createdAt) {
+  if (createdAt === cache.createdAt) {
     next();
   } else {
     console.log(`gagal lewat verify last token`);
 
-    return res.status(401).send({ message: "Token expired" });
+    return res.status(401).send({ message: "New token already requested!" });
   }
 };
 

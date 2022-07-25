@@ -7,7 +7,20 @@ const {
   profilePictureService,
   forgotPasswordService,
 } = require("./authServices");
-const { adminLoginService, newProductService } = require("./adminServices");
+const {
+  adminLoginService,
+  newProductService,
+  filterProductsService,
+  getOrdersService,
+  validPrescriptionService,
+  getProductsService,
+  getProductDetailsService,
+  editProductService,
+  deleteProductService,
+  getReportService,
+  getNameService,
+  addStockService,
+} = require("./adminServices");
 const {
   fetchProductsService,
   fetchProductDetailsService,
@@ -17,6 +30,7 @@ const {
 const {
   fetchProvincesService,
   fetchCitiesService,
+  fetchCostService,
 } = require("./rajaOngkirServices");
 const {
   addNewAddressService,
@@ -29,6 +43,10 @@ const {
   getCartServices,
   editQuantityonCartServices,
   deleteProductCartServices,
+  rejectOrderService,
+  confirmOrderService,
+  getAllTransactionService,
+  uploadReceipeService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -45,6 +63,7 @@ module.exports = {
   forgotPasswordService,
   newProductService,
   fetchPromoProductsService,
+  getAllTransactionService,
   addToCartService,
   getCartServices,
   editQuantityonCartServices,
@@ -55,4 +74,18 @@ module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
   changePrimaryAddressService,
+  rejectOrderService,
+  confirmOrderService,
+  fetchCostService,
+  uploadReceipeService,
+  filterProductsService,
+  getOrdersService,
+  validPrescriptionService,
+  getProductsService,
+  deleteProductService,
+  getProductDetailsService,
+  editProductService,
+  getReportService,
+  getNameService,
+  addStockService,
 };

@@ -1,3 +1,5 @@
+const { dbCon } = require("../connection");
+const fs = require("fs");
 const {
   addToCartServices,
   getCartServices,
@@ -5,6 +7,9 @@ const {
   deleteProductCartServices,
   getPrimaryAddressService,
   getAllAddressesService,
+  rejectOrderService,
+  confirmOrderService,
+  uploadReceipeService,
 } = require("../services/transactionServices");
 
 const addToCartController = async (req, res) => {
@@ -69,9 +74,22 @@ const deleteProductCartController = async (req, res) => {
   }
 };
 
+const uploadReceipeController = async (req, res) => {
+  try {
+    await uploadReceipeService(req);
+    return res.status(200).send("success");
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 const getPrimaryAddressController = async (req, res) => {
   try {
     const data = await getPrimaryAddressService(req);
+    console.log(data);
     return res.status(200).send({
       success: true,
       message: "Primary Address",
@@ -97,9 +115,42 @@ const getAllAddressesController = async (req, res) => {
   }
 };
 
+const rejectOrderController = async (req, res) => {
+  try {
+    console.log("ini ya");
+    console.log(req.query.id);
+    const data = await rejectOrderService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Transaksi Dibatalkan",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+const confirmOrderController = async (req, res) => {
+  try {
+    const data = await confirmOrderService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Transaksi Diterima",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getPrimaryAddressController,
   getAllAddressesController,
+  uploadReceipeController,
+  rejectOrderController,
+  confirmOrderController,
   addToCartController,
   getCartController,
   editQuantityonCartController,

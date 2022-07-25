@@ -14,12 +14,20 @@ const addNewAddressService = async (data) => {
     alamat,
     primaryAddress,
   } = data.body;
-  console.log(data.body);
+  console.log({ primaryAddress });
 
   let sql, conn;
   try {
     conn = await dbCon.promise().getConnection();
     await conn.beginTransaction();
+    if (primaryAddress) {
+      sql = `SELECT id FROM address WHERE user_id = ? AND primary_address = "1"`;
+      let [resultPrimary] = await conn.query(sql, id);
+      if (resultPrimary.length) {
+        sql = `UPDATE address SET primary_address = "0" WHERE id = ?`;
+        await conn.query(sql, resultPrimary[0].id);
+      }
+    }
     sql = `INSERT INTO address SET ?`;
     let insertData = {
       user_id: id,
@@ -33,21 +41,22 @@ const addNewAddressService = async (data) => {
       alamat,
       primary_address: primaryAddress,
     };
+    console.log(insertData);
     let [resultAddress] = await conn.query(sql, insertData);
 
     if (primaryAddress) {
-      sql = `SELECT id FROM address WHERE user_id = ? AND primary_address = "1"`;
-      let [resultPrimary] = await conn.query(sql, id);
-      if (resultPrimary.length) {
-        sql = `UPDATE address SET primary_address = "0" WHERE id = ?`;
-        await conn.query(sql, resultPrimary[0].id);
-      }
       sql = `UPDATE user_details SET address_id = ? WHERE user_id = ?`;
-      await conn.query(sql, [resultAddress.insertId, id]);
+      let [primary] = await conn.query(sql, [resultAddress.insertId, id]);
+      sql = `SELECT address_id FROM user_details WHERE user_id =  ?`;
+      [primary] = await conn.query(sql, id);
+      console.log(primary[0]);
+      await conn.commit();
+      conn.release();
+      return primary[0];
     }
-
     await conn.commit();
     conn.release();
+    return true;
   } catch (error) {
     conn.rollback();
     conn.release();
@@ -73,8 +82,12 @@ const changePrimaryAddressService = async (data) => {
     sql = `UPDATE user_details SET address_id = ? WHERE user_id = ?`;
     await conn.query(sql, [id, user_id]);
 
+    sql = `SELECT a.id, a.label, a.nama_depan, a.nama_belakang, a.nomor_hp, a.alamat, a.kode_pos, a.provinsi as kode_provinsi, p.province as provinsi, a.kota as kode_kota, c.id as destination, c.city as kota, a.primary_address  FROM address a JOIN provinces p ON (a.provinsi = p.id) JOIN cities c ON (a.kota = c.id) WHERE a.user_id = ?  ORDER BY a.id DESC`;
+    let [addresses] = await conn.query(sql, user_id);
+
     await conn.commit();
     conn.release();
+    return addresses;
   } catch (error) {
     console.log(error);
     throw new Error(error.message);

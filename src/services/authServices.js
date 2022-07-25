@@ -53,7 +53,9 @@ const registerService = async (data) => {
 };
 
 const keepLoginService = async (data) => {
-  const { id } = data.user;
+  const { id } = data;
+  console.log(data);
+  console.log(id);
   let conn, sql, result;
   try {
     conn = await dbCon.promise().getConnection();
@@ -71,7 +73,7 @@ const keepLoginService = async (data) => {
       [result] = await conn.query(sql, id);
       finalResult = { ...finalResult, cart: [...result] };
 
-      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM products_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
+      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM product_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
       [result] = await conn.query(sql, id);
       finalResult = { ...finalResult, fav: [...result] };
 
@@ -171,7 +173,7 @@ const loginService = async (data) => {
       [result] = await conn.query(sql, id);
       finalResult = { ...finalResult, cart: [...result] };
 
-      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM products_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
+      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM product_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
       [result] = await conn.query(sql, id);
       finalResult = { ...finalResult, fav: [...result] };
 
