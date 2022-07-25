@@ -129,6 +129,40 @@ const uploadReceipeService = async (data) => {
   }
 };
 
+const getUserOrdersService = async (data) => {
+  const { status } = data.params;
+  let { terms, sinceDate, toDate, page, limit, order } = data.query;
+  console.log(data.query);
+  page = parseInt(page);
+  limit = parseInt(limit);
+  console.log({ page, limit });
+  let offset = limit * page;
+  let sql, conn;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT COUNT(id) as total FROM orders  
+      ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
+    let [resultTotal] = await conn.query(sql);
+    console.log(resultTotal);
+    let total = resultTotal[0].total;
+    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE o.id > 0 
+    ${status === "all" ? "" : `AND o.status = "${status}"`} 
+    ${
+      terms
+        ? `AND (u.username LIKE "%${terms}%" OR o.transaction_code LIKE "%${terms}%")`
+        : ""
+    } 
+    ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
+    ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
+  ${order} LIMIT ?, ?`;
+    let [orders] = await conn.query(sql, [offset, limit]);
+    let responseData = { orders, total };
+    return responseData;
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
 module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
@@ -136,4 +170,5 @@ module.exports = {
   confirmOrderService,
   getAllTransactionService,
   uploadReceipeService,
+  getUserOrdersService,
 };

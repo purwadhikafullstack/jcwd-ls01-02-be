@@ -11,8 +11,8 @@ const {
   getReportService,
   getNameService,
   addStockService,
+  getProductStockService,
 } = require("../services");
-const { getProductStockService } = require("../services/adminServices");
 
 const loginAdminController = async (req, res) => {
   try {
@@ -65,7 +65,7 @@ const getOrdersController = async (req, res) => {
     const data = await getOrdersService(req);
     return res.status(200).send({
       success: true,
-      message: "Product filter",
+      message: "Order ditampilkan",
       data,
     });
   } catch (error) {

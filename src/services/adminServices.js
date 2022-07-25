@@ -219,7 +219,6 @@ const filterProductsService = async (data) => {
 const getOrdersService = async (data) => {
   const { status } = data.params;
   let { terms, sinceDate, toDate, page, limit, order } = data.query;
-  // const { terms, sinceDate, toDate } = data.query;
   console.log(data.query);
   page = parseInt(page);
   limit = parseInt(limit);
@@ -242,10 +241,10 @@ const getOrdersService = async (data) => {
     } 
     ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
     ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
-  ${order} LIMIT ?, ?`;
-    // let [orders] = await conn.query(sql);
+    ${order} LIMIT ?, ?`;
     let [orders] = await conn.query(sql, [offset, limit]);
     let responseData = { orders, total };
+    console.log(responseData);
     return responseData;
   } catch (error) {
     throw new Error(error.message || error);

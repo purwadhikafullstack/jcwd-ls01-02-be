@@ -49,6 +49,7 @@ const {
   uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
+  getUserOrdersController,
 } = require("./transactionController");
 
 module.exports = {
@@ -91,4 +92,5 @@ module.exports = {
   getNameController,
   addStockController,
   getProductStockController,
+  getUserOrdersController,
 };

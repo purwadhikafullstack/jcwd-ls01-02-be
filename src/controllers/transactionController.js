@@ -19,6 +19,7 @@ const {
   rejectOrderService,
   confirmOrderService,
   uploadReceipeService,
+  getUserOrdersService,
 } = require("../services");
 
 const getPrimaryAddressController = async (req, res) => {
@@ -80,10 +81,28 @@ const confirmOrderController = async (req, res) => {
   }
 };
 
+const getUserOrdersController = async (req, res) => {
+  try {
+    const data = await getUserOrdersService(req);
+    console.log(data);
+    return res.status(200).send({
+      success: true,
+      message: "Order user berhasil",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   getPrimaryAddressController,
   getAllAddressesController,
   uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
+  getUserOrdersController,
 };

@@ -43,6 +43,7 @@ const {
   rejectOrderService,
   confirmOrderService,
   uploadReceipeService,
+  getUserOrdersService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -80,4 +81,5 @@ module.exports = {
   getNameService,
   addStockService,
   getProductStockService,
+  getUserOrdersService,
 };
