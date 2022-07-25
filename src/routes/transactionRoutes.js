@@ -1,4 +1,14 @@
 const express = require("express");
+const { dbCon } = require("../connection");
+const {
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
+  getPrimaryAddressController,
+  getAllAddressesController,
+} = require("../controllers");
+const Router = express.Router();
 const multer = require("multer");
 const storage = multer.memoryStorage();
 const uploads = multer({ storage });
@@ -13,7 +23,10 @@ const { verifyToken, upload } = require("../lib");
 
 const { dateGenerator, codeGenerator } = require("../lib/codeGenerator");
 
-const Router = express.Router();
+Router.post("/addtocart", verifyToken, addToCartController);
+Router.get("/getcart", verifyToken, getCartController);
+Router.patch("/editquantity", verifyToken, editQuantityonCartController);
+Router.delete("/deleteproduct", verifyToken, deleteProductCartController);
 
 // const uploader = upload("/prescription-photo", "RECEIPE").single(
 //   "prescription_photo"

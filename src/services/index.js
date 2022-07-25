@@ -40,8 +40,15 @@ const {
   getPrimaryAddressService,
 } = require("./profileService");
 const {
+  getPrimaryAddressService,
+  getAllAddressesService,
+  addToCartService,
+  getCartServices,
+  editQuantityonCartServices,
+  deleteProductCartServices,
   rejectOrderService,
   confirmOrderService,
+  getAllTransactionService,
   uploadReceipeService,
 } = require("./transactionServices");
 
@@ -59,6 +66,11 @@ module.exports = {
   forgotPasswordService,
   newProductService,
   fetchPromoProductsService,
+  getAllTransactionService,
+  addToCartService,
+  getCartServices,
+  editQuantityonCartServices,
+  deleteProductCartServices,
   fetchProvincesService,
   fetchCitiesService,
   addNewAddressService,

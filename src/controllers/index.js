@@ -46,6 +46,12 @@ const {
   fetchCostController,
 } = require("./rajaOngkirController");
 const {
+  getPrimaryAddressController,
+  getAllAddressesController,
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
   uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
@@ -68,6 +74,10 @@ module.exports = {
   filterProductController,
   resetPasswordController,
   fetchPromoProductsController,
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
   updateProfile,
   getUserDetails,
   uploadReceipeController,
