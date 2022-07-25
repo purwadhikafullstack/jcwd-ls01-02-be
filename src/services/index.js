@@ -41,9 +41,7 @@ const {
   getPrimaryAddressService,
 } = require("./profileService");
 const {
-  getPrimaryAddressService,
-  getAllAddressesService,
-  addToCartService,
+  addToCartServices,
   getCartServices,
   editQuantityonCartServices,
   deleteProductCartServices,
@@ -69,7 +67,7 @@ module.exports = {
   newProductService,
   fetchPromoProductsService,
   getAllTransactionService,
-  addToCartService,
+  addToCartServices,
   getCartServices,
   editQuantityonCartServices,
   deleteProductCartServices,

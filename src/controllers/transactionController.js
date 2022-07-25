@@ -1,16 +1,15 @@
 const { dbCon } = require("../connection");
 const fs = require("fs");
 const {
+  rejectOrderService,
+  getUserOrdersService,
   addToCartServices,
   getCartServices,
   editQuantityonCartServices,
   deleteProductCartServices,
-  getPrimaryAddressService,
-  getAllAddressesService,
-  rejectOrderService,
   confirmOrderService,
   uploadReceipeService,
-} = require("../services/transactionServices");
+} = require("../services");
 
 const addToCartController = async (req, res) => {
   try {
@@ -86,16 +85,6 @@ const uploadReceipeController = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
-const {
-  getPrimaryAddressService,
-  getAllAddressesService,
-  rejectOrderService,
-  confirmOrderService,
-  uploadReceipeService,
-  getUserOrdersService,
-} = require("../services");
-
 const getPrimaryAddressController = async (req, res) => {
   try {
     const data = await getPrimaryAddressService(req);
@@ -125,8 +114,6 @@ const getAllAddressesController = async (req, res) => {
   }
 };
 
-=======
->>>>>>> 857df14ed78eca14f7717a33af4a20ea8badb0e4
 const rejectOrderController = async (req, res) => {
   try {
     console.log("ini ya");
@@ -178,12 +165,9 @@ module.exports = {
   uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
-<<<<<<< HEAD
   getUserOrdersController,
-=======
   addToCartController,
   getCartController,
   editQuantityonCartController,
   deleteProductCartController,
->>>>>>> 857df14ed78eca14f7717a33af4a20ea8badb0e4
 };

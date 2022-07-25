@@ -47,16 +47,14 @@ const {
   fetchCostController,
 } = require("./rajaOngkirController");
 const {
-  getPrimaryAddressController,
-  getAllAddressesController,
-  addToCartController,
-  getCartController,
-  editQuantityonCartController,
-  deleteProductCartController,
   uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
   getUserOrdersController,
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
 } = require("./transactionController");
 
 module.exports = {
@@ -100,12 +98,9 @@ module.exports = {
   getReportController,
   getNameController,
   addStockController,
-<<<<<<< HEAD
   getProductStockController,
   getUserOrdersController,
-=======
   editAddressController,
   getAllAddressesController,
   getPrimaryAddressController,
->>>>>>> 857df14ed78eca14f7717a33af4a20ea8badb0e4
 };
