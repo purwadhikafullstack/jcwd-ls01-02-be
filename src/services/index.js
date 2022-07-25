@@ -20,6 +20,7 @@ const {
   getReportService,
   getNameService,
   addStockService,
+  getProductStockService,
 } = require("./adminServices");
 const {
   fetchProductsService,
@@ -48,6 +49,7 @@ const {
   confirmOrderService,
   getAllTransactionService,
   uploadReceipeService,
+  getUserOrdersService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -88,6 +90,8 @@ module.exports = {
   getReportService,
   getNameService,
   addStockService,
+  getProductStockService,
+  getUserOrdersService,
   editAddressService,
   getAllAddressesService,
   getPrimaryAddressService,
