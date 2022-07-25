@@ -1,6 +1,4 @@
 const { dbCon } = require("../connection");
-const { query } = require("../connection/mysqldb");
-const db = require("../connection/mysqldb");
 const {
   dateGenerator,
   photoNameGenerator,

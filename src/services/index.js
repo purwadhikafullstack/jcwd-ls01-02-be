@@ -35,6 +35,9 @@ const {
 const {
   addNewAddressService,
   changePrimaryAddressService,
+  editAddressService,
+  getAllAddressesService,
+  getPrimaryAddressService,
 } = require("./profileService");
 const {
   getPrimaryAddressService,
@@ -71,7 +74,6 @@ module.exports = {
   fetchProvincesService,
   fetchCitiesService,
   addNewAddressService,
-  getPrimaryAddressService,
   getAllAddressesService,
   changePrimaryAddressService,
   rejectOrderService,
@@ -88,4 +90,7 @@ module.exports = {
   getReportService,
   getNameService,
   addStockService,
+  editAddressService,
+  getAllAddressesService,
+  getPrimaryAddressService,
 };

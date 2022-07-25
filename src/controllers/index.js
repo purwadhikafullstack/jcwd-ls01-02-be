@@ -36,6 +36,9 @@ const {
   getUserDetails,
   addNewAddressController,
   changePrimaryAddressController,
+  editAddressController,
+  getAllAddressesController,
+  getPrimaryAddressController,
 } = require("./profileControllers");
 const {
   fetchProvincesController,
@@ -81,8 +84,6 @@ module.exports = {
   fetchProvincesController,
   fetchCitiesController,
   addNewAddressController,
-  getPrimaryAddressController,
-  getAllAddressesController,
   changePrimaryAddressController,
   rejectOrderController,
   confirmOrderController,
@@ -97,4 +98,7 @@ module.exports = {
   getReportController,
   getNameController,
   addStockController,
+  editAddressController,
+  getAllAddressesController,
+  getPrimaryAddressController,
 };
