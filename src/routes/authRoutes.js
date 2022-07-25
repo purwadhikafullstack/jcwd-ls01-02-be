@@ -8,7 +8,6 @@ const {
   forgotPasswordController,
   tokenPasswordController,
   changePassword,
-  changePasswordProfileController,
   profilePictureController,
   resetPasswordController,
 } = require("../controllers");

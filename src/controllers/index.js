@@ -10,18 +10,36 @@ const {
   profilePictureController,
   resetPasswordController,
 } = require("./authController");
-const { loginAdminController, newProduct } = require("./adminController");
+const {
+  loginAdminController,
+  filterProductsController,
+  getOrdersController,
+  validPrescriptionController,
+  getProductsController,
+  newProductController,
+  getProductDetailsController,
+  editProductController,
+  deleteProductController,
+  getReportController,
+  addStockController,
+  getNameController,
+  getProductStockController,
+} = require("./adminController");
 const {
   fetchProductsController,
   fetchProductDetailsController,
   fetchPromoProductsController,
   filterProductController,
 } = require("./productController");
+
 const {
   updateProfile,
   getUserDetails,
   addNewAddressController,
   changePrimaryAddressController,
+  editAddressController,
+  getAllAddressesController,
+  getPrimaryAddressController,
 } = require("./profileControllers");
 const {
   fetchProvincesController,
@@ -29,12 +47,18 @@ const {
   fetchCostController,
 } = require("./rajaOngkirController");
 const {
-  getPrimaryAddressController,
-  getAllAddressesController,
+  uploadReceipeController,
+  rejectOrderController,
+  confirmOrderController,
+  getUserOrdersController,
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
 } = require("./transactionController");
 
 module.exports = {
-  newProduct,
+  newProductController,
   registerController,
   keepLoginController,
   emailVerificationController,
@@ -50,13 +74,33 @@ module.exports = {
   filterProductController,
   resetPasswordController,
   fetchPromoProductsController,
+  addToCartController,
+  getCartController,
+  editQuantityonCartController,
+  deleteProductCartController,
   updateProfile,
   getUserDetails,
+  uploadReceipeController,
   fetchProvincesController,
   fetchCitiesController,
   addNewAddressController,
-  getPrimaryAddressController,
-  getAllAddressesController,
   changePrimaryAddressController,
+  rejectOrderController,
+  confirmOrderController,
   fetchCostController,
+  filterProductsController,
+  getOrdersController,
+  validPrescriptionController,
+  getProductsController,
+  deleteProductController,
+  getProductDetailsController,
+  editProductController,
+  getReportController,
+  getNameController,
+  addStockController,
+  getProductStockController,
+  getUserOrdersController,
+  editAddressController,
+  getAllAddressesController,
+  getPrimaryAddressController,
 };

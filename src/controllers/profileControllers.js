@@ -3,9 +3,13 @@ const fs = require("fs");
 const {
   addNewAddressService,
   changePrimaryAddressService,
+  getAllAddressesService,
+  getPrimaryAddressService,
+  editAddressService,
 } = require("../services");
 
 const updateProfile = async (req, res) => {
+  console.log(req.file);
   let path = "/profile-photos";
   let pathAva = "/profile-picture";
   const data = JSON.parse(req.body.data);
@@ -39,9 +43,9 @@ const updateProfile = async (req, res) => {
     sql = `UPDATE users JOIN user_details ON (users.id = user_details.user_id) SET ? WHERE users.id = ?`;
     await conn.query(sql, [data, id]);
 
-    if (imagePathAva && result[0].profile_picture) {
-      fs.unlinkSync(`./public${result[0].profile_picture}`);
-    }
+    // if (imagePathAva && result[0].profile_picture) {
+    //   fs.unlinkSync(`./public${result[0].profile_picture}`);
+    // }
 
     sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
     let [result1] = await conn.query(sql, id);
@@ -91,19 +95,67 @@ const addNewAddressController = async (req, res) => {
 
 const changePrimaryAddressController = async (req, res) => {
   try {
-    await changePrimaryAddressService(req);
+    const data = await changePrimaryAddressService(req);
     return res.status(200).send({
       success: true,
-      message: "Primary Address Berhasil diubah",
+      message: "Primary Address Berhasil diubah, data semua address",
+      data,
     });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ success: false, message: error.message });
   }
 };
+
+const editAddressController = async (req, res) => {
+  try {
+    const data = await editAddressService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Address berhasil diubah, data semua address",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+const getPrimaryAddressController = async (req, res) => {
+  try {
+    const data = await getPrimaryAddressService(req);
+    console.log(data);
+    return res.status(200).send({
+      success: true,
+      message: "Primary Address",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+const getAllAddressesController = async (req, res) => {
+  try {
+    const data = await getAllAddressesService(req);
+    return res.status(200).send({
+      success: true,
+      message: "All Addresses",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   updateProfile,
   getUserDetails,
   addNewAddressController,
   changePrimaryAddressController,
+  editAddressController,
+  getAllAddressesController,
+  getPrimaryAddressController,
 };

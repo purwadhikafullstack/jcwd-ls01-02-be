@@ -1,4 +1,10 @@
-const { transporter, emailGenerator } = require("./emailGenerator");
+const {
+  dateGenerator,
+  codeGenerator,
+  productCodeGenerator,
+  photoNameGenerator,
+} = require("./codeGenerator");
+const { emailGenerator } = require("./emailGenerator");
 const { hashPassword, hashMatch } = require("./hashing");
 const {
   newDataToken,
@@ -10,6 +16,7 @@ const {
 } = require("./jwt");
 const { linkGenerator } = require("./link");
 const { upload } = require("./upload");
+
 module.exports = {
   hashPassword,
   newDataToken,
@@ -22,4 +29,8 @@ module.exports = {
   verifyLastToken,
   hashMatch,
   upload,
+  dateGenerator,
+  codeGenerator,
+  productCodeGenerator,
+  photoNameGenerator,
 };
