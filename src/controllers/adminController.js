@@ -12,6 +12,7 @@ const {
   getNameService,
   addStockService,
 } = require("../services");
+const { getProductStockService } = require("../services/adminServices");
 
 const loginAdminController = async (req, res) => {
   try {
@@ -185,6 +186,22 @@ const addStockController = async (req, res) => {
   }
 };
 
+const getProductStockController = async (req, res) => {
+  try {
+    const data = await getProductStockService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Stok berhasil ditampilkan",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   loginAdminController,
   newProductController,
@@ -198,4 +215,5 @@ module.exports = {
   getReportController,
   getNameController,
   addStockController,
+  getProductStockController,
 };

@@ -23,6 +23,7 @@ const {
   getReportController,
   addStockController,
   getNameController,
+  getProductStockController,
 } = require("./adminController");
 const {
   fetchProductsController,
@@ -89,4 +90,5 @@ module.exports = {
   getReportController,
   getNameController,
   addStockController,
+  getProductStockController,
 };

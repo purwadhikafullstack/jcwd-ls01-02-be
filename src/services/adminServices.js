@@ -446,6 +446,32 @@ const addStockService = async (data) => {
   }
 };
 
+const getProductStockService = async (data) => {
+  let { terms, page, limit, order } = data.query;
+  console.log(data.query);
+  page = parseInt(page);
+  limit = parseInt(limit);
+  let offset = limit * page;
+  let conn, sql;
+  try {
+    conn = dbCon.promise();
+    sql = `SELECT COUNT(id) as total FROM admin_logger
+    ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
+    let [resultTotal] = await conn.query(sql);
+    console.log(resultTotal);
+    let total = resultTotal[0].total;
+    sql = `SELECT l.id, l.aktivitas, l.keluar, l.masuk, l.sisa, l.product_id, l.created_at, a.username as petugas FROM admin_logger l JOIN admin a ON (l.admin_id = a.id ) WHERE l.admin_id > 0
+    ${terms === "" ? "" : `AND name LIKE "%${terms}%"`}
+    ${order} LIMIT ?,?`;
+    let [productStock] = await conn.query(sql, [offset, limit]);
+    let responseData = { productStock, total };
+    // console.log(responseData);
+    return responseData;
+  } catch (error) {
+    throw new Error(error.message || error);
+  }
+};
+
 module.exports = {
   adminLoginService,
   newProductService,
@@ -459,4 +485,5 @@ module.exports = {
   getReportService,
   addStockService,
   getNameService,
+  getProductStockService,
 };
