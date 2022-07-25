@@ -1,11 +1,5 @@
 const express = require("express");
-const { dbCon } = require("../connection");
-const {
-  getPrimaryAddressController,
-  getAllAddressesController,
-} = require("../controllers");
 const multer = require("multer");
-const { imageProcess } = require("../lib/upload");
 const storage = multer.memoryStorage();
 const uploads = multer({ storage });
 
@@ -49,8 +43,6 @@ Router.post(
 // });
 
 // Router.post("/uploadresep", verifyToken, uploadReceipeController);
-Router.get("/primary-address", verifyToken, getPrimaryAddressController);
-Router.get("/all-addresses", verifyToken, getAllAddressesController);
 Router.post("/order", async (req, res) => {
   // let { id } = req.query;
   // let { id: user_id } = req.user;

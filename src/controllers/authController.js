@@ -57,7 +57,6 @@ const registerController = async (req, res) => {
 
 const keepLoginController = async (req, res) => {
   try {
-    console.log(req.user);
     let data = await keepLoginService(req.user);
     return res.status(200).send({
       success: true,
@@ -78,7 +77,6 @@ const emailVerificationController = async (req, res) => {
     const data = req.body;
     const dataToken = newDataToken(data);
 
-    console.log({ dataToken });
     newCache(dataToken);
 
     const tokenEmail = createJWTEmail(dataToken);
@@ -124,7 +122,6 @@ const loginController = async (req, res) => {
     const data = await loginService(req);
 
     const dataToken = newDataToken(data);
-    console.log({ dataToken });
     if (!data.verified) {
       newCache(dataToken);
       const tokenEmail = createJWTEmail(dataToken);
@@ -198,7 +195,6 @@ const changePassword = async (req, res) => {
 
 const profilePictureController = async (req, res) => {
   try {
-    console.log(req.body);
     const data = await profilePictureService(req.body);
     return res.status(200).send(data);
   } catch (error) {

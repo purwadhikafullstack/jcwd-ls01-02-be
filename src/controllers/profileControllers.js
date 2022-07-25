@@ -3,6 +3,9 @@ const fs = require("fs");
 const {
   addNewAddressService,
   changePrimaryAddressService,
+  getAllAddressesService,
+  getPrimaryAddressService,
+  editAddressService,
 } = require("../services");
 
 const updateProfile = async (req, res) => {
@@ -103,9 +106,56 @@ const changePrimaryAddressController = async (req, res) => {
     return res.status(500).send({ success: false, message: error.message });
   }
 };
+
+const editAddressController = async (req, res) => {
+  try {
+    const data = await editAddressService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Address berhasil diubah, data semua address",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+const getPrimaryAddressController = async (req, res) => {
+  try {
+    const data = await getPrimaryAddressService(req);
+    console.log(data);
+    return res.status(200).send({
+      success: true,
+      message: "Primary Address",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+const getAllAddressesController = async (req, res) => {
+  try {
+    const data = await getAllAddressesService(req);
+    return res.status(200).send({
+      success: true,
+      message: "All Addresses",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   updateProfile,
   getUserDetails,
   addNewAddressController,
   changePrimaryAddressController,
+  editAddressController,
+  getAllAddressesController,
+  getPrimaryAddressController,
 };

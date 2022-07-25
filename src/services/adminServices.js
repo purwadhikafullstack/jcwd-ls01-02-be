@@ -121,8 +121,6 @@ const newProductService = async (data) => {
 };
 
 const editProductService = async (data) => {
-  console.log(data.body);
-  console.log(data.file);
   const parsedData = JSON.parse(data.body.data);
   let {
     name,
@@ -199,7 +197,6 @@ const filterProductsService = async (data) => {
   let { order, page, limit, terms, category } = data.query;
   page = parseInt(page);
   limit = parseInt(limit);
-  console.log(order);
   let offset = limit * page;
   let conn, sql;
   try {
@@ -219,17 +216,21 @@ const filterProductsService = async (data) => {
 const getOrdersService = async (data) => {
   const { status } = data.params;
   let { terms, sinceDate, toDate, page, limit, order } = data.query;
-  // const { terms, sinceDate, toDate } = data.query;
-  console.log(data.query);
   page = parseInt(page);
   limit = parseInt(limit);
-  console.log({ page, limit });
   let offset = limit * page;
   let sql, conn;
   try {
     conn = dbCon.promise();
-    sql = `SELECT COUNT(id) as total FROM orders  
-      ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
+    sql = `SELECT COUNT(o.id) as total FROM orders o join users u ON (o.user_id = u.id) WHERE o.id > 0 
+    ${status === "all" ? "" : `AND o.status = "${status}"`} 
+    ${
+      terms
+        ? `AND (u.username LIKE "%${terms}%" OR o.transaction_code LIKE "%${terms}%")`
+        : ""
+    } 
+    ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
+    ${toDate ? `AND o.date_process <= "${toDate}"` : ""}`;
     let [resultTotal] = await conn.query(sql);
     console.log(resultTotal);
     let total = resultTotal[0].total;
@@ -248,6 +249,7 @@ const getOrdersService = async (data) => {
     let responseData = { orders, total };
     return responseData;
   } catch (error) {
+    console.log(error);
     throw new Error(error.message || error);
   }
 };
@@ -298,12 +300,9 @@ const validPrescriptionService = async (data) => {
 
 const getProductsService = async (data) => {
   let { terms, category, golongan, page, limit, order } = data.query;
-  console.log(data.query);
-  console.log(order);
   page = parseInt(page);
   limit = parseInt(limit);
 
-  console.log({ page, limit, category, golongan });
   let offset = limit * page;
   let conn, sql;
   try {
@@ -350,7 +349,6 @@ const getProductDetailsService = async (data) => {
 };
 
 const deleteProductService = async (data) => {
-  console.log(data.query);
   let conn, sql;
   try {
     conn = await dbCon.promise().getConnection();
@@ -366,7 +364,6 @@ const deleteProductService = async (data) => {
 
 const getReportService = async (data) => {
   let { terms, page, limit, order, sinceDate, toDate } = data.query;
-  console.log(data.query);
   page = parseInt(page);
   limit = parseInt(limit);
   let offset = limit * page;
@@ -376,7 +373,6 @@ const getReportService = async (data) => {
     sql = `SELECT COUNT(id) as total FROM sales_report
     ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
     let [resultTotal] = await conn.query(sql);
-    console.log(resultTotal);
     let total = resultTotal[0].total;
     sql = `SELECT * from sales_report 
     ${sinceDate ? `AND sales_report.date >= "${sinceDate}"` : ""}
@@ -415,9 +411,7 @@ const addStockService = async (data) => {
 
     sql = `SELECT SUM(stock) as total FROM product_stock WHERE product_id = ?`;
     let [totalResult] = await conn.query(sql, product_id);
-    console.log(totalResult[0]);
     let total = totalResult[0].total;
-    console.log({ total, stock });
     insertData = {
       admin_id: id,
       aktivitas: 1,
