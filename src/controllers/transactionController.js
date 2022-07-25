@@ -1,16 +1,15 @@
 const { dbCon } = require("../connection");
 const fs = require("fs");
 const {
+  rejectOrderService,
+  getUserOrdersService,
   addToCartServices,
   getCartServices,
   editQuantityonCartServices,
   deleteProductCartServices,
-  getPrimaryAddressService,
-  getAllAddressesService,
-  rejectOrderService,
   confirmOrderService,
   uploadReceipeService,
-} = require("../services/transactionServices");
+} = require("../services");
 
 const addToCartController = async (req, res) => {
   try {
@@ -86,6 +85,35 @@ const uploadReceipeController = async (req, res) => {
   }
 };
 
+const getPrimaryAddressController = async (req, res) => {
+  try {
+    const data = await getPrimaryAddressService(req);
+    console.log(data);
+    return res.status(200).send({
+      success: true,
+      message: "Primary Address",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
+const getAllAddressesController = async (req, res) => {
+  try {
+    const data = await getAllAddressesService(req);
+    return res.status(200).send({
+      success: true,
+      message: "All Addresses",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, message: error.message });
+  }
+};
+
 const rejectOrderController = async (req, res) => {
   try {
     console.log("ini ya");
@@ -116,10 +144,28 @@ const confirmOrderController = async (req, res) => {
   }
 };
 
+const getUserOrdersController = async (req, res) => {
+  try {
+    const data = await getUserOrdersService(req);
+    console.log(data);
+    return res.status(200).send({
+      success: true,
+      message: "Order user berhasil",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
+  getUserOrdersController,
   addToCartController,
   getCartController,
   editQuantityonCartController,

@@ -36,5 +36,4 @@ app.use("/admin", adminRoutes);
 app.use("/profile", profileRoutes);
 app.use("/transaction", transactionRoutes);
 app.use("/raja-ongkir", rajaOngkirRoutes);
-
 app.listen(PORT, () => console.log(`API running on Port ${PORT}`));

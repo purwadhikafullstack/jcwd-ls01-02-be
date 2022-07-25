@@ -13,6 +13,7 @@ const {
   getReportController,
   getNameController,
   addStockController,
+  getProductStockController,
 } = require("../controllers");
 const { dateGenerator, codeGenerator } = require("../lib/codeGenerator");
 const multer = require("multer");
@@ -128,4 +129,5 @@ Router.post("/stok", async (req, res) => {
   }
 });
 Router.get("/report", getReportController);
+Router.get("/product-stock", getProductStockController);
 module.exports = Router;
