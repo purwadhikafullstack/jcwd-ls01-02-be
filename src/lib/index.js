@@ -3,6 +3,9 @@ const {
   codeGenerator,
   productCodeGenerator,
   photoNameGenerator,
+  expireDateGenerator,
+  expireEventGenerator,
+  dropEventGenerator,
 } = require("./codeGenerator");
 const { emailGenerator } = require("./emailGenerator");
 const { hashPassword, hashMatch } = require("./hashing");
@@ -33,4 +36,7 @@ module.exports = {
   codeGenerator,
   productCodeGenerator,
   photoNameGenerator,
+  expireDateGenerator,
+  expireEventGenerator,
+  dropEventGenerator,
 };

@@ -13,8 +13,13 @@ const {
   getReportController,
   getNameController,
   addStockController,
+  getProductStockController,
 } = require("../controllers");
-const { dateGenerator, codeGenerator } = require("../lib/codeGenerator");
+const {
+  dateGenerator,
+  codeGenerator,
+  expireDateGenerator,
+} = require("../lib/codeGenerator");
 const multer = require("multer");
 const { imageProcess } = require("../lib/upload");
 const storage = multer.memoryStorage();
@@ -67,6 +72,7 @@ Router.post("/order", async (req, res) => {
       prescription_photo,
       status: 1,
       transaction_code: codeGenerator("RESEP", date, user_id),
+      expired_at: expireDateGenerator(1),
     };
     sql = `INSERT INTO orders SET ?`;
     await conn.query(sql, insertData);
@@ -128,4 +134,5 @@ Router.post("/stok", async (req, res) => {
   }
 });
 Router.get("/report", getReportController);
+Router.get("/product-stock", getProductStockController);
 module.exports = Router;

@@ -19,13 +19,13 @@ const newDataToken = (data) => {
 */
 const newCache = (data) => {
   const { id } = data;
-  const expirationTime = 300;
+  const expirationTime = 600;
   myCache.set(id, data, expirationTime);
 };
 
 // createJWTEmail function : function yang digunakan untuk membuat jwt token verifikasi akun
 const createJWTEmail = (data) =>
-  jwt.sign(data, process.env.JWT_SECRET_EMAIL, { expiresIn: "5m" });
+  jwt.sign(data, process.env.JWT_SECRET_EMAIL, { expiresIn: "10m" });
 
 // createJWTAccess function : function yang digunakan untuk membuat jwt token akses login
 const createJWTAccess = (data) =>
