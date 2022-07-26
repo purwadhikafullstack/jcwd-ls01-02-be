@@ -36,8 +36,6 @@ const {
   addNewAddressService,
   changePrimaryAddressService,
   editAddressService,
-  getAllAddressesService,
-  getPrimaryAddressService,
 } = require("./profileService");
 const {
   getPrimaryAddressService,

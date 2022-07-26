@@ -37,8 +37,6 @@ const {
   addNewAddressController,
   changePrimaryAddressController,
   editAddressController,
-  getAllAddressesController,
-  getPrimaryAddressController,
 } = require("./profileControllers");
 const {
   fetchProvincesController,
