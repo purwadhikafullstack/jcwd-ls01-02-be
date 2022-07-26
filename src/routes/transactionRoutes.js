@@ -1,5 +1,4 @@
 const express = require("express");
-const { dbCon } = require("../connection");
 const {
   addToCartController,
   getCartController,
@@ -8,20 +7,17 @@ const {
   getPrimaryAddressController,
   getAllAddressesController,
   getUserOrdersController,
-} = require("../controllers");
-const Router = express.Router();
-const multer = require("multer");
-const storage = multer.memoryStorage();
-const uploads = multer({ storage });
-
-const {
   uploadReceipeController,
   rejectOrderController,
   confirmOrderController,
-} = require("../controllers/transactionController");
+  getCartPrescriptionController,
+} = require("../controllers");
+const { verifyToken } = require("../lib");
+const Router = express.Router();
+const multer = require("multer");
 
-const { verifyToken, upload } = require("../lib");
-const { dateGenerator, codeGenerator } = require("../lib/codeGenerator");
+const storage = multer.memoryStorage();
+const uploads = multer({ storage });
 
 Router.post("/addtocart", verifyToken, addToCartController);
 Router.get("/getcart", verifyToken, getCartController);
@@ -38,4 +34,10 @@ Router.get("/all-addresses", verifyToken, getAllAddressesController);
 Router.patch("/order/reject", rejectOrderController);
 Router.patch("/order/confirm", confirmOrderController);
 Router.get("/orders/:status", getUserOrdersController);
+Router.get(
+  "/get-cart-prescription",
+  verifyToken,
+  getCartPrescriptionController
+);
+
 module.exports = Router;

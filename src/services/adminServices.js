@@ -247,6 +247,7 @@ const getOrdersService = async (data) => {
     ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
     ${order} LIMIT ?, ?`;
     let [orders] = await conn.query(sql, [offset, limit]);
+
     let responseData = { orders, total };
     return responseData;
   } catch (error) {
@@ -282,7 +283,7 @@ const validPrescriptionService = async (data) => {
 
     let checkoutCart = [];
     for (const cart of cart_checkout) {
-      sql = `SELECT stock, id FROM product_stock WHERE product_id = ?`;
+      sql = `SELECT stock, id FROM product_stock WHERE product_id = ? AND stock > 0`;
       let [stock] = await conn.query(sql, cart.id);
       let { qty } = cart;
       for (let i = 0; qty > 0; i++) {

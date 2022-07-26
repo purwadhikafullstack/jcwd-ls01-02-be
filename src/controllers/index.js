@@ -55,6 +55,7 @@ const {
   getCartController,
   editQuantityonCartController,
   deleteProductCartController,
+  getCartPrescriptionController,
 } = require("./transactionController");
 
 module.exports = {
@@ -103,4 +104,5 @@ module.exports = {
   editAddressController,
   getAllAddressesController,
   getPrimaryAddressController,
+  getCartPrescriptionController,
 };
