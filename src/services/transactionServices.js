@@ -1,4 +1,5 @@
 const { dbCon } = require("../connection");
+const db = require("../connection/mysqldb");
 const {
   dateGenerator,
   photoNameGenerator,
@@ -357,6 +358,33 @@ const getUserOrdersService = async (data) => {
   }
 };
 
+const getCartPrescriptionService = async (data) => {
+  const { transaction_code } = data.query;
+  const { id: user_id } = data.user;
+  let sql, conn;
+  try {
+    conn = await dbCon.promise().getConnection();
+
+    sql = `SELECT id, status FROM orders WHERE transaction_code = ? AND user_id = ?`;
+    let [resultId] = await conn.query(sql, [transaction_code, user_id]);
+    if (!resultId.length) {
+      throw { message: "Unauthorized User" };
+    }
+    if (resultId[0].status !== "Pesanan-Diterima") {
+      throw { message: "Invalid Request" };
+    }
+    const { id } = resultId[0];
+
+    sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
+    let [cartData] = await conn.query(sql, id);
+    conn.release();
+    return { cartData, id };
+  } catch (error) {
+    conn.release();
+    throw new Error(error.message || error);
+  }
+};
+
 module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
@@ -370,4 +398,5 @@ module.exports = {
   getAllTransactionService,
   uploadReceipeService,
   getUserOrdersService,
+  getCartPrescriptionService,
 };
