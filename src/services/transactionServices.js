@@ -365,7 +365,7 @@ const getCartPrescriptionService = async (data) => {
   try {
     conn = await dbCon.promise().getConnection();
 
-    sql = `SELECT id, status FROM orders WHERE transaction_code = ? AND user_id = ?`;
+    sql = `SELECT id, status FROM orders WHERE transaction_code = ? AND user_id = ?;`;
     let [resultId] = await conn.query(sql, [transaction_code, user_id]);
     if (!resultId.length) {
       throw { message: "Unauthorized User" };
@@ -373,12 +373,20 @@ const getCartPrescriptionService = async (data) => {
     if (resultId[0].status !== "Pesanan-Diterima") {
       throw { message: "Invalid Request" };
     }
-    const { id } = resultId[0];
+    const { id, status } = resultId[0];
+
+    sql = `SELECT COUNT(id) as total FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
+    let [length] = await conn.query(sql, id);
+
+    let checkoutCart = [];
+    for (let i = 0; i < length[0].total; i++) {
+      checkoutCart.push("");
+    }
 
     sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
     let [cartData] = await conn.query(sql, id);
     conn.release();
-    return { cartData, id };
+    return { cartData, id, checkoutCart, status };
   } catch (error) {
     conn.release();
     throw new Error(error.message || error);
