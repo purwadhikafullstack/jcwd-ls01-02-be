@@ -11,6 +11,8 @@ const {
   rejectOrderController,
   confirmOrderController,
   getCartPrescriptionController,
+  uploadPaymentProofController,
+  paymentMethodController,
 } = require("../controllers");
 const { verifyToken } = require("../lib");
 const Router = express.Router();
@@ -38,6 +40,12 @@ Router.get(
   "/get-cart-prescription",
   verifyToken,
   getCartPrescriptionController
+);
+Router.post(
+  "/upload-payment",
+  uploads.single("payment_photo"),
+  verifyToken,
+  uploadPaymentProofController
 );
 
 module.exports = Router;

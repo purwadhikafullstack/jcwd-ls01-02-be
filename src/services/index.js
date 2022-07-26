@@ -51,6 +51,8 @@ const {
   uploadReceipeService,
   getUserOrdersService,
   getCartPrescriptionService,
+  uploadPaymentProofService,
+  paymentMethodService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -97,4 +99,6 @@ module.exports = {
   getAllAddressesService,
   getPrimaryAddressService,
   getCartPrescriptionService,
+  uploadPaymentProofService,
+  paymentMethodService,
 };

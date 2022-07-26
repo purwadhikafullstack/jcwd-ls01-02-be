@@ -385,6 +385,88 @@ const getCartPrescriptionService = async (data) => {
   }
 };
 
+const paymentMethodService = async (data) => {
+  const { selectedAddress, paymentMethod, shippingMethod, id } = data.body;
+  const statusPrev = 2;
+  const status = 3;
+
+  let sql, conn, result;
+
+  try {
+    conn = await dbCon.promise().getConnection();
+
+    sql = `UPDATE orders SET ? WHERE id = ?`;
+    insertData = {
+      status,
+      expired_at: expireDateGenerator(),
+    };
+    await conn.query(sql, [insertData, id]);
+
+    sql = `INSERT INTO orders SET ?`;
+    insertData = {
+      order_id: id,
+      selected_address: selectedAddress,
+      payment_method: paymentMethod,
+      shipping_method: shippingMethod,
+    };
+    await conn.query(sql, insertData);
+
+    let sqls = dropEventGenerator(statusPrev, id);
+    for (const sql of sqls) {
+      await conn.query(sql);
+    }
+
+    sqls = expireEventGenerator(status, id);
+    for (const sql of sqls) {
+      await conn.query(sql);
+    }
+    await conn.commit();
+    conn.release();
+  } catch (error) {
+    conn.rollback();
+    conn.release();
+    throw new Error(error.message || error);
+  }
+};
+
+const uploadPaymentProofService = async (data) => {
+  const { id } = data.user;
+  const dataPhoto = photoNameGenerator(data.file, "/paymentproof", "PAYMENT");
+  console.log(dataPhoto);
+  let conn, sql;
+  try {
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+    let date = dateGenerator();
+    let insertData = {
+      user_id: id,
+      payment_photo: dataPhoto.photo,
+      status: 1,
+      transaction_code: codeGenerator("PAYMENT", date, id),
+      expired_at: expireDateGenerator(1),
+    };
+    sql = `INSERT INTO orders set ?`;
+    let [result] = await conn.query(sql, insertData);
+
+    let sqls = expireEventGenerator(1, [result.insertId]);
+    console.log(sqls);
+    for (const sql of sqls) {
+      await conn.query(sql);
+    }
+
+    await imageProcess(data.file, dataPhoto.path);
+
+    await conn.commit();
+    conn.release();
+    return { message: "Success to upload payment proof" };
+  } catch (error) {
+    console.log(error);
+    await conn.rollback();
+    conn.release();
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
@@ -399,4 +481,6 @@ module.exports = {
   uploadReceipeService,
   getUserOrdersService,
   getCartPrescriptionService,
+  paymentMethodService,
+  uploadPaymentProofService,
 };
