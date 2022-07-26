@@ -39,6 +39,12 @@ const {
   editAddressService,
   getAllAddressesService,
   getPrimaryAddressService,
+  updateFullnameService,
+  updateUsernameService,
+  updateEmailService,
+  updateGenderService,
+  updateBirthDateService,
+  getUpdatedUserprofileDataService,
 } = require("./profileService");
 const {
   addToCartServices,
@@ -95,4 +101,10 @@ module.exports = {
   editAddressService,
   getAllAddressesService,
   getPrimaryAddressService,
+  updateFullnameService,
+  updateUsernameService,
+  updateEmailService,
+  updateGenderService,
+  updateBirthDateService,
+  getUpdatedUserprofileDataService,
 };
