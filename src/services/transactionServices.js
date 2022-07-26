@@ -3,6 +3,8 @@ const {
   dateGenerator,
   photoNameGenerator,
   codeGenerator,
+  expireDateGenerator,
+  expireEventGenerator,
 } = require("../lib/codeGenerator");
 const { imageProcess } = require("../lib/upload");
 
@@ -289,20 +291,34 @@ const uploadReceipeService = async (data) => {
   console.log(dataPhoto);
   let conn, sql;
   try {
-    conn = dbCon.promise();
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
     let date = dateGenerator();
     let insertData = {
       user_id: id,
       prescription_photo: dataPhoto.photo,
       status: 1,
       transaction_code: codeGenerator("RESEP", date, id),
+      expired_at: expireDateGenerator(1),
     };
     sql = `INSERT INTO orders set ?`;
-    await conn.query(sql, insertData);
+    let [result] = await conn.query(sql, insertData);
+
+    let sqls = expireEventGenerator(1, [result.insertId]);
+    console.log(sqls);
+    for (const sql of sqls) {
+      await conn.query(sql);
+    }
+
     await imageProcess(data.file, dataPhoto.path);
+
+    await conn.commit();
+    conn.release();
     return { message: "succes" };
   } catch (error) {
     console.log(error);
+    await conn.rollback();
+    conn.release();
     throw new Error(error.message);
   }
 };

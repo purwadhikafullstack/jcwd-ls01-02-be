@@ -66,9 +66,15 @@ const keepLoginService = async (data) => {
       [result] = await conn.query(sql, id);
       finalResult = { ...result[0] };
 
-      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
+      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo, c.checkout FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
       [result] = await conn.query(sql, id);
-      finalResult = { ...finalResult, cart: [...result] };
+      result = result.map((val) => {
+        return {
+          ...val,
+          checkout: val.checkout ? true : false,
+        };
+      });
+      finalResult = { ...finalResult, cart: result };
 
       sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM product_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
       [result] = await conn.query(sql, id);
@@ -80,7 +86,7 @@ const keepLoginService = async (data) => {
     conn.release();
     return result[0];
   } catch (error) {
-    throw new Error((error.message = "Something went wrong :("));
+    throw new Error(error.message);
   }
 };
 
@@ -164,9 +170,15 @@ const loginService = async (data) => {
       [result] = await conn.query(sql, id);
       finalResult = { ...result[0] };
 
-      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
+      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo, c.checkout FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
       [result] = await conn.query(sql, id);
-      finalResult = { ...finalResult, cart: [...result] };
+      result = result.map((val) => {
+        return {
+          ...val,
+          checkout: val.checkout ? true : false,
+        };
+      });
+      finalResult = { ...finalResult, cart: result };
 
       sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM product_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
       [result] = await conn.query(sql, id);
