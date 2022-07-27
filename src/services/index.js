@@ -39,12 +39,6 @@ const {
   editAddressService,
   getAllAddressesService,
   getPrimaryAddressService,
-  updateFullnameService,
-  updateUsernameService,
-  updateEmailService,
-  updateGenderService,
-  updateBirthDateService,
-  getUpdatedUserprofileDataService,
 } = require("./profileService");
 const {
   addToCartServices,
@@ -56,6 +50,9 @@ const {
   getAllTransactionService,
   uploadReceipeService,
   getUserOrdersService,
+  getCartPrescriptionService,
+  uploadPaymentProofService,
+  paymentMethodService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -101,10 +98,7 @@ module.exports = {
   editAddressService,
   getAllAddressesService,
   getPrimaryAddressService,
-  updateFullnameService,
-  updateUsernameService,
-  updateEmailService,
-  updateGenderService,
-  updateBirthDateService,
-  getUpdatedUserprofileDataService,
+  getCartPrescriptionService,
+  uploadPaymentProofService,
+  paymentMethodService,
 };

@@ -9,6 +9,9 @@ const {
   deleteProductCartServices,
   confirmOrderService,
   uploadReceipeService,
+  getCartPrescriptionService,
+  uploadPaymentProofService,
+  paymentMethodService,
 } = require("../services");
 
 const addToCartController = async (req, res) => {
@@ -161,6 +164,52 @@ const getUserOrdersController = async (req, res) => {
   }
 };
 
+const getCartPrescriptionController = async (req, res) => {
+  try {
+    const data = await getCartPrescriptionService(req);
+    console.log(data);
+    return res.status(200).send({
+      success: true,
+      message: "Data Cart dari order resep",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
+const uploadPaymentProofController = async (req, res) => {
+  try {
+    await uploadPaymentProofService(req);
+    return res.status(200).send("Success to upload payment proof");
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
+const paymentMethodController = async (req, res) => {
+  try {
+    const data = await paymentMethodService(req);
+    // console.log(data);
+    return res.status(200).send({
+      success: true,
+      message: "Success!",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   uploadReceipeController,
   rejectOrderController,
@@ -170,4 +219,7 @@ module.exports = {
   getCartController,
   editQuantityonCartController,
   deleteProductCartController,
+  getCartPrescriptionController,
+  uploadPaymentProofController,
+  paymentMethodController,
 };

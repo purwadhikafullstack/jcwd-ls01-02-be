@@ -45,7 +45,6 @@ const fetchCostService = async (data) => {
       }
     );
     let { costs } = res.data.rajaongkir.results[0];
-    console.log(costs);
     const delivery = costs.map((val) => {
       courier = courier.toUpperCase();
       courier = courier === "POS" ? `${courier} Indonesia` : courier;
@@ -56,7 +55,6 @@ const fetchCostService = async (data) => {
         durasi: val.cost[0].etd.split(" ")[0],
       };
     });
-    console.log(delivery);
     return delivery;
   } catch (error) {
     console.log(error.data);

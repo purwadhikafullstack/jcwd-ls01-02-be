@@ -38,8 +38,8 @@ const {
   addNewAddressController,
   changePrimaryAddressController,
   editAddressController,
-  getAllAddressesController,
   getPrimaryAddressController,
+  getAllAddressesController,
 } = require("./profileControllers");
 const {
   fetchProvincesController,
@@ -55,6 +55,9 @@ const {
   getCartController,
   editQuantityonCartController,
   deleteProductCartController,
+  getCartPrescriptionController,
+  uploadPaymentProofController,
+  paymentMethodController,
 } = require("./transactionController");
 
 module.exports = {
@@ -103,4 +106,7 @@ module.exports = {
   editAddressController,
   getAllAddressesController,
   getPrimaryAddressController,
+  getCartPrescriptionController,
+  uploadPaymentProofController,
+  paymentMethodController,
 };
