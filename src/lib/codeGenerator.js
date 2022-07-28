@@ -56,11 +56,11 @@ const expireEventGenerator = (status, id, carts) => {
   switch (status) {
     case 1:
       return [
-        `CREATE EVENT IF NOT EXISTS deadline_proses_resep_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY COMMENT 'deadline proses resep dari admin, maksimal 1 hari dari request order' DO UPDATE orders SET status = 7 WHERE id = ${id};`,
+        `CREATE EVENT IF NOT EXISTS deadline_proses_resep_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY COMMENT 'deadline proses resep dari admin, maksimal 1 hari dari request order' DO UPDATE orders SET status = 7, pesan = "Admin tidak dapat memproses pesanan kamu" WHERE id = ${id};`,
       ];
     case 2:
       result = [
-        `CREATE EVENT IF NOT EXISTS deadline_pesanan_resep_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE orders SET status = 7 WHERE id = ${id};`,
+        `CREATE EVENT IF NOT EXISTS deadline_pesanan_resep_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE orders SET status = 7, pesan = "Admin tidak dapat memproses pesanan kamu" WHERE id = ${id};`,
       ];
       for (let i = 0; i < carts.length; i++) {
         result = [
@@ -71,7 +71,7 @@ const expireEventGenerator = (status, id, carts) => {
       return result;
     case 3:
       result = [
-        `CREATE EVENT IF NOT EXISTS deadline_pembayaran_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE orders SET status = 7 WHERE id = ${id};`,
+        `CREATE EVENT IF NOT EXISTS deadline_pembayaran_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE orders SET status = 7, pesan = "Waktu pembayaran transaksi mu sudah lewat" WHERE id = ${id};`,
       ];
       for (let i = 0; i < carts[i].length; i++) {
         result = [
@@ -82,7 +82,7 @@ const expireEventGenerator = (status, id, carts) => {
       return result;
     case 4:
       result = [
-        `CREATE EVENT IF NOT EXISTS deadline_proses_pesanan_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE orders SET status = 7 WHERE id = ${id};`,
+        `CREATE EVENT IF NOT EXISTS deadline_proses_pesanan_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE orders SET status = 7, pesan = "Admin tidak dapat memproses pesanan kamu" WHERE id = ${id};`,
       ];
       for (let i = 0; i < carts[i].length; i++) {
         result = [

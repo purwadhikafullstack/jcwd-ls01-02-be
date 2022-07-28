@@ -375,13 +375,8 @@ const getCartPrescriptionService = async (data) => {
     }
     const { id, status } = resultId[0];
 
-    sql = `SELECT COUNT(id) as total FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
-    let [length] = await conn.query(sql, id);
-
-    let checkoutCart = [];
-    for (let i = 0; i < length[0].total; i++) {
-      checkoutCart.push("");
-    }
+    sql = `SELECT id, qty FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
+    let [checkoutCart] = await conn.query(sql, id);
 
     sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
     let [cartData] = await conn.query(sql, id);
@@ -475,6 +470,33 @@ const uploadPaymentProofService = async (data) => {
   }
 };
 
+const getOrderDetailsService = async (data) => {
+  const { transaction_code } = data.query;
+  const { id: user_id } = data.user;
+  let sql, conn, finalData;
+  try {
+    conn = await dbCon.promise().getConnection();
+
+    sql = `SELECT id, status, selected_address, payment_method, total_price, date_requested, date_process, prescription_photo, payment_photo, shipping_method, transaction_code, pesan, expired_at FROM orders WHERE transaction_code = ? AND user_id = ?;`;
+    let [dataOrder] = await conn.query(sql, [transaction_code, user_id]);
+    if (!dataOrder.length) {
+      throw { message: "Unauthorized User" };
+    }
+    const { id, status } = dataOrder[0];
+    finalData = { dataOrder: dataOrder[0] };
+    if (status !== "Pengecekan-Resep") {
+      sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
+      [carts] = await conn.query(sql, id);
+      finalData = { ...finalData, cart: carts };
+    }
+    conn.release();
+    return finalData;
+  } catch (error) {
+    conn.release();
+    throw new Error(error.message || error);
+  }
+};
+
 module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
@@ -491,4 +513,5 @@ module.exports = {
   getCartPrescriptionService,
   paymentMethodService,
   uploadPaymentProofService,
+  getOrderDetailsService,
 };

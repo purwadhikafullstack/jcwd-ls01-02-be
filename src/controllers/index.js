@@ -58,6 +58,7 @@ const {
   getCartPrescriptionController,
   uploadPaymentProofController,
   paymentMethodController,
+  getOrderDetailsController,
 } = require("./transactionController");
 
 module.exports = {
@@ -109,4 +110,5 @@ module.exports = {
   getCartPrescriptionController,
   uploadPaymentProofController,
   paymentMethodController,
+  getOrderDetailsController,
 };
