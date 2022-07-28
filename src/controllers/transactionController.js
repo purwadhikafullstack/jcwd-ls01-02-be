@@ -12,6 +12,7 @@ const {
   getCartPrescriptionService,
   uploadPaymentProofService,
   paymentMethodService,
+  getOrderDetailsService,
 } = require("../services");
 
 const addToCartController = async (req, res) => {
@@ -196,10 +197,25 @@ const uploadPaymentProofController = async (req, res) => {
 const paymentMethodController = async (req, res) => {
   try {
     const data = await paymentMethodService(req);
-    // console.log(data);
     return res.status(200).send({
       success: true,
       message: "Success!",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
+const getOrderDetailsController = async (req, res) => {
+  try {
+    const data = await getOrderDetailsService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Data detail order",
       data,
     });
   } catch (error) {
@@ -222,4 +238,5 @@ module.exports = {
   getCartPrescriptionController,
   uploadPaymentProofController,
   paymentMethodController,
+  getOrderDetailsController,
 };
