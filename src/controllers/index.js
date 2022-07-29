@@ -40,7 +40,6 @@ const {
   editAddressController,
   getPrimaryAddressController,
   getAllAddressesController,
-  uploadProfilePictureController,
 } = require("./profileControllers");
 const {
   fetchProvincesController,
@@ -112,5 +111,4 @@ module.exports = {
   uploadPaymentProofController,
   paymentMethodController,
   getOrderDetailsController,
-  uploadProfilePictureController,
 };
