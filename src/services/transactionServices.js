@@ -27,20 +27,11 @@ const addToCartServices = async (data) => {
     if (resultProductExist[0].product_id === 0) {
       sql = `INSERT INTO cart (product_id, qty, user_id) VALUES (?, ?, ?)`;
 
-      let resultInsertProduct = await conn.query(sql, [
-        productId,
-        quantity,
-        id,
-      ]);
+      await conn.query(sql, [productId, quantity, id]);
 
       // if (!resultInsertProduct) {
       //   throw { message: "Produk gagal ditambahkan" };
       // }
-      sql = `SELECT * FROM cart WHERE user_id = ?`;
-
-      let [resultAddtoCart] = await conn.query(sql, [id]);
-
-      return resultAddtoCart;
     } else {
       sql = `SELECT qty FROM cart WHERE user_id = ? AND product_id = ?`;
 
@@ -50,21 +41,14 @@ const addToCartServices = async (data) => {
 
       // console.log(quantityCart, ">>>>>>>>>>>QUANTITYY CARTTT");
 
-      let updateQuantity = await conn.query(sql, [
-        quantity + quantityCart[0].qty,
-        id,
-        productId,
-      ]);
+      await conn.query(sql, [quantity + quantityCart[0].qty, id, productId]);
       // console.log(updateQuantity, ">>>>>>>>>>>>> UPDATE QUANTITY BERHASIL");
-
-      // Harusnya untuk message itu "QUANTITY PRODUCT BERHASIL DITAMBAHKAN"
-      if (!updateQuantity) {
-        throw { message: "Product tidak berhasil menambahkan Quantity" };
-      }
-
-      quantityCart[0].qty += quantity;
-      return quantityCart;
     }
+    sql = `SELECT * FROM cart WHERE user_id = ?`;
+
+    let [resultAddtoCart] = await conn.query(sql, [id]);
+
+    return { cart: resultAddtoCart };
   } catch (error) {
     console.log(error);
     throw new Error(error.message || error);
@@ -374,10 +358,14 @@ const getCartPrescriptionService = async (data) => {
     sql = `SELECT stock_id, qty FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
     let [checkoutCart] = await conn.query(sql, id);
 
-    sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
+    sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, p.berat, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
     let [cartData] = await conn.query(sql, id);
+    let totalBerat = 0;
+    for (const cart of cartData) {
+      totalBerat += cart.qty * cart.berat;
+    }
     conn.release();
-    return { cartData, id, checkoutCart, status };
+    return { cartData, id, checkoutCart, status, totalBerat };
   } catch (error) {
     conn.release();
     throw new Error(error.message || error);

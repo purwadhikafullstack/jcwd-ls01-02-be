@@ -204,7 +204,7 @@ const filterProductsService = async (data) => {
   let conn, sql;
   try {
     conn = dbCon.promise();
-    sql = `SELECT DISTINCT p.id, p.name, p.price, p.promo, p.satuan, p.golongan, (SELECT SUM(ps1.stock) FROM product_stock ps1 WHERE ps1.product_id = p.id) as stock FROM products p JOIN product_stock ps ON (p.id = ps.product_id) WHERE (p.id > 0 AND name LIKE "%${terms}%" ${
+    sql = `SELECT DISTINCT p.id, p.name, p.price, p.promo, p.satuan, p.golongan, (SELECT SUM(ps1.stock) as total FROM product_stock ps1 WHERE ps1.product_id = p.id) as stock FROM products p JOIN product_stock ps ON (p.id = ps.product_id) WHERE (p.id > 0 AND name LIKE "%${terms}%" ${
       category === "semua" ? "" : `AND category = "${category}"`
     }) ${order} LIMIT ?, ?`;
 
@@ -232,8 +232,8 @@ const getOrdersService = async (data) => {
         ? `AND (u.username LIKE "%${terms}%" OR o.transaction_code LIKE "%${terms}%")`
         : ""
     } 
-    ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
-    ${toDate ? `AND o.date_process <= "${toDate}"` : ""}`;
+    ${sinceDate ? `AND o.date_requested >= "${sinceDate}"` : ""}
+    ${toDate ? `AND o.date_requested <= "${toDate}"` : ""}`;
     let [resultTotal] = await conn.query(sql);
     let total = resultTotal[0].total;
     sql = `SELECT o.id, o.selected_address, o.payment_method, o.expired_at, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE o.id > 0 
@@ -243,8 +243,8 @@ const getOrdersService = async (data) => {
         ? `AND (u.username LIKE "%${terms}%" OR o.transaction_code LIKE "%${terms}%")`
         : ""
     } 
-    ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
-    ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
+    ${sinceDate ? `AND o.date_requested >= "${sinceDate}"` : ""}
+    ${toDate ? `AND o.date_requested <= "${toDate}"` : ""}
     ${order} LIMIT ?, ?`;
     let [orders] = await conn.query(sql, [offset, limit]);
 
