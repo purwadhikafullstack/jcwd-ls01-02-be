@@ -37,7 +37,7 @@ Router.get("/all-addresses", verifyToken, getAllAddressesController);
 Router.get("/order-details", verifyToken, getOrderDetailsController);
 Router.patch("/order/reject", rejectOrderController);
 Router.patch("/order/confirm", confirmOrderController);
-Router.get("/orders/:status", getUserOrdersController);
+Router.get("/orders/:status", verifyToken, getUserOrdersController);
 Router.get(
   "/get-cart-prescription",
   verifyToken,

@@ -478,19 +478,19 @@ const addStockService = async (data) => {
 };
 
 const getProductStockService = async (data) => {
-  let { terms, page, limit, order } = data.query;
+  const { product_id } = data.body;
+  let { page, limit, order } = data.query;
   page = parseInt(page);
   limit = parseInt(limit);
   let offset = limit * page;
   let conn, sql;
   try {
     conn = dbCon.promise();
-    sql = `SELECT COUNT(id) as total FROM admin_logger
-    ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
-    let [resultTotal] = await conn.query(sql);
+    sql = `SELECT COUNT(id) as total FROM admin_logger WHERE product_id > 0`;
+    // sql = `SELECT COUNT(id) as total FROM admin_logger where product_id = `;
+    let [resultTotal] = await conn.query(sql, product_id);
     let total = resultTotal[0].total;
     sql = `SELECT l.id, l.aktivitas, l.keluar, l.masuk, l.sisa, l.product_id, l.created_at, a.username as petugas FROM admin_logger l JOIN admin a ON (l.admin_id = a.id ) WHERE l.admin_id > 0
-    ${terms === "" ? "" : `AND name LIKE "%${terms}%"`}
     ${order} LIMIT ?,?`;
     let [productStock] = await conn.query(sql, [offset, limit]);
     let responseData = { productStock, total };

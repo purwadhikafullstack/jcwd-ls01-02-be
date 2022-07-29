@@ -327,6 +327,7 @@ const uploadReceipeService = async (data) => {
 
 const getUserOrdersService = async (data) => {
   const { status } = data.params;
+  const { id } = data.user;
   let { terms, sinceDate, toDate, page, limit, order } = data.query;
   console.log(data.query);
   page = parseInt(page);
@@ -336,22 +337,16 @@ const getUserOrdersService = async (data) => {
   let sql, conn;
   try {
     conn = dbCon.promise();
-    sql = `SELECT COUNT(id) as total FROM orders  
-      ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
-    let [resultTotal] = await conn.query(sql);
+    sql = `SELECT COUNT(id) as total FROM orders WHERE user_id = ?`;
+    let [resultTotal] = await conn.query(sql, id);
     console.log(resultTotal);
     let total = resultTotal[0].total;
-    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE o.id > 0 
+    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE user_id = ?
     ${status === "all" ? "" : `AND o.status = "${status}"`} 
-    ${
-      terms
-        ? `AND (u.username LIKE "%${terms}%" OR o.transaction_code LIKE "%${terms}%")`
-        : ""
-    } 
     ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
     ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
   ${order} LIMIT ?, ?`;
-    let [orders] = await conn.query(sql, [offset, limit]);
+    let [orders] = await conn.query(sql, [id, offset, limit]);
     let responseData = { orders, total };
     return responseData;
   } catch (error) {
@@ -487,9 +482,7 @@ const uploadPaymentProofService = async (data) => {
     for (const sql of sqls) {
       await conn.query(sql);
     }
-
     await imageProcess(data.file, dataPhoto.path);
-
     await conn.commit();
     conn.release();
   } catch (error) {
