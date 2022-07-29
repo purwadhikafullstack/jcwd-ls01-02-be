@@ -456,9 +456,7 @@ const uploadPaymentProofService = async (data) => {
     for (const sql of sqls) {
       await conn.query(sql);
     }
-
     await imageProcess(data.file, dataPhoto.path);
-
     await conn.commit();
     conn.release();
     return { message: "Success to upload payment proof" };
