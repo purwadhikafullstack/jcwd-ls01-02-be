@@ -326,6 +326,7 @@ const uploadReceipeService = async (data) => {
 
 const getUserOrdersService = async (data) => {
   const { status } = data.params;
+  const { id } = data.user;
   let { terms, sinceDate, toDate, page, limit, order } = data.query;
   console.log(data.query);
   page = parseInt(page);
@@ -335,22 +336,16 @@ const getUserOrdersService = async (data) => {
   let sql, conn;
   try {
     conn = dbCon.promise();
-    sql = `SELECT COUNT(id) as total FROM orders  
-      ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
-    let [resultTotal] = await conn.query(sql);
+    sql = `SELECT COUNT(id) as total FROM orders WHERE user_id = ?`;
+    let [resultTotal] = await conn.query(sql, id);
     console.log(resultTotal);
     let total = resultTotal[0].total;
-    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE o.id > 0 
+    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE user_id = ?
     ${status === "all" ? "" : `AND o.status = "${status}"`} 
-    ${
-      terms
-        ? `AND (u.username LIKE "%${terms}%" OR o.transaction_code LIKE "%${terms}%")`
-        : ""
-    } 
     ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
     ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
   ${order} LIMIT ?, ?`;
-    let [orders] = await conn.query(sql, [offset, limit]);
+    let [orders] = await conn.query(sql, [id, offset, limit]);
     let responseData = { orders, total };
     return responseData;
   } catch (error) {
@@ -375,8 +370,13 @@ const getCartPrescriptionService = async (data) => {
     }
     const { id, status } = resultId[0];
 
-    sql = `SELECT id, qty FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
-    let [checkoutCart] = await conn.query(sql, id);
+    sql = `SELECT COUNT(id) as total FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
+    let [length] = await conn.query(sql, id);
+
+    let checkoutCart = [];
+    for (let i = 0; i < length[0].total; i++) {
+      checkoutCart.push("");
+    }
 
     sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
     let [cartData] = await conn.query(sql, id);
@@ -456,9 +456,7 @@ const uploadPaymentProofService = async (data) => {
     for (const sql of sqls) {
       await conn.query(sql);
     }
-
     await imageProcess(data.file, dataPhoto.path);
-
     await conn.commit();
     conn.release();
     return { message: "Success to upload payment proof" };
