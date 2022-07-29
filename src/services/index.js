@@ -39,6 +39,7 @@ const {
   editAddressService,
   getAllAddressesService,
   getPrimaryAddressService,
+  uploadProfilePictureService,
 } = require("./profileService");
 const {
   addToCartServices,
@@ -103,4 +104,5 @@ module.exports = {
   uploadPaymentProofService,
   paymentMethodService,
   getOrderDetailsService,
+  uploadProfilePictureService,
 };
