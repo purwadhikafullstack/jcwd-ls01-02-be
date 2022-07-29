@@ -14,7 +14,7 @@ const addToCartServices = async (data) => {
   const { productId, quantity } = data.body;
   // console.log(data.user, ">>>>>>>>>>");
   // console.log(data.body, ">>>>>>>>>>BODYYYY");
-  let sql, conn;
+  let sql, conn, result;
 
   try {
     conn = await dbCon.promise().getConnection();
@@ -31,15 +31,6 @@ const addToCartServices = async (data) => {
         quantity,
         id,
       ]);
-
-      // if (!resultInsertProduct) {
-      //   throw { message: "Produk gagal ditambahkan" };
-      // }
-      sql = `SELECT * FROM cart WHERE user_id = ?`;
-
-      let [resultAddtoCart] = await conn.query(sql, [id]);
-
-      return resultAddtoCart;
     } else {
       sql = `SELECT qty FROM cart WHERE user_id = ? AND product_id = ?`;
 
@@ -49,21 +40,19 @@ const addToCartServices = async (data) => {
 
       // console.log(quantityCart, ">>>>>>>>>>>QUANTITYY CARTTT");
 
-      let updateQuantity = await conn.query(sql, [
-        quantity + quantityCart[0].qty,
-        id,
-        productId,
-      ]);
+      await conn.query(sql, [quantity + quantityCart[0].qty, id, productId]);
       // console.log(updateQuantity, ">>>>>>>>>>>>> UPDATE QUANTITY BERHASIL");
-
-      // Harusnya untuk message itu "QUANTITY PRODUCT BERHASIL DITAMBAHKAN"
-      if (!updateQuantity) {
-        throw { message: "Product tidak berhasil menambahkan Quantity" };
-      }
-
-      quantityCart[0].qty += quantity;
-      return quantityCart;
     }
+
+    sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo, c.checkout FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
+    [result] = await conn.query(sql, id);
+    result = result.map((val) => {
+      return {
+        ...val,
+        checkout: val.checkout ? true : false,
+      };
+    });
+    return { cart: result };
   } catch (error) {
     console.log(error);
     throw new Error(error.message || error);

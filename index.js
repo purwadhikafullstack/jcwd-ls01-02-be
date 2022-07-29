@@ -37,3 +37,12 @@ app.use("/profile", profileRoutes);
 app.use("/transaction", transactionRoutes);
 app.use("/raja-ongkir", rajaOngkirRoutes);
 app.listen(PORT, () => console.log(`API running on Port ${PORT}`));
+
+let arr = [];
+let arr1 = 1;
+arr = [arr1];
+console.log(arr);
+
+let newArr = 4;
+arr = [...arr, newArr];
+console.log(arr);
