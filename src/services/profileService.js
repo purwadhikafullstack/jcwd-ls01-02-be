@@ -221,6 +221,7 @@ const getPrimaryAddressService = async (data) => {
     sql = `SELECT a.id, a.label, a.nama_depan, a.nama_belakang, a.nomor_hp, a.alamat, a.kode_pos, p.province as provinsi, c.id as destination, c.city as kota  FROM address a JOIN provinces p ON (a.provinsi = p.id) JOIN cities c ON (a.kota = c.id) WHERE a.id = ?`;
 
     let [primaryAddress] = await conn.query(sql, address_id);
+
     conn.release();
 
     return primaryAddress[0];

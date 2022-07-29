@@ -6,6 +6,7 @@ const {
   codeGenerator,
   expireDateGenerator,
   expireEventGenerator,
+  dropEventGenerator,
 } = require("../lib/codeGenerator");
 const { imageProcess } = require("../lib/upload");
 
@@ -375,7 +376,7 @@ const getCartPrescriptionService = async (data) => {
     }
     const { id, status } = resultId[0];
 
-    sql = `SELECT id, qty FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
+    sql = `SELECT stock_id, qty FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
     let [checkoutCart] = await conn.query(sql, id);
 
     sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
@@ -389,40 +390,49 @@ const getCartPrescriptionService = async (data) => {
 };
 
 const paymentMethodService = async (data) => {
-  const { selectedAddress, paymentMethod, shippingMethod, id } = data.body;
+  const {
+    selected_address,
+    payment_method,
+    shipping_method,
+    id,
+    checkoutCart,
+    total_price,
+  } = data.body;
   const statusPrev = 2;
   const status = 3;
 
-  let sql, conn, result;
-
+  let sql, conn;
   try {
     conn = await dbCon.promise().getConnection();
+
+    sql = `SELECT status FROM orders Where id = ?`;
+    let [resultStatus] = await conn.query(sql, id);
+
+    if (resultStatus[0].status === "Dibatalkan") {
+      throw { message: "Transaksi kamu sudah dibatalkan" };
+    }
 
     sql = `UPDATE orders SET ? WHERE id = ?`;
     insertData = {
       status,
       expired_at: expireDateGenerator(),
+      selected_address,
+      payment_method,
+      shipping_method,
+      total_price,
     };
     await conn.query(sql, [insertData, id]);
 
-    sql = `INSERT INTO orders SET ?`;
-    insertData = {
-      order_id: id,
-      selected_address: selectedAddress,
-      payment_method: paymentMethod,
-      shipping_method: shippingMethod,
-    };
-    await conn.query(sql, insertData);
-
-    let sqls = dropEventGenerator(statusPrev, id);
+    let sqls = dropEventGenerator(statusPrev, id, checkoutCart);
     for (const sql of sqls) {
       await conn.query(sql);
     }
 
-    sqls = expireEventGenerator(status, id);
+    sqls = expireEventGenerator(status, id, checkoutCart);
     for (const sql of sqls) {
       await conn.query(sql);
     }
+
     await conn.commit();
     conn.release();
   } catch (error) {
@@ -433,26 +443,47 @@ const paymentMethodService = async (data) => {
 };
 
 const uploadPaymentProofService = async (data) => {
-  const { id } = data.user;
-  const dataPhoto = photoNameGenerator(data.file, "/paymentproof", "PAYMENT");
+  console.log(data.body);
+  const parsedData = JSON.parse(data.body.data);
+  console.log(parsedData);
+  const { id: user_id } = data.user;
+  let { id, checkoutCart, transaction_code } = parsedData;
+  const dataPhoto = photoNameGenerator(data.file, "/payment-photo", "PAYMENT");
   console.log(dataPhoto);
+  const statusPrev = 3;
+  const status = 4;
   let conn, sql;
   try {
     conn = await dbCon.promise().getConnection();
     await conn.beginTransaction();
-    let date = dateGenerator();
-    let insertData = {
-      user_id: id,
-      payment_photo: dataPhoto.photo,
-      status: 1,
-      transaction_code: codeGenerator("PAYMENT", date, id),
-      expired_at: expireDateGenerator(1),
-    };
-    sql = `INSERT INTO orders set ?`;
-    let [result] = await conn.query(sql, insertData);
 
-    let sqls = expireEventGenerator(1, [result.insertId]);
-    console.log(sqls);
+    sql = `SELECT status FROM orders Where id = ?`;
+    let [resultStatus] = await conn.query(sql, id);
+
+    if (resultStatus[0].status === "Dibatalkan") {
+      throw { message: "Transaksi kamu sudah dibatalkan" };
+    }
+
+    sql = `SELECT id, status FROM orders WHERE transaction_code = ? AND user_id = ?;`;
+    let [resultId] = await conn.query(sql, [transaction_code, user_id]);
+    if (!resultId.length) {
+      throw { message: "Unauthorized User" };
+    }
+
+    sql = `UPDATE orders SET ? WHERE id = ?`;
+    let insertData = {
+      status,
+      payment_photo: dataPhoto.photo,
+      expired_at: expireDateGenerator(),
+    };
+    await conn.query(sql, [insertData, id]);
+
+    let sqls = dropEventGenerator(statusPrev, id, checkoutCart);
+    for (const sql of sqls) {
+      await conn.query(sql);
+    }
+
+    sqls = expireEventGenerator(status, id, checkoutCart);
     for (const sql of sqls) {
       await conn.query(sql);
     }
@@ -461,7 +492,6 @@ const uploadPaymentProofService = async (data) => {
 
     await conn.commit();
     conn.release();
-    return { message: "Success to upload payment proof" };
   } catch (error) {
     console.log(error);
     await conn.rollback();
@@ -482,13 +512,18 @@ const getOrderDetailsService = async (data) => {
     if (!dataOrder.length) {
       throw { message: "Unauthorized User" };
     }
+
     const { id, status } = dataOrder[0];
     finalData = { dataOrder: dataOrder[0] };
     if (status !== "Pengecekan-Resep") {
       sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
-      [carts] = await conn.query(sql, id);
-      finalData = { ...finalData, cart: carts };
+      [cart] = await conn.query(sql, id);
+      finalData = { ...finalData, cart };
+      sql = `SELECT stock_id, qty FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
+      let [checkoutCart] = await conn.query(sql, id);
+      finalData = { ...finalData, checkoutCart };
     }
+
     conn.release();
     return finalData;
   } catch (error) {

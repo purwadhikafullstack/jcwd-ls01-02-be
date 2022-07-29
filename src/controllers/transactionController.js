@@ -196,11 +196,10 @@ const uploadPaymentProofController = async (req, res) => {
 
 const paymentMethodController = async (req, res) => {
   try {
-    const data = await paymentMethodService(req);
+    await paymentMethodService(req);
     return res.status(200).send({
       success: true,
       message: "Success!",
-      data,
     });
   } catch (error) {
     console.log(error);
