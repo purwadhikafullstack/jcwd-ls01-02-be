@@ -14,9 +14,9 @@ const {
   keepLoginService,
   verificationService,
   loginService,
-  changePasswordProfileService,
   profilePictureService,
   forgotPasswordService,
+  changePasswordService,
 } = require("../services");
 
 const registerController = async (req, res) => {
@@ -57,13 +57,14 @@ const registerController = async (req, res) => {
 
 const keepLoginController = async (req, res) => {
   try {
-    let data = await keepLoginService(req);
+    let data = await keepLoginService(req.user);
     return res.status(200).send({
       success: true,
       message: "User berhasil log in",
       data,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       success: false,
       message: error.message,
@@ -121,8 +122,8 @@ const loginController = async (req, res) => {
     const data = await loginService(req);
 
     const dataToken = newDataToken(data);
-
     if (!data.verified) {
+      newCache(dataToken);
       const tokenEmail = createJWTEmail(dataToken);
       const link = linkGenerator(tokenEmail, 1);
       await emailGenerator(data, link, "verification");
@@ -135,6 +136,7 @@ const loginController = async (req, res) => {
       data,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).send({
       success: false,
       message: error.message,
@@ -193,7 +195,6 @@ const changePassword = async (req, res) => {
 
 const profilePictureController = async (req, res) => {
   try {
-    console.log(req.body);
     const data = await profilePictureService(req.body);
     return res.status(200).send(data);
   } catch (error) {

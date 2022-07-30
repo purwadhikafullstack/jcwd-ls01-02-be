@@ -38,7 +38,6 @@ const registerService = async (data) => {
     };
     [result] = await conn.query(sql, insertData);
 
-    console.log(result);
     sql = `SELECT id, username, email, verified from users where id = ?`;
     [result] = await conn.query(sql, [result.insertId]);
     // release the connection
@@ -53,7 +52,7 @@ const registerService = async (data) => {
 };
 
 const keepLoginService = async (data) => {
-  const { id } = data.user;
+  const { id } = data;
   let conn, sql, result;
   try {
     conn = await dbCon.promise().getConnection();
@@ -67,11 +66,17 @@ const keepLoginService = async (data) => {
       [result] = await conn.query(sql, id);
       finalResult = { ...result[0] };
 
-      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
+      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo, c.checkout FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
       [result] = await conn.query(sql, id);
-      finalResult = { ...finalResult, cart: [...result] };
+      result = result.map((val) => {
+        return {
+          ...val,
+          checkout: val.checkout ? true : false,
+        };
+      });
+      finalResult = { ...finalResult, cart: result };
 
-      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM products_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
+      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM product_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
       [result] = await conn.query(sql, id);
       finalResult = { ...finalResult, fav: [...result] };
 
@@ -81,7 +86,7 @@ const keepLoginService = async (data) => {
     conn.release();
     return result[0];
   } catch (error) {
-    throw new Error((error.message = "Something went wrong :("));
+    throw new Error(error.message);
   }
 };
 
@@ -151,12 +156,10 @@ const loginService = async (data) => {
       throw { message: messageError };
     }
     // cek apakah password sudah sesuai
-    console.log(result[0]);
     let hashedPassword = result[0].password;
     let match = await hashMatch(password, hashedPassword);
-    console.log(match);
     if (!match) {
-      messageError[1] = "Password yang kamu masukkan salah";
+      messageError[0] = "Password yang kamu masukan salah";
       throw { message: messageError };
     }
     const id = result[0].id;
@@ -167,11 +170,17 @@ const loginService = async (data) => {
       [result] = await conn.query(sql, id);
       finalResult = { ...result[0] };
 
-      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
+      sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo, c.checkout FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
       [result] = await conn.query(sql, id);
-      finalResult = { ...finalResult, cart: [...result] };
+      result = result.map((val) => {
+        return {
+          ...val,
+          checkout: val.checkout ? true : false,
+        };
+      });
+      finalResult = { ...finalResult, cart: result };
 
-      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM products_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
+      sql = `SELECT p.id, p.name, p.price, p.promo, p.stock, p.photo FROM product_fav f JOIN products p ON (f.product_id = p.id) WHERE f.user_id = ?`;
       [result] = await conn.query(sql, id);
       finalResult = { ...finalResult, fav: [...result] };
 
@@ -190,7 +199,6 @@ const loginService = async (data) => {
 const changePasswordService = async (data) => {
   const { id } = data.user;
   let { oldPassword, newPassword } = data.body;
-  console.log(typeof newPassword);
   let sql, conn, result;
 
   try {
@@ -232,10 +240,8 @@ const profilePictureService = async (data) => {
   // let path = "/profile-photos";
   // let pathAva = "/profile-picture";
   const { id } = data.user;
-  console.log(data);
 
   let { addPhoto, editPhoto } = data.body;
-  console.log(data);
   // kenapa data.body? kenapa tidak hanya data saja? apa perbedaannya?
 
   let sql, conn, result;

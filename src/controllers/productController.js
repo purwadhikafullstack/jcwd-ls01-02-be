@@ -66,11 +66,13 @@ const filterProductController = async (req, res) => {
       data,
     });
   } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .send({ success: false, message: error.message || error });
   }
 };
+
 module.exports = {
   fetchProductsController,
   fetchProductDetailsController,

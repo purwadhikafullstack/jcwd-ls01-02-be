@@ -1,7 +1,5 @@
 const mysql = require("mysql2");
-const { Client } = require("ssh2");
 require("dotenv").config();
-const sshClient = new Client();
 
 const host = process.env.HOST;
 const user = process.env.USER_NAME;
@@ -15,6 +13,7 @@ const db = mysql.createPool({
   database,
   port: 3306,
   connectionLimit: 10,
+  dateStrings: true,
 });
 
 db.getConnection((err, conn) => {
