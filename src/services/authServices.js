@@ -199,6 +199,7 @@ const loginService = async (data) => {
 const changePasswordService = async (data) => {
   const { id } = data.user;
   let { oldPassword, newPassword } = data.body;
+  console.log(data.body);
   let sql, conn, result;
 
   try {
@@ -210,6 +211,7 @@ const changePasswordService = async (data) => {
     const hashedPassword = result[0].password;
 
     const match = await hashMatch(oldPassword, hashedPassword);
+    console.log("match:", match);
 
     if (!match) {
       throw { message: "Incorrect Password" };

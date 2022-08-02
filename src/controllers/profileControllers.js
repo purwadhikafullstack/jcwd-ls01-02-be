@@ -11,11 +11,10 @@ const {
 const updateProfile = async (req, res) => {
   console.log(req.file);
   let path = "/profile-photos";
-  let pathAva = "/profile-picture";
   const data = JSON.parse(req.body.data);
   const { profile_picture } = req.files;
   const imagePathAva = profile_picture
-    ? `${path}${pathAva}/${profile_picture[0].filename}`
+    ? `${path}/${profile_picture[0].filename}`
     : null;
 
   if (imagePathAva) {
