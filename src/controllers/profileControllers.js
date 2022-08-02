@@ -10,12 +10,11 @@ const {
 
 const updateProfile = async (req, res) => {
   console.log(req.file);
-  let path = "/profile-photos";
   let pathAva = "/profile-picture";
   const data = JSON.parse(req.body.data);
   const { profile_picture } = req.files;
   const imagePathAva = profile_picture
-    ? `${path}${pathAva}/${profile_picture[0].filename}`
+    ? `${pathAva}/${profile_picture[0].filename}`
     : null;
 
   if (imagePathAva) {
@@ -40,14 +39,21 @@ const updateProfile = async (req, res) => {
         message: "Username has already been used! Try a different one!",
       };
     }
-    sql = `UPDATE users JOIN user_details ON (users.id = user_details.user_id) SET ? WHERE users.id = ?`;
+    // if (data.address) {
+    //   sql = `UPDATE address SET ? WHERE user_id = ? AND id = ${result.addres_id}`
+    //   await conn.query(sql, [data.id]);
+    // }
+
+    sql = `UPDATE user_details JOIN users ON (user_details.user_id = users.id) JOIN address ON (user_details.address_id = address.id)
+    SET ? WHERE user_details.user_id = ?`;
     await conn.query(sql, [data, id]);
 
     // if (imagePathAva && result[0].profile_picture) {
     //   fs.unlinkSync(`./public${result[0].profile_picture}`);
     // }
 
-    sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
+    sql = `SELECT * FROM user_details JOIN users ON (user_details.user_id = users.id) JOIN address ON (user_details.address_id = address.id)
+   WHERE user_details.user_id = ?`;
     let [result1] = await conn.query(sql, id);
     await conn.commit();
     conn.release();

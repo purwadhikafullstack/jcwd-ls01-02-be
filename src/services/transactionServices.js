@@ -258,12 +258,15 @@ const rejectOrderService = async (data) => {
 
 const confirmOrderService = async (data) => {
   console.log(data.query);
+  //   let { id, checkoutCart, transaction_code } = parsedData;
+  // const statusPrev = 4;
+  // const status = 5;
   let sql, conn;
   try {
     conn = dbCon.promise();
     sql = `SELECT * FROM orders where id = ?`;
     await conn.query(sql, [data.query.id]);
-    sql = `update orders set status = "Pesanan-Diterima" where id = ${data.query.id}`;
+    sql = `update orders set status = "Dikirim" where id = ${data.query.id}`;
     await conn.query(sql);
   } catch (error) {
     console.log(error);
