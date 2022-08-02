@@ -159,7 +159,7 @@ const loginService = async (data) => {
     let hashedPassword = result[0].password;
     let match = await hashMatch(password, hashedPassword);
     if (!match) {
-      messageError[1] = "Password yang kamu masukkan salah";
+      messageError[0] = "Password yang kamu masukan salah";
       throw { message: messageError };
     }
     const id = result[0].id;

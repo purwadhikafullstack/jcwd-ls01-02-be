@@ -6,6 +6,7 @@ const {
   codeGenerator,
   expireDateGenerator,
   expireEventGenerator,
+  dropEventGenerator,
 } = require("../lib/codeGenerator");
 const { imageProcess } = require("../lib/upload");
 
@@ -31,6 +32,11 @@ const addToCartServices = async (data) => {
         quantity,
         id,
       ]);
+      await conn.query(sql, [productId, quantity, id]);
+
+      // if (!resultInsertProduct) {
+      //   throw { message: "Produk gagal ditambahkan" };
+      // }
     } else {
       sql = `SELECT qty FROM cart WHERE user_id = ? AND product_id = ?`;
 
@@ -53,6 +59,11 @@ const addToCartServices = async (data) => {
       };
     });
     return { cart: result };
+    sql = `SELECT * FROM cart WHERE user_id = ?`;
+
+    let [resultAddtoCart] = await conn.query(sql, [id]);
+
+    return { cart: resultAddtoCart };
   } catch (error) {
     console.log(error);
     throw new Error(error.message || error);
@@ -315,6 +326,7 @@ const uploadReceipeService = async (data) => {
 
 const getUserOrdersService = async (data) => {
   const { status } = data.params;
+  const { id } = data.user;
   let { terms, sinceDate, toDate, page, limit, order } = data.query;
   console.log(data.query);
   page = parseInt(page);
@@ -324,22 +336,16 @@ const getUserOrdersService = async (data) => {
   let sql, conn;
   try {
     conn = dbCon.promise();
-    sql = `SELECT COUNT(id) as total FROM orders  
-      ${terms ? `AND name LIKE "%${terms}%"` : ""}`;
-    let [resultTotal] = await conn.query(sql);
+    sql = `SELECT COUNT(id) as total FROM orders WHERE user_id = ?`;
+    let [resultTotal] = await conn.query(sql, id);
     console.log(resultTotal);
     let total = resultTotal[0].total;
-    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE o.id > 0 
+    sql = `SELECT o.id, o.selected_address, o.payment_method, o.status, o.total_price, o.date_process, o.date_requested, o.prescription_photo, o.payment_method, o.shipping_method, o.user_id, o.transaction_code, u.username FROM orders o JOIN users u ON (o.user_id = u.id) WHERE user_id = ?
     ${status === "all" ? "" : `AND o.status = "${status}"`} 
-    ${
-      terms
-        ? `AND (u.username LIKE "%${terms}%" OR o.transaction_code LIKE "%${terms}%")`
-        : ""
-    } 
     ${sinceDate ? `AND o.date_process >= "${sinceDate}"` : ""}
     ${toDate ? `AND o.date_process <= "${toDate}"` : ""}
   ${order} LIMIT ?, ?`;
-    let [orders] = await conn.query(sql, [offset, limit]);
+    let [orders] = await conn.query(sql, [id, offset, limit]);
     let responseData = { orders, total };
     return responseData;
   } catch (error) {
@@ -354,7 +360,7 @@ const getCartPrescriptionService = async (data) => {
   try {
     conn = await dbCon.promise().getConnection();
 
-    sql = `SELECT id, status FROM orders WHERE transaction_code = ? AND user_id = ?`;
+    sql = `SELECT id, status FROM orders WHERE transaction_code = ? AND user_id = ?;`;
     let [resultId] = await conn.query(sql, [transaction_code, user_id]);
     if (!resultId.length) {
       throw { message: "Unauthorized User" };
@@ -362,12 +368,19 @@ const getCartPrescriptionService = async (data) => {
     if (resultId[0].status !== "Pesanan-Diterima") {
       throw { message: "Invalid Request" };
     }
-    const { id } = resultId[0];
+    const { id, status } = resultId[0];
 
-    sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
+    sql = `SELECT stock_id, qty FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
+    let [checkoutCart] = await conn.query(sql, id);
+
+    sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, p.berat, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
     let [cartData] = await conn.query(sql, id);
+    let totalBerat = 0;
+    for (const cart of cartData) {
+      totalBerat += cart.qty * cart.berat;
+    }
     conn.release();
-    return { cartData, id };
+    return { cartData, id, checkoutCart, status, totalBerat };
   } catch (error) {
     conn.release();
     throw new Error(error.message || error);
@@ -375,40 +388,49 @@ const getCartPrescriptionService = async (data) => {
 };
 
 const paymentMethodService = async (data) => {
-  const { selectedAddress, paymentMethod, shippingMethod, id } = data.body;
+  const {
+    selected_address,
+    payment_method,
+    shipping_method,
+    id,
+    checkoutCart,
+    total_price,
+  } = data.body;
   const statusPrev = 2;
   const status = 3;
 
-  let sql, conn, result;
-
+  let sql, conn;
   try {
     conn = await dbCon.promise().getConnection();
+
+    sql = `SELECT status FROM orders Where id = ?`;
+    let [resultStatus] = await conn.query(sql, id);
+
+    if (resultStatus[0].status === "Dibatalkan") {
+      throw { message: "Transaksi kamu sudah dibatalkan" };
+    }
 
     sql = `UPDATE orders SET ? WHERE id = ?`;
     insertData = {
       status,
       expired_at: expireDateGenerator(),
+      selected_address,
+      payment_method,
+      shipping_method,
+      total_price,
     };
     await conn.query(sql, [insertData, id]);
 
-    sql = `INSERT INTO orders SET ?`;
-    insertData = {
-      order_id: id,
-      selected_address: selectedAddress,
-      payment_method: paymentMethod,
-      shipping_method: shippingMethod,
-    };
-    await conn.query(sql, insertData);
-
-    let sqls = dropEventGenerator(statusPrev, id);
+    let sqls = dropEventGenerator(statusPrev, id, checkoutCart);
     for (const sql of sqls) {
       await conn.query(sql);
     }
 
-    sqls = expireEventGenerator(status, id);
+    sqls = expireEventGenerator(status, id, checkoutCart);
     for (const sql of sqls) {
       await conn.query(sql);
     }
+
     await conn.commit();
     conn.release();
   } catch (error) {
@@ -419,40 +441,90 @@ const paymentMethodService = async (data) => {
 };
 
 const uploadPaymentProofService = async (data) => {
-  const { id } = data.user;
-  const dataPhoto = photoNameGenerator(data.file, "/paymentproof", "PAYMENT");
+  console.log(data.body);
+  const parsedData = JSON.parse(data.body.data);
+  console.log(parsedData);
+  const { id: user_id } = data.user;
+  let { id, checkoutCart, transaction_code } = parsedData;
+  const dataPhoto = photoNameGenerator(data.file, "/payment-photo", "PAYMENT");
   console.log(dataPhoto);
+  const statusPrev = 3;
+  const status = 4;
   let conn, sql;
   try {
     conn = await dbCon.promise().getConnection();
     await conn.beginTransaction();
-    let date = dateGenerator();
-    let insertData = {
-      user_id: id,
-      payment_photo: dataPhoto.photo,
-      status: 1,
-      transaction_code: codeGenerator("PAYMENT", date, id),
-      expired_at: expireDateGenerator(1),
-    };
-    sql = `INSERT INTO orders set ?`;
-    let [result] = await conn.query(sql, insertData);
 
-    let sqls = expireEventGenerator(1, [result.insertId]);
-    console.log(sqls);
+    sql = `SELECT status FROM orders Where id = ?`;
+    let [resultStatus] = await conn.query(sql, id);
+
+    if (resultStatus[0].status === "Dibatalkan") {
+      throw { message: "Transaksi kamu sudah dibatalkan" };
+    }
+
+    sql = `SELECT id, status FROM orders WHERE transaction_code = ? AND user_id = ?;`;
+    let [resultId] = await conn.query(sql, [transaction_code, user_id]);
+    if (!resultId.length) {
+      throw { message: "Unauthorized User" };
+    }
+
+    sql = `UPDATE orders SET ? WHERE id = ?`;
+    let insertData = {
+      status,
+      payment_photo: dataPhoto.photo,
+      expired_at: expireDateGenerator(),
+    };
+    await conn.query(sql, [insertData, id]);
+
+    let sqls = dropEventGenerator(statusPrev, id, checkoutCart);
     for (const sql of sqls) {
       await conn.query(sql);
     }
 
+    sqls = expireEventGenerator(status, id, checkoutCart);
+    for (const sql of sqls) {
+      await conn.query(sql);
+    }
     await imageProcess(data.file, dataPhoto.path);
-
     await conn.commit();
     conn.release();
-    return { message: "Success to upload payment proof" };
   } catch (error) {
     console.log(error);
     await conn.rollback();
     conn.release();
     throw new Error(error.message);
+  }
+};
+
+const getOrderDetailsService = async (data) => {
+  const { transaction_code } = data.query;
+  const { id: user_id } = data.user;
+  let sql, conn, finalData;
+  try {
+    conn = await dbCon.promise().getConnection();
+
+    sql = `SELECT id, status, selected_address, payment_method, total_price, date_requested, date_process, prescription_photo, payment_photo, shipping_method, transaction_code, pesan, expired_at FROM orders WHERE transaction_code = ? AND user_id = ?;`;
+    let [dataOrder] = await conn.query(sql, [transaction_code, user_id]);
+    if (!dataOrder.length) {
+      throw { message: "Unauthorized User" };
+    }
+
+    const { id, status } = dataOrder[0];
+    finalData = { dataOrder: dataOrder[0] };
+    if (status !== "Pengecekan-Resep") {
+      sql = `SELECT DISTINCT cc.product_id, cc.price, p.photo, p.name, p.promo + cc.price as init_price, p.satuan, (SELECT SUM(cc1.qty) FROM checkout_cart cc1 WHERE cc1.product_id = cc.product_id AND cc1.order_id = cc.order_id) as qty FROM checkout_cart cc JOIN products p ON (cc.product_id = p.id) WHERE cc.order_id = ?;`;
+      [cart] = await conn.query(sql, id);
+      finalData = { ...finalData, cart };
+      sql = `SELECT stock_id, qty FROM checkout_cart WHERE qty > 0 AND order_id = ?;`;
+      let [checkoutCart] = await conn.query(sql, id);
+      finalData = { ...finalData, checkoutCart };
+    }
+
+    conn.release();
+    return finalData;
+  } catch (error) {
+    conn.release();
+    throw new Error(error.message || error);
   }
 };
 
@@ -472,4 +544,5 @@ module.exports = {
   getCartPrescriptionService,
   paymentMethodService,
   uploadPaymentProofService,
+  getOrderDetailsService,
 };

@@ -53,6 +53,7 @@ const {
   getCartPrescriptionService,
   uploadPaymentProofService,
   paymentMethodService,
+  getOrderDetailsService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -101,4 +102,5 @@ module.exports = {
   getCartPrescriptionService,
   uploadPaymentProofService,
   paymentMethodService,
+  getOrderDetailsService,
 };

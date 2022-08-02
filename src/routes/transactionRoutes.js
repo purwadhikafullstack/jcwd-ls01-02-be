@@ -13,11 +13,12 @@ const {
   getCartPrescriptionController,
   uploadPaymentProofController,
   paymentMethodController,
+  getOrderDetailsController,
 } = require("../controllers");
+
 const { verifyToken } = require("../lib");
 const Router = express.Router();
 const multer = require("multer");
-
 const storage = multer.memoryStorage();
 const uploads = multer({ storage });
 
@@ -33,19 +34,21 @@ Router.post(
 );
 Router.get("/primary-address", verifyToken, getPrimaryAddressController);
 Router.get("/all-addresses", verifyToken, getAllAddressesController);
+Router.get("/order-details", verifyToken, getOrderDetailsController);
 Router.patch("/order/reject", rejectOrderController);
 Router.patch("/order/confirm", confirmOrderController);
-Router.get("/orders/:status", getUserOrdersController);
+Router.get("/orders/:status", verifyToken, getUserOrdersController);
 Router.get(
   "/get-cart-prescription",
   verifyToken,
   getCartPrescriptionController
 );
-Router.post(
+Router.patch(
   "/upload-payment",
   uploads.single("payment_photo"),
   verifyToken,
   uploadPaymentProofController
 );
+Router.patch("/payment-method", paymentMethodController);
 
 module.exports = Router;

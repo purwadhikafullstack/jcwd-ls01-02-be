@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(cors({ exposedHeaders: ["x-token-access", "x-total-count"] }));
 
 app.get("/", (req, res) => {
-  res.status(200).send("<h1>API Backend for Bootcamp Project</h1>");
+  res.status(200).send("<h1>API Server JCWDLS001-02</h1>");
 });
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
@@ -46,3 +46,6 @@ console.log(arr);
 let newArr = 4;
 arr = [...arr, newArr];
 console.log(arr);
+app.listen(PORT, () =>
+  console.log(`API Server JCWDLS001-02 Running on Port ${PORT}`)
+);
