@@ -15,7 +15,7 @@ const addToCartServices = async (data) => {
   const { productId, quantity } = data.body;
   // console.log(data.user, ">>>>>>>>>>");
   // console.log(data.body, ">>>>>>>>>>BODYYYY");
-  let sql, conn;
+  let sql, conn, result;
 
   try {
     conn = await dbCon.promise().getConnection();
@@ -27,6 +27,11 @@ const addToCartServices = async (data) => {
     if (resultProductExist[0].product_id === 0) {
       sql = `INSERT INTO cart (product_id, qty, user_id) VALUES (?, ?, ?)`;
 
+      let resultInsertProduct = await conn.query(sql, [
+        productId,
+        quantity,
+        id,
+      ]);
       await conn.query(sql, [productId, quantity, id]);
 
       // if (!resultInsertProduct) {
@@ -44,6 +49,16 @@ const addToCartServices = async (data) => {
       await conn.query(sql, [quantity + quantityCart[0].qty, id, productId]);
       // console.log(updateQuantity, ">>>>>>>>>>>>> UPDATE QUANTITY BERHASIL");
     }
+
+    sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo, c.checkout FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
+    [result] = await conn.query(sql, id);
+    result = result.map((val) => {
+      return {
+        ...val,
+        checkout: val.checkout ? true : false,
+      };
+    });
+    return { cart: result };
     sql = `SELECT * FROM cart WHERE user_id = ?`;
 
     let [resultAddtoCart] = await conn.query(sql, [id]);
