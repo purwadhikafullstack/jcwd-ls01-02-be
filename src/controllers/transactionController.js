@@ -120,8 +120,6 @@ const getAllAddressesController = async (req, res) => {
 
 const rejectOrderController = async (req, res) => {
   try {
-    console.log("ini ya");
-    console.log(req.query.id);
     const data = await rejectOrderService(req);
     return res.status(200).send({
       success: true,

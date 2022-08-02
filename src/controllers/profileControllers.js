@@ -10,11 +10,11 @@ const {
 
 const updateProfile = async (req, res) => {
   console.log(req.file);
-  let pathAva = "/profile-picture";
+  let path = "/profile-photos";
   const data = JSON.parse(req.body.data);
   const { profile_picture } = req.files;
   const imagePathAva = profile_picture
-    ? `${pathAva}/${profile_picture[0].filename}`
+    ? `${path}/${profile_picture[0].filename}`
     : null;
 
   if (imagePathAva) {
@@ -40,8 +40,8 @@ const updateProfile = async (req, res) => {
       };
     }
     // if (data.address) {
-    //   sql = `UPDATE address SET ? WHERE user_id = ? AND id = ${result.addres_id}`
-    //   await conn.query(sql, [data.id]);
+    //   sql = `UPDATE address SET ? alamat =${data.address} WHERE user_id = ${id}`;
+    //   await conn.query(sql);
     // }
 
     sql = `UPDATE user_details JOIN users ON (user_details.user_id = users.id) JOIN address ON (user_details.address_id = address.id)
