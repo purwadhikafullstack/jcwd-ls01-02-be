@@ -255,63 +255,63 @@ const getAllTransactionService = async (data) => {
   }
 };
 // bisa cancel tapi belum pakai dropevent
-// const rejectOrderService = async (data) => {
-//   let sql, conn;
-//   try {
-//     conn = dbCon.promise();
-//     sql = `SELECT * FROM orders where id = ?`;
-//     await conn.query(sql, [data.query.id]);
-//     sql = `update orders set status = "Dibatalkan" where id = ${data.query.id}`;
-//     await conn.query(sql);
-//   } catch (error) {
-//     console.log(error);
-//     throw new Error(error.message);
-//   }
-// };
-
 const rejectOrderService = async (data) => {
-  const { checkoutCart, transaction_code } = data.body;
-  statusPrev = (status) => {
-    if (status == "PR") {
-      return 1;
-    } else if (status == "PD") {
-      return 2;
-    } else if (status == "MP") {
-      return 3;
-    } else if (status == "DP") {
-      return 4;
-    } else if (status == "DK") {
-      return 5;
-    } else if (status == "SL") {
-      return 6;
-    } else if (status == "DB") {
-      return 7;
-    }
-  };
   let sql, conn;
   try {
-    conn = await dbCon.promise().getConnection();
-    await conn.beginTransaction();
-    sql = `SELECT status, id FROM orders WHERE transaction_code = ?`;
-    let [result] = await conn.query(sql, transaction_code);
-    const { status: statusPrev, id } = result[0];
-    let sqls = dropEventGenerator(statusPrev, id, checkoutCart);
-    for (const sql of sqls) {
-      await conn.query(sql);
-    }
-    sql = `UPDATE orders SET ? WHERE id = ?`;
-    insertData = {
-      status,
-      pesan: "Pesanan dibatalkan",
-    };
-    await conn.query(sql, [insertData, id]);
+    conn = dbCon.promise();
+    sql = `SELECT * FROM orders where id = ?`;
+    await conn.query(sql, [data.query.id]);
+    sql = `update orders set status = "Dibatalkan" where id = ${data.query.id}`;
+    await conn.query(sql);
   } catch (error) {
     console.log(error);
     throw new Error(error.message);
   }
 };
 
-// // bisa confirm tapi belum pakai dropevent
+// const rejectOrderService = async (data) => {
+//   const { checkoutCart, transaction_code } = data.body;
+//   statusPrev = (status) => {
+//     if (status == "PR") {
+//       return 1;
+//     } else if (status == "PD") {
+//       return 2;
+//     } else if (status == "MP") {
+//       return 3;
+//     } else if (status == "DP") {
+//       return 4;
+//     } else if (status == "DK") {
+//       return 5;
+//     } else if (status == "SL") {
+//       return 6;
+//     } else if (status == "DB") {
+//       return 7;
+//     }
+//   };
+//   let sql, conn;
+//   try {
+//     conn = await dbCon.promise().getConnection();
+//     await conn.beginTransaction();
+//     sql = `SELECT status, id FROM orders WHERE transaction_code = ?`;
+//     let [result] = await conn.query(sql, transaction_code);
+//     const { status: statusPrev, id } = result[0];
+//     let sqls = dropEventGenerator(statusPrev, id, checkoutCart);
+//     for (const sql of sqls) {
+//       await conn.query(sql);
+//     }
+//     sql = `UPDATE orders SET ? WHERE id = ?`;
+//     insertData = {
+//       status,
+//       pesan: "Pesanan dibatalkan",
+//     };
+//     await conn.query(sql, [insertData, id]);
+//   } catch (error) {
+//     console.log(error);
+//     throw new Error(error.message);
+//   }
+// };
+
+// // bisa confirm tapi belum pakai dropevent, dan setelah proses dikirim tidak berlanjut ke berhasil
 // const confirmOrderService = async (data) => {
 //   let sql, conn;
 //   try {
@@ -326,31 +326,52 @@ const rejectOrderService = async (data) => {
 //   }
 // };
 
-// status jadi dikirim
+// status dari diproses jadi dikirim
 // nomor resi ....
 // checkoutCart
 // dropevent
 // expire event
 const confirmOrderService = async (data) => {
-  const parsedData = JSON.parse(data.body.data);
-  console.log(parsedData);
-  let { id, checkoutCart, transaction_code } = data.body;
+  const statusPrev = 4;
+  const status = 5;
+  const { transaction_code } = data.body;
   let sql, conn;
   try {
     conn = await dbCon.promise().getConnection();
     await conn.beginTransaction();
-    sql = `SELECT * FROM orders where id = ?`;
-    await conn.query(sql, [data.query.id]);
+    sql = `SELECT id, status FROM orders where transaction_code = ?`;
+    let [resultStatus] = await conn.query(sql, transaction_code);
+    let { status, id } = resultStatus[0];
 
-    let sqls = dropEventGenerator(statusPrev, id, checkoutCart);
-    for (const sql of sqls) {
-      await conn.query(sql);
+    if (resultStatus[0].status === "Dibatalkan") {
+      throw { message: "Transaksi kamu sudah dibatalkan" };
     }
-    sqls = expireEventGenerator(status, id, checkoutCart);
-    for (const sql of sqls) {
-      await conn.query(sql);
-    }
+    sql = `UPDATE orders SET ? WHERE id = ?`;
+    let insertData = {
+      status,
+      expired_at: expireDateGenerator(),
+    };
+    await conn.query(sql, [insertData, id]);
+
+    sql = `SELECT stock_id, qty FROM checkout_cart WHERE order_id = ?;`;
+    let [checkoutCart] = await conn.query(sql, id);
+
+    // let sqls = dropEventGenerator(statusPrev, id, checkoutCart);
+    // console.log(sqls);
+    // console.log({ statusPrev, id, checkoutCart });
+    // for (const sql of sqls) {
+    //   await conn.query(sql);
+    // }
+    // sqls = expireEventGenerator(status, id, checkoutCart);
+    // console.log(sqls);
+    // for (const sql of sqls) {
+    //   await conn.query(sql);
+    // }
+    await conn.commit();
+    conn.release();
   } catch (error) {
+    await conn.rollback();
+    conn.release();
     console.log(error);
     throw new Error(error.message);
   }
