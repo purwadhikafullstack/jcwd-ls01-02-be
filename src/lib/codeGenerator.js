@@ -14,9 +14,10 @@ const dateGenerator = (full) => {
   return `${year}-${month}-${date} ${hours}:${minutes}`;
 };
 
-const expireDateGenerator = () => {
+const expireDateGenerator = (time) => {
+  let timer = time ? time : 1;
   const date = new Date();
-  date.setDate(date.getDate() + 1);
+  date.setDate(date.getDate() + timer);
   return date;
 };
 
@@ -82,7 +83,7 @@ const expireEventGenerator = (status, id, carts) => {
       result = [
         `CREATE EVENT IF NOT EXISTS deadline_pembayaran_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE orders SET status = 7, pesan = "Kamu tidak membayar transaksi sebelum batas waktu yang telah ditentukan" WHERE id = ${id};`,
       ];
-      for (let i = 0; i < carts[i].length; i++) {
+      for (let i = 0; i < carts.length; i++) {
         result = [
           ...result,
           `CREATE EVENT IF NOT EXISTS deadline_pembayaran_${id}_${i} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE product_stock SET stock = stock + ${carts[i].qty} WHERE id = ${carts[i].stock_id};`,
@@ -93,7 +94,7 @@ const expireEventGenerator = (status, id, carts) => {
       result = [
         `CREATE EVENT IF NOT EXISTS deadline_proses_pesanan_${id} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE orders SET status = 7, pesan = "Admin tidak dapat memproses pesanan kamu" WHERE id = ${id};`,
       ];
-      for (let i = 0; i < carts[i].length; i++) {
+      for (let i = 0; i < carts.length; i++) {
         result = [
           ...result,
           `CREATE EVENT IF NOT EXISTS deadline_proses_pesanan_${id}_${i} ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DO UPDATE product_stock SET stock = stock + ${carts[i].qty} WHERE id = ${carts[i].stock_id};`,

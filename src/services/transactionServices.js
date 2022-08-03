@@ -15,7 +15,7 @@ const addToCartServices = async (data) => {
   const { productId, quantity } = data.body;
   // console.log(data.user, ">>>>>>>>>>");
   // console.log(data.body, ">>>>>>>>>>BODYYYY");
-  let sql, conn;
+  let sql, conn, result;
 
   try {
     conn = await dbCon.promise().getConnection();
@@ -27,6 +27,11 @@ const addToCartServices = async (data) => {
     if (resultProductExist[0].product_id === 0) {
       sql = `INSERT INTO cart (product_id, qty, user_id) VALUES (?, ?, ?)`;
 
+      let resultInsertProduct = await conn.query(sql, [
+        productId,
+        quantity,
+        id,
+      ]);
       await conn.query(sql, [productId, quantity, id]);
 
       // if (!resultInsertProduct) {
@@ -44,6 +49,16 @@ const addToCartServices = async (data) => {
       await conn.query(sql, [quantity + quantityCart[0].qty, id, productId]);
       // console.log(updateQuantity, ">>>>>>>>>>>>> UPDATE QUANTITY BERHASIL");
     }
+
+    sql = `SELECT c.qty, p.id, p.name, p.price, p.promo, p.stock, p.photo, c.checkout FROM cart c JOIN products p ON (c.product_id = p.id) WHERE c.user_id = ?`;
+    [result] = await conn.query(sql, id);
+    result = result.map((val) => {
+      return {
+        ...val,
+        checkout: val.checkout ? true : false,
+      };
+    });
+    return { cart: result };
     sql = `SELECT * FROM cart WHERE user_id = ?`;
 
     let [resultAddtoCart] = await conn.query(sql, [id]);
@@ -106,7 +121,7 @@ const deleteProductCartServices = async (data, user) => {
   try {
     conn = await dbCon.promise().getConnection();
 
-    sql = `DELETE FROM cart WHERE user_id = ? AND id = ?`;
+    sql = `DELETE FROM cart WHERE user_id = ? AND product_id = ?`;
     let [deleteProduct] = await conn.query(sql, [user, data]);
 
     sql = `SELECT * FROM cart WHERE user_id = ?`;
@@ -174,60 +189,6 @@ const getAllAddressesService = async (data) => {
   }
 };
 
-const paymentPhotoService = async (req, res) => {
-  let path = "/payment";
-  let pathAva = "/payment-photo";
-  const data = JSON.parse(req.body.data);
-  const { payment_photo } = req.files;
-  const imagePathAva = payment_photo
-    ? `${path}${pathAva}/${payment_photo[0].filename}`
-    : null;
-
-  if (imagePathAva) {
-    data.payment_photo = imagePathAva;
-  }
-
-  const { id } = req.user;
-  let conn, sql;
-  try {
-    conn = await dbCon.promise().getConnection();
-    await conn.beginTransaction();
-    sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
-    let [result] = await conn.query(sql, [id]);
-    if (!result.length) {
-      throw { message: "id not found" };
-    }
-    // sql = `SELECT id FROM users WHERE username = ?`;
-    // let [usernameFound] = await conn.query(sql, data.username);
-    // // error jika tidak unique
-    // if (usernameFound.length && usernameFound[0].id !== id) {
-    //   throw {
-    //     message: "Username has already been used! Try a different one!",
-    //   };
-    // }
-    sql = `UPDATE users JOIN user_details ON (users.id = user_details.user_id) SET ? WHERE users.id = ?`;
-    await conn.query(sql, [data, id]);
-
-    if (imagePathAva && result[0].payment_photo) {
-      fs.unlinkSync(`./public${result[0].payment_photo}`);
-    }
-
-    sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
-    let [result1] = await conn.query(sql, id);
-    await conn.commit();
-    conn.release();
-    return res.status(200).send(result1[0]);
-  } catch (error) {
-    if (imagePathAva) {
-      fs.unlinkSync("./public" + imagePathAva);
-    }
-    conn.rollback();
-    conn.release();
-    console.log(error);
-    return res.status(500).send({ message: error.message || error });
-  }
-};
-
 const getAllTransactionService = async (data) => {
   let conn, sql;
 
@@ -239,10 +200,8 @@ const getAllTransactionService = async (data) => {
     throw new Error(error.message);
   }
 };
-
+// bisa cancel tapi belum pakai dropevent
 const rejectOrderService = async (data) => {
-  console.log(data.query);
-
   let sql, conn;
   try {
     conn = dbCon.promise();
@@ -257,15 +216,32 @@ const rejectOrderService = async (data) => {
 };
 
 const confirmOrderService = async (data) => {
-  console.log(data.query);
+  const statusPrev = 4;
+  const status = 5;
+  const { transaction_code } = data.body;
   let sql, conn;
   try {
-    conn = dbCon.promise();
-    sql = `SELECT * FROM orders where id = ?`;
-    await conn.query(sql, [data.query.id]);
-    sql = `update orders set status = "Pesanan-Diterima" where id = ${data.query.id}`;
-    await conn.query(sql);
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+    sql = `SELECT id, status FROM orders where transaction_code = ?`;
+    let [resultStatus] = await conn.query(sql, transaction_code);
+    let { id } = resultStatus[0];
+
+    if (resultStatus[0].status === "Dibatalkan") {
+      throw { message: "Transaksi kamu sudah dibatalkan" };
+    }
+    sql = `UPDATE orders SET ? WHERE id = ?`;
+    let insertData = {
+      status,
+      expired_at: expireDateGenerator(7),
+    };
+    await conn.query(sql, [insertData, id]);
+
+    await conn.commit();
+    conn.release();
   } catch (error) {
+    await conn.rollback();
+    conn.release();
     console.log(error);
     throw new Error(error.message);
   }
@@ -381,6 +357,7 @@ const paymentMethodService = async (data) => {
     checkoutCart,
     total_price,
   } = data.body;
+  console.log(data.body);
   const statusPrev = 2;
   const status = 3;
 
@@ -426,13 +403,10 @@ const paymentMethodService = async (data) => {
 };
 
 const uploadPaymentProofService = async (data) => {
-  console.log(data.body);
   const parsedData = JSON.parse(data.body.data);
-  console.log(parsedData);
   const { id: user_id } = data.user;
   let { id, checkoutCart, transaction_code } = parsedData;
   const dataPhoto = photoNameGenerator(data.file, "/payment-photo", "PAYMENT");
-  console.log(dataPhoto);
   const statusPrev = 3;
   const status = 4;
   let conn, sql;
@@ -513,6 +487,33 @@ const getOrderDetailsService = async (data) => {
   }
 };
 
+const orderReceivedService = async (data) => {
+  const status = 6;
+  const { transaction_code } = data.body;
+  let sql, conn;
+  try {
+    conn = await dbCon.promise().getConnection();
+    await conn.beginTransaction();
+    sql = `SELECT id, status FROM orders where transaction_code = ?`;
+    let [resultStatus] = await conn.query(sql, transaction_code);
+    let { id } = resultStatus[0];
+
+    sql = `UPDATE orders SET ? WHERE id = ?`;
+    let insertData = {
+      status,
+    };
+    await conn.query(sql, [insertData, id]);
+
+    await conn.commit();
+    conn.release();
+  } catch (error) {
+    await conn.rollback();
+    conn.release();
+    console.log(error);
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   getPrimaryAddressService,
   getAllAddressesService,
@@ -520,7 +521,6 @@ module.exports = {
   getCartServices,
   editQuantityonCartServices,
   deleteProductCartServices,
-  paymentPhotoService,
   rejectOrderService,
   confirmOrderService,
   getAllTransactionService,
@@ -530,4 +530,5 @@ module.exports = {
   paymentMethodService,
   uploadPaymentProofService,
   getOrderDetailsService,
+  orderReceivedService,
 };

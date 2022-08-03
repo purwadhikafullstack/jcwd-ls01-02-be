@@ -9,29 +9,31 @@ const {
 } = require("../services");
 
 const updateProfile = async (req, res) => {
-  console.log(req.file);
+  console.log(req.files);
   let path = "/profile-photos";
-  let pathAva = "/profile-picture";
   const data = JSON.parse(req.body.data);
   const { profile_picture } = req.files;
   const imagePathAva = profile_picture
-    ? `${path}${pathAva}/${profile_picture[0].filename}`
+    ? `${path}/${profile_picture[0].filename}`
     : null;
 
   if (imagePathAva) {
     data.profile_picture = imagePathAva;
   }
+  console.log(data);
 
   const { id } = req.user;
   let conn, sql;
   try {
     conn = await dbCon.promise().getConnection();
     await conn.beginTransaction();
+
     sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
     let [result] = await conn.query(sql, [id]);
     if (!result.length) {
       throw { message: "id not found" };
     }
+
     sql = `SELECT id FROM users WHERE username = ?`;
     let [usernameFound] = await conn.query(sql, data.username);
     // error jika tidak unique
@@ -40,6 +42,9 @@ const updateProfile = async (req, res) => {
         message: "Username has already been used! Try a different one!",
       };
     }
+
+    // sql = `UPDATE user_details JOIN users ON (user_details.user_id = users.id) JOIN address ON (user_details.address_id = address.id)
+    // SET ? WHERE user_details.user_id = ?`;
     sql = `UPDATE users JOIN user_details ON (users.id = user_details.user_id) SET ? WHERE users.id = ?`;
     await conn.query(sql, [data, id]);
 
@@ -47,8 +52,10 @@ const updateProfile = async (req, res) => {
     //   fs.unlinkSync(`./public${result[0].profile_picture}`);
     // }
 
-    sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
+    sql = `SELECT * FROM user_details JOIN users ON (user_details.user_id = users.id) JOIN address ON (user_details.address_id = address.id)
+   WHERE users.id = ?`;
     let [result1] = await conn.query(sql, id);
+    console.log(result1);
     await conn.commit();
     conn.release();
     return res.status(200).send(result1[0]);

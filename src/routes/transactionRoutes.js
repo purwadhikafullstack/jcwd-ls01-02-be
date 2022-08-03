@@ -14,6 +14,7 @@ const {
   uploadPaymentProofController,
   paymentMethodController,
   getOrderDetailsController,
+  orderReceivedController,
 } = require("../controllers");
 
 const { verifyToken } = require("../lib");
@@ -50,5 +51,6 @@ Router.patch(
   uploadPaymentProofController
 );
 Router.patch("/payment-method", paymentMethodController);
+Router.patch("/order-received", orderReceivedController);
 
 module.exports = Router;
