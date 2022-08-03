@@ -120,8 +120,6 @@ const getAllAddressesController = async (req, res) => {
 
 const rejectOrderController = async (req, res) => {
   try {
-    console.log("ini ya");
-    console.log(req.query.id);
     const data = await rejectOrderService(req);
     return res.status(200).send({
       success: true,
@@ -136,11 +134,10 @@ const rejectOrderController = async (req, res) => {
 
 const confirmOrderController = async (req, res) => {
   try {
-    const data = await confirmOrderService(req);
+    await confirmOrderService(req);
     return res.status(200).send({
       success: true,
       message: "Transaksi Diterima",
-      data,
     });
   } catch (error) {
     console.log(error);
