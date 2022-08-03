@@ -396,6 +396,7 @@ const paymentMethodService = async (data) => {
     checkoutCart,
     total_price,
   } = data.body;
+  console.log(data.body);
   const statusPrev = 2;
   const status = 3;
 
