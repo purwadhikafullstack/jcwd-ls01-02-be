@@ -14,9 +14,10 @@ const dateGenerator = (full) => {
   return `${year}-${month}-${date} ${hours}:${minutes}`;
 };
 
-const expireDateGenerator = () => {
+const expireDateGenerator = (time) => {
+  let timer = time ? time : 1;
   const date = new Date();
-  date.setDate(date.getDate() + 1);
+  date.setDate(date.getDate() + timer);
   return date;
 };
 

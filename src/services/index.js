@@ -54,6 +54,7 @@ const {
   uploadPaymentProofService,
   paymentMethodService,
   getOrderDetailsService,
+  orderReceivedService,
 } = require("./transactionServices");
 
 module.exports = {
@@ -103,4 +104,5 @@ module.exports = {
   uploadPaymentProofService,
   paymentMethodService,
   getOrderDetailsService,
+  orderReceivedService,
 };

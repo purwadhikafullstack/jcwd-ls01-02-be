@@ -59,6 +59,7 @@ const {
   uploadPaymentProofController,
   paymentMethodController,
   getOrderDetailsController,
+  orderReceivedController,
 } = require("./transactionController");
 
 module.exports = {
@@ -111,4 +112,5 @@ module.exports = {
   uploadPaymentProofController,
   paymentMethodController,
   getOrderDetailsController,
+  orderReceivedController,
 };

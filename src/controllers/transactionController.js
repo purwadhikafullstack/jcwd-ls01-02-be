@@ -13,6 +13,7 @@ const {
   uploadPaymentProofService,
   paymentMethodService,
   getOrderDetailsService,
+  orderReceivedService,
 } = require("../services");
 
 const addToCartController = async (req, res) => {
@@ -222,6 +223,21 @@ const getOrderDetailsController = async (req, res) => {
   }
 };
 
+const orderReceivedController = async (req, res) => {
+  try {
+    await orderReceivedService(req);
+    return res.status(200).send({
+      success: true,
+      message: "Data detail order",
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .send({ success: false, message: error.message || error });
+  }
+};
+
 module.exports = {
   uploadReceipeController,
   rejectOrderController,
@@ -235,4 +251,5 @@ module.exports = {
   uploadPaymentProofController,
   paymentMethodController,
   getOrderDetailsController,
+  orderReceivedController,
 };

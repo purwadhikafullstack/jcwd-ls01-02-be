@@ -389,8 +389,6 @@ const deleteProductService = async (data) => {
   let conn, sql;
   try {
     conn = await dbCon.promise().getConnection();
-    sql = `SELECT * from products where id = ?`;
-    await conn.query(sql, [data.query.id]);
     sql = `DELETE FROM products where id = ${data.query.id}`;
     await conn.query(sql);
     sql = `SELECT * from products`;
