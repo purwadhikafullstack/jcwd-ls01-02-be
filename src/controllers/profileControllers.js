@@ -39,14 +39,21 @@ const updateProfile = async (req, res) => {
         message: "Username has already been used! Try a different one!",
       };
     }
-    sql = `UPDATE users JOIN user_details ON (users.id = user_details.user_id) SET ? WHERE users.id = ?`;
+    // if (data.address) {
+    //   sql = `UPDATE address SET ? alamat =${data.address} WHERE user_id = ${id}`;
+    //   await conn.query(sql);
+    // }
+
+    sql = `UPDATE user_details JOIN users ON (user_details.user_id = users.id) JOIN address ON (user_details.address_id = address.id)
+    SET ? WHERE user_details.user_id = ?`;
     await conn.query(sql, [data, id]);
 
     // if (imagePathAva && result[0].profile_picture) {
     //   fs.unlinkSync(`./public${result[0].profile_picture}`);
     // }
 
-    sql = `SELECT * FROM users JOIN user_details ON (users.id = user_details.user_id) WHERE users.id = ?`;
+    sql = `SELECT * FROM user_details JOIN users ON (user_details.user_id = users.id) JOIN address ON (user_details.address_id = address.id)
+   WHERE user_details.user_id = ?`;
     let [result1] = await conn.query(sql, id);
     await conn.commit();
     conn.release();
